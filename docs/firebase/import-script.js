@@ -12,7 +12,7 @@ const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
 
 // Inicializar la app con credenciales
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -45,7 +45,7 @@ async function importData() {
       genero: usuario.genero,
       estado_cuenta: usuario.estado_cuenta,
       create_at: toTimestamp(usuario.create_at),
-      update_at: toTimestamp(usuario.update_at)
+      update_at: toTimestamp(usuario.update_at),
     });
   }
 
@@ -54,7 +54,7 @@ async function importData() {
   for (const tag of data.tags) {
     const tagRef = db.collection('tags').doc(tag.ID.toString());
     batch.set(tagRef, {
-      nombre: tag.nombre
+      nombre: tag.nombre,
     });
   }
 
@@ -63,7 +63,7 @@ async function importData() {
   for (const rol of data.roles) {
     const rolRef = db.collection('roles').doc(rol.ID.toString());
     batch.set(rolRef, {
-      nombre: rol.nombre
+      nombre: rol.nombre,
     });
   }
 
@@ -72,7 +72,7 @@ async function importData() {
   for (const rol of data.roles_comunidades) {
     const rolRef = db.collection('roles_comunidades').doc(rol.ID.toString());
     batch.set(rolRef, {
-      nombre: rol.nombre
+      nombre: rol.nombre,
     });
   }
 
@@ -88,7 +88,7 @@ async function importData() {
       creador_id: comunidad.creador_id?.toString(),
       ubicacion: comunidad.ubicacion,
       create_at: toTimestamp(comunidad.create_at),
-      update_at: toTimestamp(comunidad.update_at)
+      update_at: toTimestamp(comunidad.update_at),
     });
   }
 
@@ -113,7 +113,7 @@ async function importData() {
         estado: reporte.estado,
         estado_seguimiento: reporte.estado_seguimiento,
         create_at: toTimestamp(reporte.create_at),
-        update_at: toTimestamp(reporte.update_at)
+        update_at: toTimestamp(reporte.update_at),
       });
     }
 
@@ -133,7 +133,7 @@ async function importData() {
         cover: actividad.cover,
         fecha: toTimestamp(actividad.fecha),
         create_at: toTimestamp(actividad.create_at),
-        update_at: toTimestamp(actividad.update_at)
+        update_at: toTimestamp(actividad.update_at),
       });
     }
 
@@ -147,14 +147,15 @@ async function importData() {
     console.log('Importando comentarios...');
     for (const comentario of data.comentarios) {
       if (comentario.actividades_Id) {
-        const comentarioRef = db.collection('actividades')
-                              .doc(comentario.actividades_Id.toString())
-                              .collection('comentarios')
-                              .doc(comentario.ID.toString());
+        const comentarioRef = db
+          .collection('actividades')
+          .doc(comentario.actividades_Id.toString())
+          .collection('comentarios')
+          .doc(comentario.ID.toString());
         batch3.set(comentarioRef, {
           autor_id: comentario.autor_id?.toString(),
           contenido: comentario.contenido,
-          fecha_comentario: toTimestamp(comentario.fecha_comentario)
+          fecha_comentario: toTimestamp(comentario.fecha_comentario),
         });
       }
     }
@@ -163,12 +164,13 @@ async function importData() {
     console.log('Importando fotos de reportes...');
     for (const foto of data.fotos) {
       if (foto.reports_id) {
-        const fotoRef = db.collection('reports')
-                        .doc(foto.reports_id.toString())
-                        .collection('fotos')
-                        .doc(foto.ID.toString());
+        const fotoRef = db
+          .collection('reports')
+          .doc(foto.reports_id.toString())
+          .collection('fotos')
+          .doc(foto.ID.toString());
         batch3.set(fotoRef, {
-          image: foto.image
+          image: foto.image,
         });
       }
     }
@@ -185,7 +187,7 @@ async function importData() {
       const relRef = db.collection('reports_tags').doc(`rel_${index}`);
       batch4.set(relRef, {
         reports_id: rel.reports_id.toString(),
-        tag_id: rel.tag_id.toString()
+        tag_id: rel.tag_id.toString(),
       });
     }
 
@@ -195,7 +197,7 @@ async function importData() {
       const relRef = db.collection('comunidad_tags').doc(`rel_${index}`);
       batch4.set(relRef, {
         comunidad_id: rel.comunidad_id.toString(),
-        tag_id: rel.tag_id.toString()
+        tag_id: rel.tag_id.toString(),
       });
     }
 
@@ -213,7 +215,7 @@ async function importData() {
         usuario_id: rel.usuario_id.toString(),
         comunidad_id: rel.comunidad_id.toString(),
         rol_id: rel.rol_id.toString(),
-        fecha_asignacion: toTimestamp(rel.fecha_asignacion)
+        fecha_asignacion: toTimestamp(rel.fecha_asignacion),
       });
     }
 
@@ -221,12 +223,13 @@ async function importData() {
     console.log('Importando galería de comunidad...');
     for (const foto of data.galeria_comunidad) {
       if (foto.comunidad_id) {
-        const fotoRef = db.collection('comunidades')
-                        .doc(foto.comunidad_id.toString())
-                        .collection('galeria')
-                        .doc(foto.ID.toString());
+        const fotoRef = db
+          .collection('comunidades')
+          .doc(foto.comunidad_id.toString())
+          .collection('galeria')
+          .doc(foto.ID.toString());
         batch5.set(fotoRef, {
-          imagen: foto.imagen
+          imagen: foto.imagen,
         });
       }
     }
@@ -237,7 +240,7 @@ async function importData() {
       const relRef = db.collection('me_encanta').doc(`rel_${index}`);
       batch5.set(relRef, {
         usuario_id: rel.usuario_id.toString(),
-        reports_id: rel.reports_id.toString()
+        reports_id: rel.reports_id.toString(),
       });
     }
 
@@ -247,7 +250,7 @@ async function importData() {
       const relRef = db.collection('follows').doc(`rel_${index}`);
       batch5.set(relRef, {
         usuario_id: rel.usuario_id.toString(),
-        comunidad_id: rel.comunidad_id.toString()
+        comunidad_id: rel.comunidad_id.toString(),
       });
     }
 
@@ -255,10 +258,11 @@ async function importData() {
     console.log('Importando seguimiento de reportes...');
     for (const seguimiento of data.seguimiento_reportes) {
       if (seguimiento.reporte_id) {
-        const seguimientoRef = db.collection('reports')
-                              .doc(seguimiento.reporte_id.toString())
-                              .collection('seguimiento')
-                              .doc(seguimiento.ID.toString());
+        const seguimientoRef = db
+          .collection('reports')
+          .doc(seguimiento.reporte_id.toString())
+          .collection('seguimiento')
+          .doc(seguimiento.ID.toString());
         batch5.set(seguimientoRef, {
           usuario_id: seguimiento.usuario_id.toString(),
           estado_anterior: seguimiento.estado_anterior,
@@ -270,7 +274,7 @@ async function importData() {
           prioridad: seguimiento.prioridad,
           create_at: toTimestamp(seguimiento.create_at),
           update_at: toTimestamp(seguimiento.update_at),
-          imagen: seguimiento.imagen
+          imagen: seguimiento.imagen,
         });
       }
     }

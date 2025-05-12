@@ -3,6 +3,7 @@
 ## Colecciones principales
 
 ### usuarios
+
 ```
 usuarios/{userId}
 {
@@ -16,9 +17,11 @@ usuarios/{userId}
   update_at: timestamp
 }
 ```
+
 Nota: Las contraseñas no se almacenan en Firestore, se manejan a través del sistema de autenticación de Firebase.
 
 ### comunidades
+
 ```
 comunidades/{comunidadId}
 {
@@ -34,6 +37,7 @@ comunidades/{comunidadId}
 ```
 
 ### reports
+
 ```
 reports/{reportId}
 {
@@ -50,6 +54,7 @@ reports/{reportId}
 ```
 
 ### actividades
+
 ```
 actividades/{actividadId}
 {
@@ -69,6 +74,7 @@ actividades/{actividadId}
 ```
 
 ### tags
+
 ```
 tags/{tagId}
 {
@@ -77,6 +83,7 @@ tags/{tagId}
 ```
 
 ### roles
+
 ```
 roles/{rolId}
 {
@@ -85,6 +92,7 @@ roles/{rolId}
 ```
 
 ### roles_comunidades
+
 ```
 roles_comunidades/{rolId}
 {
@@ -95,6 +103,7 @@ roles_comunidades/{rolId}
 ## Subcolecciones
 
 ### Comentarios de actividades
+
 ```
 actividades/{actividadId}/comentarios/{comentarioId}
 {
@@ -105,6 +114,7 @@ actividades/{actividadId}/comentarios/{comentarioId}
 ```
 
 ### Fotos de reportes
+
 ```
 reports/{reportId}/fotos/{fotoId}
 {
@@ -113,6 +123,7 @@ reports/{reportId}/fotos/{fotoId}
 ```
 
 ### Seguimiento de reportes
+
 ```
 reports/{reportId}/seguimiento/{seguimientoId}
 {
@@ -131,6 +142,7 @@ reports/{reportId}/seguimiento/{seguimientoId}
 ```
 
 ### Galería de comunidad
+
 ```
 comunidades/{comunidadId}/galeria/{fotoId}
 {
@@ -141,6 +153,7 @@ comunidades/{comunidadId}/galeria/{fotoId}
 ## Colecciones para relaciones
 
 ### usuarios_roles
+
 ```
 usuarios_roles/{docId}
 {
@@ -150,6 +163,7 @@ usuarios_roles/{docId}
 ```
 
 ### comunidad_tags
+
 ```
 comunidad_tags/{docId}
 {
@@ -159,6 +173,7 @@ comunidad_tags/{docId}
 ```
 
 ### reports_tags
+
 ```
 reports_tags/{docId}
 {
@@ -168,6 +183,7 @@ reports_tags/{docId}
 ```
 
 ### usuarios_comunidades_roles
+
 ```
 usuarios_comunidades_roles/{docId}
 {
@@ -179,6 +195,7 @@ usuarios_comunidades_roles/{docId}
 ```
 
 ### me_encanta
+
 ```
 me_encanta/{docId}
 {
@@ -188,6 +205,7 @@ me_encanta/{docId}
 ```
 
 ### follows
+
 ```
 follows/{docId}
 {
