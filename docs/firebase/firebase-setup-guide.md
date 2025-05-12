@@ -25,14 +25,14 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:3000/api', // Mantener para compatibilidad
   firebaseConfig: {
-    apiKey: "TU_API_KEY",
-    authDomain: "tu-proyecto.firebaseapp.com",
-    projectId: "tu-proyecto",
-    storageBucket: "tu-proyecto.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID",
-    measurementId: "TU_MEASUREMENT_ID" // Opcional, para Google Analytics
-  }
+    apiKey: 'TU_API_KEY',
+    authDomain: 'tu-proyecto.firebaseapp.com',
+    projectId: 'tu-proyecto',
+    storageBucket: 'tu-proyecto.appspot.com',
+    messagingSenderId: 'TU_SENDER_ID',
+    appId: 'TU_APP_ID',
+    measurementId: 'TU_MEASUREMENT_ID', // Opcional, para Google Analytics
+  },
 };
 ```
 
@@ -45,16 +45,19 @@ Puedes importar los datos JSON a Firestore de varias maneras:
 Puedes usar el SDK Admin de Firebase para nodejs para crear un script que importe tus datos:
 
 1. Instala las herramientas de Firebase CLI:
+
 ```bash
 npm install -g firebase-tools
 ```
 
 2. Inicia sesión en Firebase:
+
 ```bash
 firebase login
 ```
 
 3. Inicializa el proyecto Firebase en tu directorio:
+
 ```bash
 firebase init
 ```
@@ -68,7 +71,7 @@ const serviceAccount = require('./path/to/serviceAccountKey.json');
 const data = require('./docs/firebase/reponse.json');
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -77,31 +80,37 @@ const db = admin.firestore();
 async function importData() {
   // Convertir usuarios a estructura de Firestore
   for (const usuario of data.usuarios) {
-    await db.collection('usuarios').doc(usuario.ID.toString()).set({
-      nombre_usuario: usuario.nombre_usuario,
-      email: usuario.email,
-      foto_perfil: usuario.foto_perfil,
-      fecha_nacimiento: admin.firestore.Timestamp.fromDate(new Date(usuario.fecha_nacimiento)),
-      genero: usuario.genero,
-      estado_cuenta: usuario.estado_cuenta,
-      create_at: admin.firestore.Timestamp.fromDate(new Date(usuario.create_at)),
-      update_at: admin.firestore.Timestamp.fromDate(new Date(usuario.update_at))
-    });
+    await db
+      .collection('usuarios')
+      .doc(usuario.ID.toString())
+      .set({
+        nombre_usuario: usuario.nombre_usuario,
+        email: usuario.email,
+        foto_perfil: usuario.foto_perfil,
+        fecha_nacimiento: admin.firestore.Timestamp.fromDate(new Date(usuario.fecha_nacimiento)),
+        genero: usuario.genero,
+        estado_cuenta: usuario.estado_cuenta,
+        create_at: admin.firestore.Timestamp.fromDate(new Date(usuario.create_at)),
+        update_at: admin.firestore.Timestamp.fromDate(new Date(usuario.update_at)),
+      });
     console.log(`Importado usuario ${usuario.ID}`);
   }
 
   // Importar comunidades
   for (const comunidad of data.comunidades) {
-    await db.collection('comunidades').doc(comunidad.ID.toString()).set({
-      nombre: comunidad.nombre,
-      descripcion: comunidad.descripcion,
-      logo: comunidad.logo,
-      cover: comunidad.cover,
-      creador_id: comunidad.creador_id.toString(),
-      ubicacion: comunidad.ubicacion,
-      create_at: admin.firestore.Timestamp.fromDate(new Date(comunidad.create_at)),
-      update_at: admin.firestore.Timestamp.fromDate(new Date(comunidad.update_at))
-    });
+    await db
+      .collection('comunidades')
+      .doc(comunidad.ID.toString())
+      .set({
+        nombre: comunidad.nombre,
+        descripcion: comunidad.descripcion,
+        logo: comunidad.logo,
+        cover: comunidad.cover,
+        creador_id: comunidad.creador_id.toString(),
+        ubicacion: comunidad.ubicacion,
+        create_at: admin.firestore.Timestamp.fromDate(new Date(comunidad.create_at)),
+        update_at: admin.firestore.Timestamp.fromDate(new Date(comunidad.update_at)),
+      });
     console.log(`Importada comunidad ${comunidad.ID}`);
   }
 
@@ -114,6 +123,7 @@ importData().catch(console.error);
 ```
 
 5. Ejecuta el script:
+
 ```bash
 node import-data.js
 ```

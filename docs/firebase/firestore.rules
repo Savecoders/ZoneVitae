@@ -1,0 +1,169 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Comprobar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Comprobar si el ID del usuario coincide con el documento que intenta acceder
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Comprobar si el usuario es administrador (rol = 1) de una comunidad
+    function isCommunityAdmin(communityId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)) &&
+        get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)).data.rol_id == '1';
+    }
+
+    // Comprobar si el usuario es moderador (rol = 3) de una comunidad
+    function isCommunityModerator(communityId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)) &&
+        get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)).data.rol_id == '3';
+    }
+
+    // Comprobar si el usuario es miembro (rol = 2) o tiene un rol superior en una comunidad
+    function isCommunityMember(communityId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId));
+    }
+
+    // Reglas para usuarios
+    match /usuarios/{userId} {
+      // Todos pueden leer perfiles públicos, solo el propietario puede escribir/actualizar
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isOwner(userId);
+    }
+
+    // Reglas para comunidades
+    match /comunidades/{communityId} {
+      // Comunidades públicas pueden ser leídas por todos, creadas por usuarios autenticados
+      // y actualizadas/eliminadas por administradores
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isCommunityAdmin(communityId);
+      allow delete: if isCommunityAdmin(communityId);
+
+      // Subcolección de galería
+      match /galeria/{imageId} {
+        allow read: if true;
+        allow create: if isCommunityMember(communityId);
+        allow update, delete: if isCommunityAdmin(communityId) || isCommunityModerator(communityId);
+      }
+    }
+
+    // Reglas para reportes
+    match /reports/{reportId} {
+      // Reportes públicos pueden ser leídos por miembros de la comunidad, creados por usuarios autenticados
+      // y administrados por moderadores/administradores
+      allow read: if true;
+      allow create: if isAuthenticated();
+
+      // Solo administradores y moderadores de la comunidad pueden actualizar el estado
+      allow update: if isAuthenticated() &&
+        (resource.data.autor_id == request.auth.uid ||
+         isCommunityAdmin(resource.data.comunidad_id) ||
+         isCommunityModerator(resource.data.comunidad_id));
+
+      allow delete: if isCommunityAdmin(resource.data.comunidad_id);
+
+      // Subcolección de fotos
+      match /fotos/{photoId} {
+        allow read: if true;
+        allow create: if isAuthenticated() && resource.data.autor_id == request.auth.uid;
+        allow update, delete: if isAuthenticated() && resource.data.autor_id == request.auth.uid;
+      }
+
+      // Subcolección de seguimientos
+      match /seguimiento/{followupId} {
+        allow read: if true;
+        allow create: if isCommunityAdmin(get(/databases/$(database)/documents/reports/$(reportId)).data.comunidad_id) ||
+                      isCommunityModerator(get(/databases/$(database)/documents/reports/$(reportId)).data.comunidad_id);
+        allow update, delete: if isCommunityAdmin(get(/databases/$(database)/documents/reports/$(reportId)).data.comunidad_id);
+      }
+    }
+
+    // Reglas para actividades
+    match /actividades/{activityId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() &&
+        (resource.data.comunidad_id == null ||
+         isCommunityAdmin(resource.data.comunidad_id) ||
+         isCommunityModerator(resource.data.comunidad_id));
+
+      // Subcolección de comentarios
+      match /comentarios/{commentId} {
+        allow read: if true;
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated() && resource.data.autor_id == request.auth.uid;
+        allow delete: if isAuthenticated() &&
+          (resource.data.autor_id == request.auth.uid ||
+           isCommunityAdmin(get(/databases/$(database)/documents/actividades/$(activityId)).data.comunidad_id) ||
+           isCommunityModerator(get(/databases/$(database)/documents/actividades/$(activityId)).data.comunidad_id));
+      }
+    }
+
+    // Reglas para tags
+    match /tags/{tagId} {
+      allow read: if true;
+      allow create, update, delete: if isAuthenticated();
+    }
+
+    // Reglas para roles
+    match /roles/{roleId} {
+      allow read: if true;
+      allow write: if false; // Solo administradores del sistema pueden modificar roles
+    }
+
+    // Reglas para roles de comunidades
+    match /roles_comunidades/{roleId} {
+      allow read: if true;
+      allow write: if false; // Solo administradores del sistema pueden modificar roles
+    }
+
+    // Reglas para relaciones de usuarios y roles
+    match /usuarios_roles/{docId} {
+      allow read: if true;
+      allow write: if false; // Solo administradores del sistema pueden asignar roles
+    }
+
+    // Reglas para relaciones de tags con comunidades
+    match /comunidad_tags/{docId} {
+      allow read: if true;
+      allow create, delete: if isAuthenticated();
+    }
+
+    // Reglas para relaciones de tags con reportes
+    match /reports_tags/{docId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Reglas para relaciones de usuarios, comunidades y roles
+    match /usuarios_comunidades_roles/{docId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.rol_id == '2'; // Cualquiera puede unirse como miembro
+      allow update, delete: if isAuthenticated() &&
+        (request.resource.data.usuario_id == request.auth.uid || // Puedo abandonar
+         isCommunityAdmin(request.resource.data.comunidad_id)); // Admins pueden gestionar miembros
+    }
+
+    // Reglas para "me gusta" en reportes
+    match /me_encanta/{docId} {
+      allow read: if true;
+      allow create, delete: if isAuthenticated() && request.resource.data.usuario_id == request.auth.uid;
+    }
+
+    // Reglas para seguir comunidades
+    match /follows/{docId} {
+      allow read: if true;
+      allow create, delete: if isAuthenticated() && request.resource.data.usuario_id == request.auth.uid;
+    }
+  }
+}
