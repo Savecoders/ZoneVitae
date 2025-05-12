@@ -28,16 +28,35 @@ El proyecto ZoneVitae está organizado en las siguientes carpetas principales:
 - **Seguimiento**: Seguimiento del estado de reportes y resolución de problemas
 - **Perfiles de Usuario**: Gestión de perfiles y roles dentro de las comunidades
 
-## Integración con Firebase
+## Docker
 
-El proyecto puede utilizar Firebase como backend, aprovechando los siguientes servicios:
+ZoneVitae utiliza Docker para facilitar la implementación y el desarrollo. Asegúrate de tener Docker instalado y ejecutándose en tu máquina.
 
-- **Firestore**: Base de datos NoSQL para almacenar usuarios, comunidades, reportes, etc.
-- **Authentication**: Sistema de autenticación para usuarios
-- **Storage**: Almacenamiento para imágenes de perfiles, comunidades y reportes
-- **Cloud Functions**: Funciones serverless para lógica de backend (opcional)
+### Comandos Docker
 
-Para obtener más información sobre la implementación con Firebase, consulta la [documentación de Firebase](./docs/firebase/README.md).
+- **Construir la imagen**:
+
+  ```bash
+  docker build -t zonevitae .
+  ```
+
+- **Ejecutar el contenedor**:
+
+  ```bash
+  docker run -d -p 8080:80 zonevitae
+  ```
+
+- **Detener el contenedor**:
+
+  ```bash
+  docker stop <container_id>
+  ```
+
+- **Eliminar el contenedor**:
+
+  ```bash
+  docker rm <container_id>
+  ```
 
 ## Configuración del Proyecto
 
