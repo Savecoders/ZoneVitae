@@ -1,0 +1,87 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Funciones auxiliares
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Reglas para imágenes de perfil de usuario
+    match /user-profiles/{userId}/{fileName} {
+      allow read: if true; // Perfiles públicos
+      allow write: if isOwner(userId); // Solo el propietario puede subir/actualizar su perfil
+    }
+
+    // Reglas para imágenes de comunidades
+    match /community-images/{communityId}/{fileName} {
+      allow read: if true; // Imágenes de comunidad públicas
+      allow write: if isAuthenticated() &&
+        exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)) &&
+        (
+          get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)).data.rol_id == '1' ||
+          get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + communityId)).data.rol_id == '3'
+        );
+    }
+
+    // Reglas para imágenes de reportes
+    match /reporte-images/{reporteId}/{fileName} {
+      allow read: if true; // Imágenes de reportes son públicas
+
+      // El autor del reporte puede crear imágenes
+      allow create: if isAuthenticated() &&
+        exists(/databases/$(database)/documents/reports/$(reporteId)) &&
+        get(/databases/$(database)/documents/reports/$(reporteId)).data.autor_id == request.auth.uid;
+
+      // Solo el autor o administradores pueden borrar imágenes
+      allow delete: if isAuthenticated() &&
+        (
+          // Soy el autor del reporte
+          get(/databases/$(database)/documents/reports/$(reporteId)).data.autor_id == request.auth.uid ||
+          // Soy admin de la comunidad
+          (
+            exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/reports/$(reporteId)).data.comunidad_id)) &&
+            get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/reports/$(reporteId)).data.comunidad_id)).data.rol_id == '1'
+          )
+        );
+    }
+
+    // Reglas para imágenes de actividades
+    match /activity-images/{activityId}/{fileName} {
+      allow read: if true;
+      // Solo creadores de actividades y administradores pueden subir/eliminar imágenes
+      allow write: if isAuthenticated() &&
+        (
+          exists(/databases/$(database)/documents/actividades/$(activityId)) &&
+          (
+            // Soy creador de la actividad (para creación inicial)
+            request.resource.metadata.createdBy == request.auth.uid ||
+            // Soy admin de la comunidad
+            (
+              exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/actividades/$(activityId)).data.comunidad_id)) &&
+              get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/actividades/$(activityId)).data.comunidad_id)).data.rol_id == '1'
+            )
+          )
+        );
+    }
+
+    // Reglas para seguimiento de reportes
+    match /seguimiento-reportes/{reporteId}/{seguimientoId}/{fileName} {
+      allow read: if true;
+      // Solo admins y moderadores pueden subir archivos de seguimiento
+      allow write: if isAuthenticated() &&
+        exists(/databases/$(database)/documents/reports/$(reporteId)) &&
+        (
+          // Soy admin o moderador de la comunidad
+          exists(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/reports/$(reporteId)).data.comunidad_id)) &&
+          (
+            get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/reports/$(reporteId)).data.comunidad_id)).data.rol_id == '1' ||
+            get(/databases/$(database)/documents/usuarios_comunidades_roles/$(request.auth.uid + '_' + get(/databases/$(database)/documents/reports/$(reporteId)).data.comunidad_id)).data.rol_id == '3'
+          )
+        );
+    }
+  }
+}
