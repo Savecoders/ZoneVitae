@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "json": "json-server --watch ./public/preview/data.json --port 5000",
     "serve:ssr:ZoneVitae": "node dist/zone-vitae/server/server.mjs"
   },
   "private": true,
@@ -22,6 +23,8 @@
     "@angular/ssr": "^19.2.6",
     "@tailwindcss/postcss": "^4.1.6",
     "express": "^4.18.2",
+    "json-server": "^1.0.0-beta.3",
+    "lucide-angular": "^0.510.0",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.6",
