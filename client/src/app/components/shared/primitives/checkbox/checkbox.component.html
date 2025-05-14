@@ -1,0 +1,66 @@
+<label
+  [ngClass]="[
+    'inline-flex items-center gap-2 select-none cursor-pointer',
+    disabled ? 'opacity-50 cursor-not-allowed' : '',
+    className || ''
+  ]"
+>
+  <div class="relative">
+    <input
+      type="checkbox"
+      class="sr-only peer"
+      [id]="id"
+      [checked]="checked"
+      [disabled]="disabled"
+      (change)="onChange($event)"
+      (blur)="onTouched()"
+    />
+    <div
+      [ngClass]="[
+        'flex items-center justify-center transition-colors duration-200',
+        sizeClasses,
+        colorClasses,
+        'border rounded',
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        checked ? 'bg-current border-current' : 'bg-background border-border'
+      ]"
+    >
+      @if (checked) {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        [ngClass]="iconSizeClasses"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="3"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      } @if (checked === null || indeterminate) {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        [ngClass]="iconSizeClasses"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="3"
+          d="M6 12h12"
+        />
+      </svg>
+      }
+    </div>
+  </div>
+  @if (label) {
+  <span [ngClass]="textSizeClasses">{{ label }}</span>
+  } @else {
+  <ng-content></ng-content>
+  }
+</label>

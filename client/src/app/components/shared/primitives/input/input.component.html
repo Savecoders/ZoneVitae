@@ -1,0 +1,62 @@
+<div [ngClass]="[fullWidth ? 'w-full' : '', className || '']">
+  @if (label) {
+  <label
+    [for]="id"
+    class="block text-sm font-medium mb-1"
+    [ngClass]="{ 'text-danger': validation && validation.state === 'invalid' }"
+  >
+    {{ label }}
+    @if (required) {
+    <span class="text-danger ml-1">*</span>
+    }
+  </label>
+  }
+
+  <div class="relative">
+    @if (startContent) {
+    <div
+      class="absolute left-0 top-0 bottom-0 flex items-center justify-center pl-3"
+    >
+      <ng-container [ngTemplateOutlet]="startContent"></ng-container>
+    </div>
+    }
+
+    <input
+      [id]="id"
+      [type]="type"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [required]="required"
+      [readonly]="readonly"
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+      [ngClass]="[
+        'outline-none transition-all duration-200 bg-content1',
+        startContent ? 'pl-10' : 'pl-3',
+        endContent ? 'pr-10' : 'pr-3',
+        radiusClasses,
+        sizeClasses,
+        borderClasses,
+        colorClasses,
+        fullWidth ? 'w-full' : '',
+        disabled ? 'opacity-80 cursor-not-allowed' : ''
+      ]"
+    />
+
+    @if (endContent) {
+    <div
+      class="absolute right-0 top-0 bottom-0 flex items-center justify-center pr-3"
+    >
+      <ng-container [ngTemplateOutlet]="endContent"></ng-container>
+    </div>
+    }
+  </div>
+
+  @if (validation && validation.state === 'invalid' && validation.message) {
+  <p class="text-danger text-sm mt-1">
+    {{ validation.message }}
+  </p>
+  }
+</div>

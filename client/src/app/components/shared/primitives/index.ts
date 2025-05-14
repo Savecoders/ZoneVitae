@@ -1,0 +1,16 @@
+// Export all primitives for easy import
+export * from './button/button.component';
+export * from './card/card.component';
+export * from './theme-toggle/theme-toggle.component';
+export * from './input/input.component';
+export * from './checkbox/checkbox.component';
+export * from './toggle/toggle.component';
+export * from './badge/badge.component';
+export * from './avatar/avatar.component';
+export * from './textarea/textarea.component';
+export * from './label/label.component';
+export * from './separator/separator.component';
+export * from './toast/toast.component';
+export * from './sonner/sonner.component';
+export * from './breadcrumb/breadcrumb.component';
+export * from './fault/fault.component';

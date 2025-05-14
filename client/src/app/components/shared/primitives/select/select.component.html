@@ -1,0 +1,78 @@
+<div
+  class="relative w-full"
+  [class.cursor-not-allowed]="disabled"
+  [class.opacity-50]="disabled"
+>
+  <!-- Label for the select -->
+  @if (label) {
+  <label
+    [for]="id"
+    class="block text-sm font-medium mb-2"
+    [class.text-danger]="validation?.state === 'invalid'"
+  >
+    {{ label }}
+    @if (required) {
+    <span class="text-danger ml-1">*</span>
+    }
+  </label>
+  }
+
+  <!-- Select trigger button -->
+  <button
+    #triggerButton
+    type="button"
+    [id]="id"
+    [disabled]="disabled"
+    (click)="toggleDropdown()"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-controls]="id + '-listbox'"
+    class="flex items-center justify-between w-full border bg-background shadow-sm"
+    [ngClass]="[
+      radiusClasses,
+      sizeClasses,
+      validation?.state === 'invalid'
+        ? 'border-danger focus:border-danger focus:ring-danger/20'
+        : 'border-input focus:border-primary focus:ring-primary/20'
+    ]"
+  >
+    <span class="truncate" [class.text-foreground-muted]="!selectedLabel">
+      {{ selectedLabel || placeholder }}
+    </span>
+    <span class="pointer-events-none flex items-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 transition-transform duration-200"
+        [class.rotate-180]="isOpen"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </span>
+  </button>
+
+  <!-- Dropdown options -->
+  @if (isOpen) {
+  <div
+    [id]="id + '-listbox'"
+    role="listbox"
+    class="absolute left-0 z-10 mt-1 max-h-60 w-full overflow-auto border border-input rounded-md bg-background shadow-md p-1"
+    [ngClass]="radiusClasses"
+  >
+    <ng-content></ng-content>
+  </div>
+  }
+
+  <!-- Validation message -->
+  @if (validation?.message && validation?.state === 'invalid') {
+  <div class="text-danger text-sm mt-1">
+    {{ validation?.message }}
+  </div>
+  }
+</div>

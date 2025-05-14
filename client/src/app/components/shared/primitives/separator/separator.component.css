@@ -1,0 +1,46 @@
+.separator {
+  flex-shrink: 0;
+  border-radius: 0;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.separator.horizontal {
+  width: 100%;
+  height: 1px;
+  margin: 1rem 0;
+}
+
+.separator.vertical {
+  width: 1px;
+  height: 100%;
+  margin: 0 1rem;
+}
+
+/* Decorative styles */
+.separator.decorative.horizontal {
+  position: relative;
+}
+
+.separator.decorative.horizontal::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  bottom: -1px;
+  background-color: currentColor;
+  border-radius: 4px;
+}
+
+.separator.decorative.vertical::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 40px;
+  right: -1px;
+  background-color: currentColor;
+  border-radius: 4px;
+}

@@ -1,0 +1,18 @@
+<fieldset
+  [ngClass]="[
+    'flex',
+    inline ? 'flex-row gap-4' : 'flex-col gap-2',
+    disabled ? 'opacity-50' : '',
+    className || ''
+  ]"
+  [attr.aria-labelledby]="labelId"
+>
+  <legend *ngIf="label" [id]="labelId" class="text-sm font-medium mb-2">
+    {{ label }}
+  </legend>
+  <ng-content></ng-content>
+
+  <div *ngIf="validation?.state === 'invalid'" class="text-danger text-sm mt-1">
+    {{ validation.message }}
+  </div>
+</fieldset>

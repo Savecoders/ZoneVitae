@@ -1,0 +1,41 @@
+<label
+  [ngClass]="[
+    'inline-flex items-center gap-2 select-none cursor-pointer',
+    disabled ? 'opacity-50 cursor-not-allowed' : '',
+    className || ''
+  ]"
+>
+  <div class="relative">
+    <input
+      type="radio"
+      class="sr-only peer"
+      [id]="id"
+      [name]="name"
+      [value]="value"
+      [checked]="checked"
+      [disabled]="disabled"
+      (change)="onChange($event)"
+      (blur)="onTouched()"
+    />
+    <div
+      [ngClass]="[
+        'flex items-center justify-center transition-colors duration-200 rounded-full',
+        sizeClasses,
+        'border',
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        checked ? 'border-current' : 'border-border'
+      ]"
+      [class]="colorClasses"
+    >
+      <div
+        *ngIf="checked"
+        [ngClass]="[
+          'rounded-full transition-transform duration-200 transform scale-100',
+          dotSizeClasses
+        ]"
+      ></div>
+    </div>
+  </div>
+  <span *ngIf="label" [ngClass]="textSizeClasses">{{ label }}</span>
+  <ng-content *ngIf="!label"></ng-content>
+</label>

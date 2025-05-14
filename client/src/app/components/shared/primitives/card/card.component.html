@@ -1,0 +1,11 @@
+<div
+  [ngClass]="[
+    'relative overflow-hidden',
+    radiusClasses,
+    shadowClasses,
+    borderClasses,
+    className || ''
+  ]"
+>
+  <ng-content></ng-content>
+</div>
