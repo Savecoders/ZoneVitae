@@ -1,0 +1,56 @@
+<header
+  [ngClass]="
+    isScrolled
+      ? 'bg-background/85 backdrop-blur-lg'
+      : 'bg-background/65 backdrop-blur-md'
+  "
+  class="border-b border-border flex items-center justify-between px-4 py-3 fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+>
+  <div class="flex items-center">
+    <a routerLink="/" class="flex items-center gap-2 mr-6">
+      <div class="w-8 h-8 flex items-center justify-center border-2 rounded">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+          />
+        </svg>
+      </div>
+      <span class="font-medium text-lg">Logo</span>
+    </a>
+  </div>
+
+  <div class="w-full max-w-xl">
+    <app-input
+      [fullWidth]="true"
+      [placeholder]="'Search'"
+      [startContent]="searchIcon"
+    ></app-input>
+    <ng-template #searchIcon>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 text-foreground-muted"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </ng-template>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <app-theme-toggle></app-theme-toggle>
+    <app-avatar [name]="'User'" [size]="'md'" [showBadge]="false"> </app-avatar>
+  </div>
+</header>
