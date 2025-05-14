@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { LayoutComponent } from "../shared/layout/layout.component";
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [LayoutComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

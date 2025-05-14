@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { LayoutComponent } from "../shared/layout/layout.component";
 
 @Component({
   selector: 'app-activities',
-  imports: [],
+  imports: [LayoutComponent],
   templateUrl: './activities.component.html',
   styleUrl: './activities.component.css'
 })
