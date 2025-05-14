@@ -12,7 +12,7 @@ import {
 } from '@angular/platform-browser';
 import { DEFAULT_UI_CONFIG, UI_CONFIG } from './config/ui.config';
 import { ThemeService } from './services/theme.service';
-import { ColorUtilService } from './services/color-util.service';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +21,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     { provide: UI_CONFIG, useValue: DEFAULT_UI_CONFIG },
     ThemeService,
-    ColorUtilService,
+    provideHttpClient(),
   ],
 };
