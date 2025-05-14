@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-4">
       @for (topic of topics; track topic.id) {
       <a
-        [routerLink]="['/topics', topic.slug]"
+        [routerLink]="['/', topic.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
       >
         <span class="text-foreground-muted">
@@ -37,7 +37,7 @@
     <div class="flex flex-col gap-4">
       @for( user_link of user_section; track user_link.id) {
       <a
-        [routerLink]="['/topics', user_link.slug]"
+        [routerLink]="['/', user_link.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
       >
         <span class="text-foreground-muted">
@@ -68,7 +68,7 @@
     <div class="flex flex-col gap-4">
       @for( page_link of page_resources; track page_link.id) {
       <a
-        [routerLink]="['/topics', page_link.slug]"
+        [routerLink]="['/', page_link.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
       >
         <span class="text-foreground-muted">

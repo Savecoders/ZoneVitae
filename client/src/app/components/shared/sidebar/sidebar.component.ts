@@ -12,12 +12,12 @@ import { SeparatorComponent } from '../primitives/separator/separator.component'
 })
 export class SidebarComponent {
   topics = [
-    { id: 1, name: 'Home', slug: 'environment' },
-    { id: 1, name: 'Explorar', slug: 'environment' },
-    { id: 1, name: 'Comunidades', slug: 'environment' },
-    { id: 2, name: 'Reportes', slug: 'technology' },
-    { id: 3, name: 'Actividades', slug: 'health' },
-    { id: 3, name: 'Todos', slug: 'health' },
+    { id: 1, name: 'Home', slug: 'reports' },
+    { id: 1, name: 'Explorar', slug: 'reports' },
+    { id: 1, name: 'Comunidades', slug: 'comunities' },
+    { id: 2, name: 'Reportes', slug: 'reports' },
+    { id: 3, name: 'Actividades', slug: 'activities' },
+    { id: 3, name: 'Todos', slug: 'reports' },
   ];
 
   user_section = [
@@ -26,9 +26,9 @@ export class SidebarComponent {
   ];
 
   page_resources = [
-    { id: 3, name: 'Details', slug: 'resources' },
-    { id: 1, name: 'Help', slug: 'resources' },
-    { id: 2, name: 'Blog', slug: 'resources' },
+    { id: 3, name: 'Details', slug: 'about' },
+    { id: 1, name: 'Help', slug: 'helps' },
+    { id: 2, name: 'Blog', slug: 'about' },
   ];
 
   admin_section = [
