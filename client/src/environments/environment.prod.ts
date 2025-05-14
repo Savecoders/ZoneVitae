@@ -1,7 +1,5 @@
 export const environment = {
-  production: true,
-  apiUrl: '/api',
-  firebaseConfig: {
-    // Aquí irían las credenciales de Firebase si se utilizan
-  },
+  production: false,
+  apiUrl: 'http://localhost:5000/',
+  jsonServerUrl: 'http://localhost:5000',
 };
