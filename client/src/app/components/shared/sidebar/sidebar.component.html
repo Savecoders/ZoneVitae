@@ -1,6 +1,6 @@
 <div
   class="flex flex-col gap-4 bg-default-50 sticky top-2 p-2 m-4 rounded-md border-2 border-default-400 shadow-md overflow-y-auto max-h-[calc(100vh-2rem)]"
-  [class.max-w-56]="!isCollapsed"
+  [class.max-w-54]="!isCollapsed"
   [class.max-w-20]="isCollapsed"
 >
   <!-- Collapse Button -->
@@ -20,7 +20,7 @@
   <!-- Topics Section -->
   <app-card class="p-4 bg-default-50">
     <div class="flex flex-col gap-4">
-      @for (topic of topics; track topic.id) {
+      @for (topic of topics; track $index) {
       <a
         [routerLink]="['/', topic.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
@@ -41,7 +41,7 @@
 
   <app-card class="p-4">
     <div class="flex flex-col gap-4">
-      @for (user_link of user_section; track user_link.id) {
+      @for (user_link of user_section; track $index) {
       <a
         [routerLink]="['/', user_link.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
@@ -62,7 +62,7 @@
 
   <app-card class="p-4">
     <div class="flex flex-col gap-4">
-      @for (page_link of page_resources; track page_link.id) {
+      @for (page_link of page_resources; track $index) {
       <a
         [routerLink]="['/', page_link.slug]"
         class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
