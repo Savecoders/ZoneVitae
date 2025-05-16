@@ -33,8 +33,7 @@
                   <div
                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
                   >
-                    @for (community of communities.slice(0, 4); track
-                    community.ID) {
+                    @for (community of communities.slice(0, 4); track $index) {
                     <div
                       class="bg-default-300 rounded-xl px-4 py-8 text-center"
                     >
@@ -71,7 +70,7 @@
                   >
                     All
                   </button>
-                  @for (tag of tags; track tag.ID) {
+                  @for (tag of tags; track $index) {
                   <button
                     class="px-3 py-1 rounded-full text-sm"
                     [class.bg-primary]="selectedTag === tag.ID"
@@ -113,7 +112,7 @@
               <div class="bg-gray-50 p-4 rounded-lg text-gray-600">
                 <p>No posts found.</p>
               </div>
-              } @else { @for (post of posts; track post.ID) {
+              } @else { @for (post of posts; track $index) {
               <app-post-card [post]="post"></app-post-card>
               } }
             </div>
@@ -148,8 +147,7 @@
                   </div>
                   } @else {
                   <div class="divide-y bg-default-100">
-                    @for (activity of activities.slice(0, 3); track activity.ID)
-                    {
+                    @for (activity of activities.slice(0, 3); track $index) {
                     <div class="p-3 bg-default-50 hover:bg-gray-50">
                       <div class="font-medium text-sm">
                         {{ activity.nombre }}
