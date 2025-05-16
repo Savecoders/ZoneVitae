@@ -1,184 +1,112 @@
-<div class="h-screen flex bg-background overflow-hidden">
-  <!-- Sidebar -->
-  <div class="flex-shrink-0 z-50">
-    <app-sidebar></app-sidebar>
-  </div>
-
-  <!-- Main content area with header -->
-  <div class="flex flex-col flex-grow overflow-y-auto relative">
-    <div class="sticky top-0 z-50 w-full">
-      <app-header></app-header>
+<app-layout>
+  <!-- Community highlights -->
+  <div banner-space>
+    @if (isLoadingCommunities) {
+    <div class="flex justify-center items-center py-4">
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-default-300"
+      ></div>
     </div>
-    <main class="flex-1 mx-auto w-full p-4 mt-8 bg-default-50 pb-12 pt-4">
-      <div class="grid grid-cols-12 gap-6 p-6">
-        <!-- Main content area -->
-        <div class="col-span-12">
-          <div class="grid grid-cols-12 gap-6">
-            <!-- Community highlights -->
-            <div
-              class="col-span-12 bg-default-100 rounded-lg shadow-sm overflow-hidden"
-            >
-              @if (isLoadingCommunities) {
-              <div class="flex justify-center items-center py-4">
-                <div
-                  class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-default-300"
-                ></div>
-              </div>
-              } @else {
-              <div class="bg-default-50 rounded-lg shadow-sm overflow-hidden">
-                <div class="p-4 border-b">
-                  <h2 class="text-xl font-semibold">Featured Communities</h2>
-                </div>
-                <div class="p-4">
-                  <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                  >
-                    @for (community of communities.slice(0, 4); track $index) {
-                    <div
-                      class="bg-default-300 rounded-xl px-4 py-8 text-center"
-                    >
-                      <div class="mb-2 flex justify-center">
-                        <div
-                          class="w-16 h-16 bg-default-50 rounded-full flex items-center justify-center text-primary font-bold text-xl"
-                        >
-                          {{ community.nombre.charAt(0).toUpperCase() }}
-                        </div>
-                      </div>
-                      <h3 class="font-medium">{{ community.nombre }}</h3>
-                      <p class="text-xs text-gray-500 mt-1">
-                        {{ community.ubicacion }}
-                      </p>
-                    </div>
-                    }
-                  </div>
-                </div>
-              </div>
-              }
-            </div>
-            <!--
-            <div class="col-span-12 mt-6">
-              <div class="bg-default-50 rounded-lg shadow-sm p-4">
-                <h2 class="text-lg font-medium mb-3">Filter by Tag</h2>
-                <div class="flex flex-wrap gap-2">
-                  <button
-                    class="px-3 py-1 rounded-full text-sm"
-                    [class.bg-primary]="selectedTag === null"
-                    [class.text-white]="selectedTag === null"
-                    [class.bg-gray-100]="selectedTag !== null"
-                    [class.text-gray-800]="selectedTag !== null"
-                    (click)="filterByTag(null)"
-                  >
-                    All
-                  </button>
-                  @for (tag of tags; track $index) {
-                  <button
-                    class="px-3 py-1 rounded-full text-sm"
-                    [class.bg-primary]="selectedTag === tag.ID"
-                    [class.text-white]="selectedTag === tag.ID"
-                    [class.bg-gray-100]="selectedTag !== tag.ID"
-                    [class.text-gray-800]="selectedTag !== tag.ID"
-                    (click)="filterByTag(tag.ID ?? null)"
-                  >
-                    {{ tag.nombre }}
-                  </button>
-                  }
-                </div>
+    } @else {
+    <div class="bg-default-50 rounded-lg shadow-sm overflow-hidden">
+      <div class="p-4 border-b">
+        <h2 class="text-xl font-semibold">Featured Communities</h2>
+      </div>
+      <div class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          @for (community of communities.slice(0, 4); track $index) {
+          <div class="bg-default-300 rounded-xl px-4 py-8 text-center">
+            <div class="mb-2 flex justify-center">
+              <div
+                class="w-16 h-16 bg-default-50 rounded-full flex items-center justify-center text-primary font-bold text-xl"
+              >
+                {{ community.nombre.charAt(0).toUpperCase() }}
               </div>
             </div>
-            -->
-
-            <!-- Posts feed -->
-            <div class="flex flex-col w-full col-span-8 space-y-6 mt-6">
-              <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-medium">Posts</h2>
-                <div class="text-sm text-gray-500" *ngIf="userCount > 0">
-                  {{ userCount }} registered user{{
-                    userCount !== 1 ? "s" : ""
-                  }}
-                </div>
-              </div>
-
-              @if (isLoading) {
-              <div class="flex justify-center items-center py-8">
-                <div
-                  class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
-                ></div>
-              </div>
-              } @else if (loadError) {
-              <div class="bg-red-50 p-4 rounded-lg text-red-600">
-                <p>Error loading posts. Please try again later.</p>
-              </div>
-              } @else if (posts.length === 0) {
-              <div class="bg-gray-50 p-4 rounded-lg text-gray-600">
-                <p>No posts found.</p>
-              </div>
-              } @else { @for (post of posts; track $index) {
-              <app-post-card [post]="post"></app-post-card>
-              } }
-            </div>
-
-            <!-- Sidebar content -->
-            <div class="col-span-4 mt-6 max-w-xs">
-              <div class="sticky top-24 space-y-6">
-                <!-- Follow section -->
-                <app-follow-section></app-follow-section>
-
-                <!-- Upcoming activities -->
-                <div
-                  class="rounded-lg shadow-sm overflow-hidden bg-default-100"
-                >
-                  <div class="p-4 border-b bg-default-100">
-                    <h2 class="font-medium">Upcoming Activities</h2>
-                  </div>
-
-                  @if (isLoadingActivities) {
-                  <div class="flex justify-center items-center py-4">
-                    <div
-                      class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"
-                    ></div>
-                  </div>
-                  } @else if (activitiesError) {
-                  <div class="p-4 text-sm text-red-600">
-                    <p>Error loading activities.</p>
-                  </div>
-                  } @else if (activities.length === 0) {
-                  <div class="p-4 text-sm text-gray-500">
-                    <p>No upcoming activities.</p>
-                  </div>
-                  } @else {
-                  <div class="divide-y bg-default-100">
-                    @for (activity of activities.slice(0, 3); track $index) {
-                    <div class="p-3 bg-default-50 hover:bg-gray-50">
-                      <div class="font-medium text-sm">
-                        {{ activity.nombre }}
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        {{ activity.fecha_inicio | date : "MMM d, y" }}
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        {{ activity.ubicacion }}
-                      </div>
-                    </div>
-                    }
-                  </div>
-                  <div class="p-3 bg-default-200 text-center">
-                    <a
-                      href="/activities"
-                      class="text-primary text-sm hover:underline"
-                      >View all activities</a
-                    >
-                  </div>
-                  }
-                </div>
-
-                <div class="mt-6">
-                  <app-footer></app-footer>
-                </div>
-              </div>
-            </div>
+            <h3 class="font-medium">{{ community.nombre }}</h3>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ community.ubicacion }}
+            </p>
           </div>
+          }
         </div>
       </div>
-    </main>
+    </div>
+    }
   </div>
-</div>
+
+  <!-- Posts feed -->
+  <div main-content>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-medium">Posts</h2>
+      <div class="text-sm text-gray-500" *ngIf="userCount > 0">
+        {{ userCount }} registered user{{ userCount !== 1 ? "s" : "" }}
+      </div>
+    </div>
+
+    @if (isLoading) {
+    <div class="flex justify-center items-center py-8">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+      ></div>
+    </div>
+    } @else if (loadError) {
+    <div class="bg-red-50 p-4 rounded-lg text-red-600">
+      <p>Error loading posts. Please try again later.</p>
+    </div>
+    } @else if (posts.length === 0) {
+    <div class="bg-gray-50 p-4 rounded-lg text-gray-600">
+      <p>No posts found.</p>
+    </div>
+    } @else { @for (post of posts; track $index) {
+    <app-post-card [post]="post"></app-post-card>
+    } }
+  </div>
+
+  <!-- Alerts Highlights -->
+  <div alerts-highlights>
+    <!-- Upcoming activities -->
+    <div class="rounded-lg shadow-sm overflow-hidden bg-default-100">
+      <div class="p-4 border-b bg-default-100">
+        <h2 class="font-medium">Upcoming Activities</h2>
+      </div>
+
+      @if (isLoadingActivities) {
+      <div class="flex justify-center items-center py-4">
+        <div
+          class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"
+        ></div>
+      </div>
+      } @else if (activitiesError) {
+      <div class="p-4 text-sm text-red-600">
+        <p>Error loading activities.</p>
+      </div>
+      } @else if (activities.length === 0) {
+      <div class="p-4 text-sm text-gray-500">
+        <p>No upcoming activities.</p>
+      </div>
+      } @else {
+      <div class="divide-y bg-default-100">
+        @for (activity of activities.slice(0, 3); track $index) {
+        <div class="p-3 bg-default-50 hover:bg-gray-50">
+          <div class="font-medium text-sm">
+            {{ activity.nombre }}
+          </div>
+          <div class="text-xs text-gray-500 mt-1">
+            {{ activity.fecha_inicio | date : "MMM d, y" }}
+          </div>
+          <div class="text-xs text-gray-500 mt-1">
+            {{ activity.ubicacion }}
+          </div>
+        </div>
+        }
+      </div>
+      <div class="p-3 bg-default-200 text-center">
+        <a href="/activities" class="text-primary text-sm hover:underline"
+          >View all activities</a
+        >
+      </div>
+      }
+    </div>
+  </div>
+</app-layout>

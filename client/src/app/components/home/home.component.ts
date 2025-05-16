@@ -20,6 +20,7 @@ import { environment } from '../../../environments/environment';
 import { Comunidad } from '../../models/comunidad.model';
 import { Tag } from '../../models/tag.model';
 import { Actividad } from '../../models/actividad.model';
+import { LayoutComponent } from "../shared/layout/layout.component";
 
 @Component({
   selector: 'app-home',
@@ -31,7 +32,8 @@ import { Actividad } from '../../models/actividad.model';
     FooterComponent,
     PostCardComponent,
     FollowSectionComponent,
-  ],
+    LayoutComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
