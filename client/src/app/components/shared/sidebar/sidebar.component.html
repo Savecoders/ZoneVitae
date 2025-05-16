@@ -1,101 +1,91 @@
 <div
-  class="flex flex-col gap-4 bg-default-50 sticky top-2 max-w-56 p-2 m-4 rounded-md border-2 border-default-400 shadow-md overflow-y-auto max-h-[calc(100vh-2rem)]"
+  class="flex flex-col gap-4 bg-default-50 sticky top-2 p-2 m-4 rounded-md border-2 border-default-400 shadow-md overflow-y-auto max-h-[calc(100vh-2rem)]"
+  [class.max-w-56]="!isCollapsed"
+  [class.max-w-20]="isCollapsed"
 >
+  <!-- Collapse Button -->
+  <button
+    (click)="toggleSidebar()"
+    class="self-end text-foreground hover:text-primary p-1 rounded-md hover:bg-muted transition-colors mb-2"
+    [title]="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+  >
+    <span>
+      <i-lucide
+        [img]="isCollapsed ? ChevronRightIcon : ChevronLeftIcon"
+        class="my-icon"
+      ></i-lucide>
+    </span>
+  </button>
+
   <!-- Topics Section -->
   <app-card class="p-4 bg-default-50">
     <div class="flex flex-col gap-4">
       @for (topic of topics; track topic.id) {
       <a
         [routerLink]="['/', topic.slug]"
-        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
+        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
+        [class.justify-center]="isCollapsed"
+        [class.gap-2]="!isCollapsed"
+        [title]="topic.name"
       >
         <span class="text-foreground-muted">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-            />
-          </svg>
+          <i-lucide [img]="topic.icon" class="my-icon"></i-lucide>
         </span>
-        {{ topic.name }}
+        <span [class.hidden]="isCollapsed">{{ topic.name }}</span>
       </a>
       }
     </div>
   </app-card>
 
-  <app-separator className="mx-4 bg-default-400 h-[0.5px]" />
+  <app-separator className="mx-4 bg-default-400 h-[1px]" />
 
   <app-card class="p-4">
     <div class="flex flex-col gap-4">
-      @for( user_link of user_section; track user_link.id) {
+      @for (user_link of user_section; track user_link.id) {
       <a
         [routerLink]="['/', user_link.slug]"
-        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
+        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
+        [class.justify-center]="isCollapsed"
+        [class.gap-2]="!isCollapsed"
+        [title]="user_link.name"
       >
         <span class="text-foreground-muted">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-            />
-          </svg>
+          <i-lucide [img]="user_link.icon" class="my-icon"></i-lucide>
         </span>
-        {{ user_link.name }}
+        <span [class.hidden]="isCollapsed">{{ user_link.name }}</span>
       </a>
       }
     </div>
   </app-card>
 
-  <app-separator className="mx-4 bg-default-400 h-[0.5px]" />
+  <app-separator className="mx-4 bg-default-400 h-[1px]" />
 
   <app-card class="p-4">
     <div class="flex flex-col gap-4">
-      @for( page_link of page_resources; track page_link.id) {
+      @for (page_link of page_resources; track page_link.id) {
       <a
         [routerLink]="['/', page_link.slug]"
-        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center gap-2"
+        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
+        [class.justify-center]="isCollapsed"
+        [class.gap-2]="!isCollapsed"
+        [title]="page_link.name"
       >
         <span class="text-foreground-muted">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-            />
-          </svg>
+          <i-lucide [img]="page_link.icon" class="my-icon"></i-lucide>
         </span>
-        {{ page_link.name }}
+        <span [class.hidden]="isCollapsed">{{ page_link.name }}</span>
       </a>
       }
     </div>
   </app-card>
 
-  <app-separator className="mx-4 bg-default-400 h-[0.5px]" />
+  <app-separator
+    className="mx-4 bg-default-400 h-[1px]"
+    [class.hidden]="isCollapsed"
+  />
 
-  <app-card class="p-4">
+  <!-- About section - hide completely when collapsed -->
+  <app-card class="p-4" [class.hidden]="isCollapsed">
     <h2 class="text-xl font-medium mb-3">About</h2>
     <p class="text-foreground-muted mb-2">
       ZoneVitae is a community platform for sharing and discovering content

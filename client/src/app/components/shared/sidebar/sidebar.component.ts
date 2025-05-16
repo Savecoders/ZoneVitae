@@ -3,38 +3,70 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardComponent } from '../primitives/card/card.component';
 import { SeparatorComponent } from '../primitives/separator/separator.component';
+import {
+  LucideAngularModule,
+  HomeIcon,
+  TelescopeIcon,
+  MapPinIcon,
+  ProportionsIcon,
+  MegaphoneIcon,
+  VolleyballIcon,
+  UserRoundIcon,
+  BellIcon,
+  NotepadTextIcon,
+  CircleHelpIcon,
+  BetweenVerticalEnd,
+  UsersRoundIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from 'lucide-angular';
+import { ILinks } from '../../../lib/ILinks.interface';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterModule, CardComponent, SeparatorComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    CardComponent,
+    SeparatorComponent,
+    LucideAngularModule,
+  ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent {
-  topics = [
-    { id: 1, name: 'Home', slug: 'reports' },
-    { id: 1, name: 'Explorar', slug: 'reports' },
-    { id: 1, name: 'Comunidades', slug: 'comunities' },
-    { id: 2, name: 'Reportes', slug: 'reports' },
-    { id: 3, name: 'Actividades', slug: 'activities' },
-    { id: 3, name: 'Todos', slug: 'reports' },
+  isCollapsed = false;
+  ChevronLeftIcon = ChevronLeftIcon;
+  ChevronRightIcon = ChevronRightIcon;
+
+  topics: ILinks[] = [
+    { id: 1, name: 'Home', slug: '', icon: HomeIcon },
+    { id: 2, name: 'Explorar', slug: 'reports', icon: TelescopeIcon },
+    { id: 3, name: 'Comunidades', slug: 'comunities', icon: MapPinIcon },
+    { id: 4, name: 'Reportes', slug: 'reports', icon: ProportionsIcon },
+    { id: 5, name: 'Actividades', slug: 'activities', icon: MegaphoneIcon },
+    { id: 6, name: 'Todos', slug: 'reports', icon: VolleyballIcon },
   ];
 
-  user_section = [
-    { id: 1, name: 'Mi perfil', slug: 'profile' },
-    { id: 2, name: 'Notificaciones', slug: 'profile' },
+  user_section: ILinks[] = [
+    { id: 7, name: 'Mi perfil', slug: 'profile', icon: UserRoundIcon },
+    { id: 8, name: 'Notificaciones', slug: 'profile', icon: BellIcon },
   ];
 
-  page_resources = [
-    { id: 3, name: 'Details', slug: 'about' },
-    { id: 1, name: 'Help', slug: 'helps' },
-    { id: 2, name: 'Blog', slug: 'about' },
+  page_resources: ILinks[] = [
+    { id: 9, name: 'Details', slug: 'about', icon: NotepadTextIcon },
+    { id: 10, name: 'Help', slug: 'helps', icon: CircleHelpIcon },
+    { id: 11, name: 'Blog', slug: 'about', icon: BetweenVerticalEnd },
   ];
 
-  admin_section = [
-    { id: 1, name: 'Usuarios', slug: 'admin' },
-    { id: 2, name: 'Reportes', slug: 'admin' },
-    { id: 3, name: 'Actividades', slug: 'admin' },
-    { id: 4, name: 'Comunidades', slug: 'admin' },
+  admin_section: ILinks[] = [
+    { id: 12, name: 'Usuarios', slug: 'admin', icon: UsersRoundIcon },
+    { id: 13, name: 'Reportes', slug: 'admin', icon: ProportionsIcon },
+    { id: 14, name: 'Actividades', slug: 'admin', icon: MegaphoneIcon },
+    { id: 15, name: 'Comunidades', slug: 'admin', icon: MapPinIcon },
   ];
+
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+  }
 }

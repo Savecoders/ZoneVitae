@@ -1,3 +1,21 @@
 :host {
   display: block;
 }
+
+div[class*="flex flex-col gap-4"] {
+  transition: max-width 0.1s ease, padding 0.1s ease;
+}
+
+a {
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* Improve the icon appearance in collapsed state */
+a.justify-center i-lucide {
+  margin: 0 auto;
+}
+
+span:not(.hidden) {
+  transition: opacity 0.3s ease;
+}
