@@ -1,7 +1,7 @@
 <div>
   <h2 class="text-xl font-medium mb-4">Community posts</h2>
   <div class="grid grid-cols-4 gap-4">
-    @for (post of communityPosts; track post.id) {
+    @for (post of communityPosts; track $index) {
     <a [routerLink]="['/post', post.id]" class="block group">
       <app-card
         class="p-0 overflow-hidden group-hover:border-primary transition-colors h-full flex flex-col"

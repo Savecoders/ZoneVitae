@@ -6,27 +6,36 @@
 
   <!-- Main content area with header -->
   <div class="flex flex-col flex-grow overflow-y-auto relative">
-    <div class="sticky top-0 z-50 w-full">
-      <app-header></app-header>
-    </div>
+    <app-header></app-header>
     <main class="flex-1 mx-auto w-full p-4 mt-8 bg-default-50 pb-12 pt-4">
       <section class="grid grid-cols-12 gap-6 p-6">
         <!-- Main content area -->
-        <div class="col-span-8 space-y-6 mt-6 bg-default-100">
+        <div class="col-span-12">
           <div class="grid grid-cols-12 gap-6">
-            <section class="flex flex-col w-full col-span-8 space-y-6 mt-6">
-              <ng-content></ng-content>
+            <section
+              class="col-span-12 bg-default-100 rounded-lg shadow-sm overflow-hidden"
+            >
+              <!-- highlights -->
+              <!-- banner space -->
+              <ng-content select="[banner-space]"></ng-content>
             </section>
           </div>
         </div>
         <!--
-            -->
+        Principal content area -->
+
+        <div class="flex flex-col w-full col-span-8 space-y-6 mt-6">
+          <ng-content select="[main-content]"></ng-content>
+        </div>
 
         <!-- Sidebar content -->
         <div class="col-span-4 mt-6 max-w-xs">
           <div class="sticky top-24 space-y-6">
             <!-- Follow section -->
             <app-follow-section></app-follow-section>
+
+            <!-- Alerts Highlights -->
+            <ng-content select="[alerts-highlights]"></ng-content>
 
             <div class="mt-6">
               <app-footer></app-footer>
