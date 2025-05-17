@@ -14,6 +14,10 @@ div[class*="flex flex-col gap-4"]::-webkit-scrollbar {
   display: none;
 }
 
+button[class*="flex flex-col gap-4"]::-webkit-scrollbar {
+  display: none;
+}
+
 /* Show scrollbar only on hover */
 div[class*="flex flex-col gap-4"]:hover {
   scrollbar-width: thin; /* Firefox */
