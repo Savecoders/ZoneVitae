@@ -1,10 +1,10 @@
 <header
   [ngClass]="
     isScrolled
-      ? 'bg-background/85 backdrop-blur-lg'
-      : 'bg-background/65 backdrop-blur-md'
+      ? 'bg-default-50/85 backdrop-blur-lg'
+      : 'bg-default-50/65 backdrop-blur-md'
   "
-  class="border-b border-default-400 shadow-md flex items-center justify-between p-4 fixed z-50 transition-all duration-300"
+  class="border-b border-default-400 shadow-md flex items-center justify-between p-3 m-4 fixed z-50 transition-all duration-300 w-[calc(90%-7rem)]"
 >
   <div class="flex items-center">
     <a routerLink="/" class="flex items-center gap-2 mr-6">

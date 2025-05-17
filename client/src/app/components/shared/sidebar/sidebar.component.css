@@ -4,6 +4,24 @@
 
 div[class*="flex flex-col gap-4"] {
   transition: max-width 0.1s ease, padding 0.1s ease;
+  /* Hide scrollbar by default but maintain scrollability */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+div[class*="flex flex-col gap-4"]::-webkit-scrollbar {
+  display: none;
+}
+
+/* Show scrollbar only on hover */
+div[class*="flex flex-col gap-4"]:hover {
+  scrollbar-width: thin; /* Firefox */
+  -ms-overflow-style: auto; /* IE and Edge */
+}
+
+div[class*="flex flex-col gap-4"]:hover::-webkit-scrollbar {
+  display: block;
 }
 
 a {
