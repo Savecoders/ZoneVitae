@@ -14,6 +14,9 @@ import { DEFAULT_UI_CONFIG, UI_CONFIG } from './config/ui.config';
 import { ThemeService } from './services/theme.service';
 import { provideHttpClient } from '@angular/common/http';
 
+// Import the CloudinaryModule Docs
+import { CloudinaryModule } from '@cloudinary/ng';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -22,5 +25,6 @@ export const appConfig: ApplicationConfig = {
     { provide: UI_CONFIG, useValue: DEFAULT_UI_CONFIG },
     ThemeService,
     provideHttpClient(),
+    CloudinaryModule,
   ],
 };
