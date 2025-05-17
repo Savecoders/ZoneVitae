@@ -1,43 +1,46 @@
-<header
-  [ngClass]="
-    isScrolled
-      ? 'bg-default-50/85 backdrop-blur-lg'
-      : 'bg-default-50/65 backdrop-blur-md'
-  "
-  class="border-b border-default-400 shadow-md flex items-center justify-between p-4 fixed z-50 transition-all duration-300 w-[calc(90%-7rem)]"
->
-  <div class="flex items-center">
-    <a routerLink="/" class="flex items-center gap-2 mr-6">
-      <div class="w-16 h-16 flex items-center justify-center">
-        <img src="logo-light.svg" alt="logo" srcset="" />
-      </div>
-      <span class="font-medium text-lg">ZoneVitae</span>
-    </a>
-  </div>
+<header class="w-full">
+  <nav
+    [ngClass]="
+      isScrolled
+        ? 'bg-default-50/85 backdrop-blur-lg'
+        : 'bg-default-50/65 backdrop-blur-md'
+    "
+    class="border-b border-default-400 shadow-md flex items-center justify-between py-4 md:px-3 xl:px-4 z-50 transition-all duration-300 md:w-[calc(84%)] xl:w-[calc(92%)] gap-x-2 fixed top-0"
+  >
+    <div class="flex items-center">
+      <a routerLink="/" class="flex items-center gap-2 mr-2">
+        <div class="w-16 h-16 flex items-center justify-center">
+          <img src="logo-light.svg" alt="logo" srcset="logo-light.svg" />
+        </div>
+        <span class="font-medium text-xl">ZoneVitae</span>
+      </a>
+    </div>
 
-  <div class="w-full max-w-xl">
-    <app-input
-      [fullWidth]="true"
-      [placeholder]="'Search'"
-      [startContent]="searchIcon"
-    ></app-input>
-    <ng-template #searchIcon>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4 text-foreground-muted"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-    </ng-template>
-  </div>
+    <div class="w-full max-w-2xl">
+      <app-input
+        [fullWidth]="true"
+        [placeholder]="'Search'"
+        [startContent]="searchIcon"
+      ></app-input>
+      <ng-template #searchIcon>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-foreground-muted"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </ng-template>
+    </div>
 
-  <div class="flex items-center gap-3">
-    <app-theme-toggle></app-theme-toggle>
-    <app-avatar [name]="'User'" [size]="'md'" [showBadge]="false"> </app-avatar>
-  </div>
+    <div class="flex items-center gap-3">
+      <app-theme-toggle></app-theme-toggle>
+      <app-avatar [name]="'User'" [size]="'md'" [showBadge]="false">
+      </app-avatar>
+    </div>
+  </nav>
 </header>
