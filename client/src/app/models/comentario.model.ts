@@ -1,5 +1,5 @@
 export interface Comentario {
-  ID?: number;
+  id?: number;
   actividades_Id?: number | null;
   autor_id?: number | null;
   contenido: string;

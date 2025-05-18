@@ -1,5 +1,5 @@
 export interface Foto {
-  ID?: number;
+  id?: number;
   image?: string | null;
   reports_id?: number | null;
 }

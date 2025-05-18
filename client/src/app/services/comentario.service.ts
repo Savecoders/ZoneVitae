@@ -17,7 +17,7 @@ export class ComentarioService extends BaseService<Comentario> {
     return this.getAll();
   }
 
-  // Get comment by ID
+  // Get comment by id
   getComentarioById(id: number): Observable<Comentario> {
     return this.getById(id);
   }

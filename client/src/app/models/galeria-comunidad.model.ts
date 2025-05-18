@@ -1,5 +1,5 @@
 export interface GaleriaComunidad {
-  ID?: number;
+  id?: number;
   comunidad_id?: number | null;
   imagen: string | null;
 }

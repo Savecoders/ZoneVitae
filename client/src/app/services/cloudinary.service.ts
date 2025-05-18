@@ -25,7 +25,7 @@ export class CloudinaryService {
     });
   }
 
-  // Upload an image and return URL or public ID
+  // Upload an image and return URL or public id
   uploadImage(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('file', file);

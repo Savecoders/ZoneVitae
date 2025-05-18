@@ -3,7 +3,7 @@ import { Comunidad } from './comunidad.model';
 import { Comentario } from './comentario.model';
 
 export interface ActividadCompleta {
-  ID?: number;
+  id?: number;
   nombre: string;
   descripcion?: string | null;
   fecha_inicio: Date | string;
