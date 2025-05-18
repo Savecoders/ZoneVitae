@@ -49,6 +49,7 @@ export interface DialogRef {
   onConfirm: Subject<void>;
   onCancel: Subject<void>;
   onClosed: Subject<void>;
+  _componentRef?: any; // Expose component reference for debugging
 }
 
 @Injectable({
@@ -110,6 +111,16 @@ export class DialogService {
     instance.contentClassName = options.contentClassName || '';
     instance.overlayClassName = options.overlayClassName || '';
 
+    // Set the content template if it exists
+    if (options.content) {
+      if (options.content instanceof TemplateRef) {
+        instance.contentTemplate = options.content;
+      } else if (typeof options.content === 'string') {
+        // Set text content (to be handled in the template)
+        instance.content = options.content;
+      }
+    }
+
     // Handle dialog events
     instance.confirm.subscribe(() => {
       onConfirm.next();
@@ -132,7 +143,7 @@ export class DialogService {
     document.body.appendChild(componentRef.location.nativeElement);
     this.appRef.attachView(componentRef.hostView);
 
-    // Return the dialog reference
+    // Return the dialog reference with the component reference for debugging
     return {
       close: () => {
         instance.close();
@@ -140,6 +151,7 @@ export class DialogService {
       onConfirm,
       onCancel,
       onClosed,
+      _componentRef: componentRef,
     };
   }
 
@@ -203,17 +215,41 @@ export class DialogService {
     });
   }
 
-  /**
-   * Open a custom dialog with a component
-   */
-  custom<T>(
+  custom<T extends object>(
     component: Type<T>,
     options: Partial<DialogOptions> = {},
     componentProps?: Partial<T>
   ): DialogRef {
-    // This would require more complex implementation to dynamically create and
-    // inject components into the dialog content
-    // For simplicity, we're not implementing this now
-    throw new Error('Not implemented yet');
+    // Create a div to hold our component
+    const containerDiv = document.createElement('div');
+
+    // Create the component instance
+    const componentRef = createComponent(component, {
+      environmentInjector: this.environmentInjector,
+      hostElement: containerDiv,
+      elementInjector: this.injector,
+    });
+
+    // Set component properties if provided
+    if (componentProps) {
+      Object.assign(componentRef.instance, componentProps);
+    }
+
+    // Render component to container
+    this.appRef.attachView(componentRef.hostView);
+
+    // Open dialog with the container div as content
+    const dialogRef = this.open({
+      ...options,
+      content: containerDiv.innerHTML,
+    });
+
+    // Add cleanup for component
+    dialogRef.onClosed.subscribe(() => {
+      this.appRef.detachView(componentRef.hostView);
+      componentRef.destroy();
+    });
+
+    return dialogRef;
   }
 }

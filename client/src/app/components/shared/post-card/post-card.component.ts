@@ -6,7 +6,6 @@ import { AvatarComponent } from '../primitives/avatar/avatar.component';
 
 export interface PostData {
   id: number;
-  ID?: number; // Added for compatibility with the tracking function
   title: string;
   content: string;
   imageUrl?: string;

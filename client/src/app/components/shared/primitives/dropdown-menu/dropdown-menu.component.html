@@ -1,0 +1,96 @@
+<div class="inline-block text-left" #dropdownContainer>
+  <!-- Trigger button -->
+  <div>
+    <button
+      type="button"
+      [class]="buttonClass"
+      aria-expanded="isOpen"
+      aria-haspopup="true"
+      (click)="toggleMenu()"
+      [attr.aria-label]="label"
+      [disabled]="disabled"
+    >
+      <!-- Custom trigger content if provided -->
+      @if (triggerTemplateRef) {
+      <ng-container [ngTemplateOutlet]="triggerTemplateRef"></ng-container>
+      } @else {
+      <span>{{ label }}</span>
+      @if (showChevron) {
+
+      <i-lucide
+        [img]="ChevronDownIcon"
+        class="my-icon ml-2 -mr-1 h-4 w-4"
+      ></i-lucide>
+
+      } }
+    </button>
+  </div>
+
+  <!-- Dropdown menu -->
+  @if (isOpen) {
+  <div
+    class="fixed z-40 mt-2 p-2 rounded-md shadow-lg dropdown-menu-animation"
+    [class.right-0]="align === 'right'"
+    [class.left-0]="align === 'left' || !align"
+    [class.origin-top-right]="align === 'right'"
+    [class.origin-top-left]="align === 'left' || !align"
+    [style.min-width]="minWidth"
+    [style.max-height]="maxHeight"
+    role="menu"
+    aria-orientation="vertical"
+  >
+    <div
+      class="py-1 rounded-md border border-content2 overflow-y-auto"
+      [class]="menuClass"
+      role="none"
+    >
+      <!-- Custom menu content if provided -->
+      @if (menuTemplateRef) {
+      <ng-container [ngTemplateOutlet]="menuTemplateRef"></ng-container>
+      } @else {
+      <!-- Default menu items -->
+      @for (item of items; track item.id) { @if (item.divider) {
+      <div class="h-px my-1 bg-content2" role="separator"></div>
+      } @else {
+      <a
+        [href]="item.href || '#'"
+        class="flex flex-row gap-2 items-center align-middle w-full px-4 py-2 text-sm"
+        [class.text-default-700]="!item.disabled"
+        [class.bg-default-200]="selectedItem?.id === item.id"
+        [class.hover:bg-default-200]="!item.disabled"
+        [class.text-default-400]="item.disabled"
+        [class.cursor-not-allowed]="item.disabled"
+        [class.cursor-pointer]="!item.disabled"
+        (click)="onSelect($event, item)"
+        role="menuitem"
+      >
+        <!-- Item icon if present -->
+        @if (item.icon) {
+        <span class="text-foreground-muted">
+          <i-lucide [img]="item.icon" class="my-icon"></i-lucide>
+        </span>
+        }
+
+        <!-- Check icon for selected item -->
+        @if (showSelectedCheck && selectedItem?.id === item.id && !item.icon) {
+
+        <i-lucide
+          [img]="CheckCheckIcon"
+          class="my-icon ml-2 -mr-1 h-4 w-4"
+        ></i-lucide>
+        } @if (item.label) {
+        <span class="flex-grow">{{ item.label }}</span>
+        }
+
+        <!-- Keyboard shortcut -->
+        <!-- @if (item.shortcut) {
+        <span class="ml-auto text-xs text-default-500">{{
+          item.shortcut
+        }}</span>
+        } -->
+      </a>
+      } } }
+    </div>
+  </div>
+  }
+</div>
