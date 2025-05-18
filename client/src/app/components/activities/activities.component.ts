@@ -9,7 +9,7 @@ import { CloudinaryService } from 'app/services/cloudinary.service';
   styleUrl: './activities.component.css',
 })
 export class ActivitiesComponent implements OnInit {
-  // The public ID of the image in Cloudinary
+  // The public id of the image in Cloudinary
   imagePublicId: string = 'oc3g6ommnvuksvxzn912';
   imageUrl: string = '';
   constructor(private cloudinaryService: CloudinaryService) {}
