@@ -13,4 +13,3 @@ export * from './separator/separator.component';
 export * from './toast/toast.component';
 export * from './sonner/sonner.component';
 export * from './breadcrumb/breadcrumb.component';
-export * from './fault/fault.component';

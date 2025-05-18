@@ -4,6 +4,7 @@ import { Observable, map, switchMap, of } from 'rxjs';
 import { BaseService } from './base.service';
 import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
+import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
 
 @Injectable({
   providedIn: 'root',
@@ -84,4 +85,19 @@ export class ReporteService extends BaseService<Reporte> {
         })
       );
   }
+
+   
+crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
+  return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
+}
+
+
+
+updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
+  return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
+}
+
+
+
+
 }

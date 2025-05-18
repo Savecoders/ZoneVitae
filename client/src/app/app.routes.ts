@@ -28,6 +28,13 @@ export const routes: Routes = [
         (m) => m.ActivitiesComponent
       ),
   },
+  {path: 'auditoria',
+    loadComponent:() =>
+      import('./components/auditoria/auditoria.component').then(
+        (m) => m.AuditoriaComponent
+      ),
+
+  },
 
   // users paths
 

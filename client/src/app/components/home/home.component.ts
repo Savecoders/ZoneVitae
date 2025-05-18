@@ -132,7 +132,7 @@ export class HomeComponent implements OnInit {
           }).pipe(
             map(({ communities, authors, likes, reportComments }) => {
               // Create a map for quick lookups
-              const communityMap = new Map(communities.map((c) => [c.ID, c]));
+              const communityMap = new Map(communities.map((c) => [c.id, c]));
               const authorMap = new Map(authors.map((a) => [a.ID, a]));
 
               // Transform reports into PostData format
@@ -144,22 +144,22 @@ export class HomeComponent implements OnInit {
                   ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
-                  (like: any) => like.reports_id === report.ID
+                  (like: any) => like.reports_id === report.id
                 ).length;
                 const postComments = reportComments.filter(
                   (comment) =>
                     // This is a simplification since comments in your data are linked to activities, not reports
                     // You'll need to adjust this based on your actual data structure
-                    comment.actividades_Id === report.ID
+                    comment.actividades_Id === report.id
                 ).length;
 
                 return {
-                  id: report.ID as number,
-                  ID: report.ID as number, // Adding this to ensure compatibility with track ID
+                  id: report.id as number,
+                  ID: report.id as number, // Adding this to ensure compatibility with track ID
                   title: report.titulo,
                   content: report.contenido,
                   // You would need to add a field for images in your model or get them from the fotos table
-                  imageUrl: report.ID
+                  imageUrl: report.id
                     ? `https://source.unsplash.com/random/800x500?report,${report.estado.toLowerCase()}`
                     : undefined,
                   author: {
@@ -169,7 +169,7 @@ export class HomeComponent implements OnInit {
                   },
                   community: community
                     ? {
-                        id: community.ID as number,
+                        id: community.id as number,
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()
@@ -343,7 +343,7 @@ export class HomeComponent implements OnInit {
           }).pipe(
             map(({ communities, authors, likes, reportComments }) => {
               // Create a map for quick lookups
-              const communityMap = new Map(communities.map((c) => [c.ID, c]));
+              const communityMap = new Map(communities.map((c) => [c.id, c]));
               const authorMap = new Map(authors.map((a) => [a.ID, a]));
 
               // Transform reports into PostData format
@@ -355,18 +355,18 @@ export class HomeComponent implements OnInit {
                   ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
-                  (like: any) => like.reports_id === report.ID
+                  (like: any) => like.reports_id === report.id
                 ).length;
                 const postComments = reportComments.filter(
-                  (comment) => comment.actividades_Id === report.ID
+                  (comment) => comment.actividades_Id === report.id
                 ).length;
 
                 return {
-                  id: report.ID as number,
-                  ID: report.ID as number, // Adding this to ensure compatibility with track ID
+                  id: report.id as number,
+                  ID: report.id as number, // Adding this to ensure compatibility with track ID
                   title: report.titulo,
                   content: report.contenido,
-                  imageUrl: report.ID
+                  imageUrl: report.id
                     ? `https://source.unsplash.com/random/800x500?report,${report.estado.toLowerCase()}`
                     : undefined,
                   author: {
@@ -376,7 +376,7 @@ export class HomeComponent implements OnInit {
                   },
                   community: community
                     ? {
-                        id: community.ID as number,
+                        id: community.id as number,
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()

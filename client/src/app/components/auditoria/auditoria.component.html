@@ -1,1 +1,204 @@
-<app-layout> </app-layout>
+<app-layout>
+<!-- Formulario de edición (se muestra cuando showEditForm es true) -->
+
+    <!-- Formulario de comentarios (aparece al cambiar estado) -->
+  <div *ngIf="showCommentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
+      <h2 class="text-xl font-semibold mb-4">Confirmar cambio de estado</h2>
+      <p class="mb-4">Estás cambiando el estado a: <strong>{{currentStatusChange}}</strong></p>
+      
+      <div class="space-y-4">
+        <!-- Nuevo estado -->
+        <mat-form-field class="w-full">
+          <mat-label>Nuevo estado</mat-label>
+          <mat-select [(ngModel)]="currentStatusChange" name="nuevoEstado" >
+            <mat-option *ngFor="let estado of estadoOptions" [value]="estado">
+              {{ estado }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Textarea para comentarios -->
+        <mat-form-field class="w-full">
+          <mat-label >Comentarios sobre la decisión</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="commentText" 
+            name="commentText"
+            rows="4"
+          ></textarea>
+        </mat-form-field>
+
+     
+        <!-- Botones -->
+        <div class="flex justify-end gap-4 mt-6">
+          <button 
+            type="button" 
+            (click)="cancelarCambio()"
+            class="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="  aplicarCambioEstado
+()"
+           
+            class="px-4 py-2 rounded-md bg-primary hover:bg-primary-dark text-white "
+          >
+            Confirmar Cambio
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de edición de seguimiento -->
+<div *ngIf="showSeguimientoForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
+    <h2 class="text-xl font-semibold mb-4">Editar Seguimiento</h2>
+    
+    <form [formGroup]="seguimientoForm" class="space-y-4">
+      <!-- Selector de Estado de Seguimiento -->
+      <mat-form-field class="w-full">
+        <mat-label>Estado de Seguimiento</mat-label>
+        <mat-select formControlName="estadoSeguimiento">
+          <mat-option value="Denegado">Denegado</mat-option>
+          <mat-option value="Revisado">Revisado</mat-option>
+          <mat-option value="Resuelto">Resuelto</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Selector de Prioridad -->
+      <mat-form-field class="w-full">
+        <mat-label>Prioridad</mat-label>
+        <mat-select formControlName="prioridad">
+          <mat-option value="Baja">Baja</mat-option>
+          <mat-option value="Media">Media</mat-option>
+          <mat-option value="Alta">Alta</mat-option>
+          <mat-option value="Crítica">Crítica</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Textarea para acciones realizadas -->
+      <mat-form-field class="w-full">
+        <mat-label>Acciones realizadas</mat-label>
+        <textarea matInput formControlName="acciones" rows="4"></textarea>
+      </mat-form-field>
+
+      <!-- Checkbox de confirmación -->
+      <mat-checkbox formControlName="confirmar">
+        Confirmo los cambios realizados
+      </mat-checkbox>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-4 mt-6">
+        <button 
+          type="button" 
+          (click)="cancelarEdicionSeguimiento()"
+          class="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          (click)="guardarSeguimiento()"
+          [disabled]="!seguimientoForm.valid"
+          class="px-4 py-2 rounded-md bg-primary hover:bg-primary-dark text-white disabled:bg-gray-400"
+        >
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="w-full">
+  <form (submit)="aplicarFiltro(); $event.preventDefault()">
+      <mat-form-field >
+    <mat-label >Buscar por titulo o comunidad</mat-label>
+    <input 
+        matInput 
+        [(ngModel)]="filtro" 
+        name="filtro"
+        placeholder="Escribe para buscar..."
+        (keyup.enter)="aplicarFiltro()"
+      >
+       <button 
+        matSuffix 
+        mat-icon-button 
+        (click)="aplicarFiltro()"
+      >
+
+      </button>
+
+  </mat-form-field>
+  </form>
+  
+<table mat-table [dataSource]="dataSource" class="bg-default-100">
+  <!-- Título Column -->
+  <ng-container matColumnDef="titulo">
+    <th mat-header-cell *matHeaderCellDef > TÍTULO </th>
+ 
+    <td mat-cell *matCellDef="let reporte" class="">   <lucide-angular [img]="FileSearch" class="my-icon"></lucide-angular>{{reporte.titulo}} </td>
+  </ng-container>
+
+  <!-- Comunidad Column -->
+  <ng-container matColumnDef="comunidad">
+    <th mat-header-cell *matHeaderCellDef  > COMUNIDAD </th>
+    <td mat-cell *matCellDef="let reporte"> 
+      {{getNombreComunidad(reporte.comunidad_id || 0)}}
+
+    </td>
+  </ng-container>
+
+  <!-- Fecha Column -->
+  <ng-container matColumnDef="fecha">
+    <th mat-header-cell *matHeaderCellDef > FECHA </th>
+    <td mat-cell *matCellDef="let reporte"> 
+      {{formatearFecha(reporte.create_at)}} 
+    </td>
+  </ng-container>
+
+  <!-- Estado Column -->
+<ng-container matColumnDef="estado">
+  <th mat-header-cell *matHeaderCellDef > ESTADO </th>
+  <td mat-cell *matCellDef="let reporte">
+    {{ reporte.estado }}
+    <button mat-button class="ml-2" (click)="abrirCambioEstado(reporte)">
+      Cambiar estado
+    </button>
+  </td>
+</ng-container>
+
+  <!-- Seguimiento Column -->
+  <ng-container matColumnDef="seguimiento">
+    <th mat-header-cell *matHeaderCellDef > SEGUIMIENTO </th>
+    <td mat-cell *matCellDef="let reporte">
+      {{reporte.estado_seguimiento}}
+      <button mat-button class="text-foreground" (click)="abrirFormSeguimiento(reporte)">
+  Editar Seguimiento
+</button>
+    </td>
+  </ng-container>
+  <!-- Acciones Column -->
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef > ACCIONES </th>
+    <td mat-cell *matCellDef="let reporte">
+  
+    <button mat-button class="text-foreground" (click)="restablecerReporte(reporte)">
+      Eliminar
+      Cambios
+    </button>
+
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+</div>
+  
+</app-layout>

@@ -18,6 +18,7 @@ export class SidebarComponent {
     { id: 2, name: 'Reportes', slug: 'reports' },
     { id: 3, name: 'Actividades', slug: 'activities' },
     { id: 3, name: 'Todos', slug: 'reports' },
+    { id: 4, name: 'Auditoria', slug: 'auditoria' },
   ];
 
   user_section = [

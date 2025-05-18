@@ -6,7 +6,7 @@ export enum PrioridadSeguimientoReporte {
 }
 
 export interface SeguimientoReporte {
-  ID?: number;
+  id?: number;
   reporte_id: number;
   usuario_id: number;
   estado_anterior: string;

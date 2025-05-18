@@ -57,10 +57,10 @@ export class CommunityPostsComponent implements OnInit {
         map((communities) => {
           return communities.map((community) => {
             return {
-              id: community.ID as number,
+              id: community.id as number,
               title: community.nombre,
               community: {
-                id: community.ID as number,
+                id: community.id as number,
                 name: community.nombre,
                 slug: community.nombre.toLowerCase().replace(/\s+/g, '-'),
               },
