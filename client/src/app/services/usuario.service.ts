@@ -50,7 +50,7 @@ export class UsuarioService extends BaseService<Usuario> {
     return this.getProfile().pipe(
       switchMap((profile) => {
         if (profile) {
-          return this.update(profile.ID!, userData);
+          return this.update(profile.id!, userData);
         }
         throw new Error('No profile found');
       })

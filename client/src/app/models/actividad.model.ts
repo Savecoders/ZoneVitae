@@ -1,5 +1,5 @@
 export interface Actividad {
-  ID?: number;
+  id?: number;
   comunidad_id?: number | null;
   nombre: string;
   descripcion?: string | null;

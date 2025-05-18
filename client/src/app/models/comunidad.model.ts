@@ -5,7 +5,7 @@ export enum EstadoComunidad {
 }
 
 export interface Comunidad {
-  ID?: number;
+  id?: number;
   nombre: string;
   descripcion?: string | null;
   logo?: string | null;

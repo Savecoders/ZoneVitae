@@ -27,7 +27,7 @@ export class ReporteService extends BaseService<Reporte> {
     );
   }
 
-  // Get report by ID
+  // Get report by id
   getReporteById(id: number): Observable<Reporte> {
     return this.getById(id);
   }

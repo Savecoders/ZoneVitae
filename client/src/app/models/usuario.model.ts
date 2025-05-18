@@ -11,7 +11,7 @@ export enum EstadoCuentaUsuario {
 }
 
 export interface Usuario {
-  ID?: number;
+  id?: number;
   nombre_usuario: string;
   email: string;
   password?: string;
