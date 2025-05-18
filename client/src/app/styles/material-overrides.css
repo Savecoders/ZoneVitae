@@ -1,0 +1,160 @@
+/* Material Component Overrides with Tailwind v4 */
+
+/* General Material table styling */
+.mat-mdc-table {
+  background-color: transparent !important;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Table Header Row */
+.mat-mdc-header-row {
+  background-color: var(--color-default-300);
+  height: 56px;
+}
+
+/* Table Header Cell */
+.mat-mdc-header-cell {
+  color: var(--color-default-foreground);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 1rem;
+}
+
+/* Sort header styles */
+.mat-sort-header-container {
+  justify-content: flex-start;
+  align-items: center;
+  color: var(--color-default-foreground);
+}
+
+.mat-sort-header-arrow {
+  color: var(--color-default-foreground);
+}
+
+/* Table rows */
+.mat-mdc-row {
+  height: 52px;
+  transition: background-color 0.2s ease;
+}
+
+.mat-mdc-row:nth-child(odd) {
+  background-color: var(--color-default-200);
+}
+
+.mat-mdc-row:nth-child(even) {
+  background-color: var(--color-default-100);
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--color-default-300);
+}
+
+/* Table cells */
+.mat-mdc-cell {
+  color: var(--color-default-foreground);
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-default-300);
+}
+
+/* Paginator styling */
+.mat-mdc-paginator {
+  background-color: var(--color-default-200);
+  color: var(--color-default-foreground);
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+}
+
+.mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-range-label {
+  color: var(--color-default-foreground);
+}
+
+.mat-mdc-paginator-icon {
+  fill: var(--color-default-foreground);
+}
+
+/* Disabled paginator controls */
+.mat-mdc-icon-button[disabled] .mat-mdc-paginator-icon {
+  fill: var(--color-default-500);
+}
+
+/* Paginator select styling */
+.mat-mdc-select-value,
+.mat-mdc-select-arrow {
+  color: var(--color-default-foreground);
+}
+
+/* Dialog/popup styles */
+.mat-mdc-menu-panel {
+  background-color: var(--color-content1);
+  border: 1px solid var(--color-content2);
+  border-radius: 0.75rem;
+}
+
+.mat-mdc-menu-item {
+  color: var(--color-content1-foreground);
+}
+
+.mat-mdc-menu-item:hover {
+  background-color: var(--color-content2);
+}
+
+/* No data row styling */
+tr.mat-mdc-row.mat-mdc-no-data-row td {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Form field styling */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field-infix {
+  background-color: var(--color-content1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.mat-mdc-form-field-label {
+  color: var(--color-default-700);
+}
+
+/* Input styling */
+.mat-mdc-input-element {
+  color: var(--color-default-foreground);
+}
+
+/* Checkbox styling */
+.mat-mdc-checkbox
+  .mdc-checkbox
+  .mdc-checkbox__native-control:enabled:checked
+  ~ .mdc-checkbox__background {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Tooltip styling */
+.mat-mdc-tooltip {
+  background-color: var(--color-content3);
+  color: var(--color-content3-foreground);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Progress spinner */
+.mat-mdc-progress-spinner circle {
+  stroke: var(--color-primary);
+}
+
+/* Slider */
+.mat-mdc-slider .mdc-slider__track--active {
+  background-color: var(--color-primary);
+}
+
+.mat-mdc-slider .mdc-slider__thumb-knob {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}

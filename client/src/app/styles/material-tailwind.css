@@ -1,0 +1,186 @@
+:root {
+  --mdc-theme-primary: var(--color-primary);
+  --mdc-theme-secondary: var(--color-secondary);
+  --mdc-theme-surface: var(--color-content1);
+  --mdc-theme-background: var(--color-default-100);
+  --mdc-theme-on-primary: var(--color-default-foreground);
+  --mdc-theme-on-secondary: var(--color-default-foreground);
+  --mdc-theme-on-surface: var(--color-default-foreground);
+}
+
+/* Angular Material Table Styling */
+.mat-mdc-table {
+  background-color: transparent !important;
+}
+
+.mat-mdc-header-row {
+  background-color: var(--color-default-300) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--color-default-foreground) !important;
+  font-weight: 600;
+}
+
+.mat-mdc-row:nth-child(odd) {
+  background-color: var(--color-default-200);
+}
+
+.mat-mdc-row:nth-child(even) {
+  background-color: var(--color-default-100);
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--color-default-300);
+}
+
+.mat-mdc-cell {
+  color: var(--color-default-foreground) !important;
+}
+
+/* Angular Material Paginator */
+.mat-mdc-paginator {
+  background-color: var(--color-default-200) !important;
+}
+
+.mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-range-label {
+  color: var(--color-default-700) !important;
+}
+
+.mat-mdc-paginator-icon {
+  fill: var(--color-default-700) !important;
+}
+
+.mat-mdc-icon-button[disabled] .mat-mdc-paginator-icon {
+  fill: var(--color-default-500) !important;
+}
+
+/* Angular Material Form Fields */
+.mat-mdc-form-field-flex {
+  background-color: var(--color-content1) !important;
+}
+
+.mat-mdc-select-value-text,
+.mat-mdc-select-arrow {
+  color: var(--color-default-foreground) !important;
+}
+
+/* Angular Material Buttons */
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button {
+  font-family: inherit !important;
+}
+
+.mat-mdc-button.mat-primary,
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-outlined-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-protected-button-label-text-color: var(--color-primary);
+  --mdc-protected-button-container-color: var(--color-primary);
+}
+
+.mat-mdc-button.mat-accent,
+.mat-mdc-raised-button.mat-accent,
+.mat-mdc-outlined-button.mat-accent,
+.mat-mdc-unelevated-button.mat-accent {
+  --mdc-protected-button-label-text-color: var(--color-secondary);
+  --mdc-protected-button-container-color: var(--color-secondary);
+}
+
+/* Angular Material Dialog/Modal */
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: var(--color-content1) !important;
+  border-radius: 0.75rem !important;
+  padding: 1.25rem !important;
+}
+
+.mat-mdc-dialog-title {
+  color: var(--color-default-foreground) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+.mat-mdc-dialog-content {
+  color: var(--color-default-700) !important;
+}
+
+.mat-mdc-dialog-actions {
+  padding: 1rem 1.5rem !important;
+}
+
+/* Angular Material Menu */
+.mat-mdc-menu-panel {
+  background-color: var(--color-content1) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.mat-mdc-menu-item {
+  color: var(--color-default-foreground) !important;
+}
+
+.mat-mdc-menu-item:hover:not([disabled]) {
+  background-color: var(--color-content2) !important;
+}
+
+/* Angular Material Checkbox */
+.mat-mdc-checkbox .mdc-checkbox .mdc-checkbox__background {
+  border-color: var(--color-default-500) !important;
+}
+
+.mat-mdc-checkbox
+  .mdc-checkbox
+  .mdc-checkbox__native-control:enabled:checked
+  ~ .mdc-checkbox__background {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* No data row styling */
+.mat-mdc-no-data-row .mat-mdc-cell {
+  padding: 1.5rem !important;
+  text-align: center;
+  color: var(--color-default-500) !important;
+}
+
+/* Sort Header */
+.mat-sort-header-arrow {
+  color: var(--color-default-700) !important;
+}
+
+/* Loading indicator styling */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--color-default-300);
+  border-top-color: var(--color-primary);
+  animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Improved focus states for accessibility */
+.mat-mdc-button:focus-visible,
+.mat-mdc-raised-button:focus-visible,
+.mat-mdc-outlined-button:focus-visible,
+.mat-mdc-unelevated-button:focus-visible,
+.mat-mdc-icon-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
