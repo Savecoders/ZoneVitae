@@ -17,8 +17,8 @@ import {
   CircleHelpIcon,
   BetweenVerticalEnd,
   UsersRoundIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
+  LayoutPanelLeftIcon,
+  LayoutGridIcon,
 } from 'lucide-angular';
 import { ILinks } from '../../../lib/ILinks.interface';
 
@@ -36,8 +36,8 @@ import { ILinks } from '../../../lib/ILinks.interface';
 })
 export class SidebarComponent {
   isCollapsed = false;
-  ChevronLeftIcon = ChevronLeftIcon;
-  ChevronRightIcon = ChevronRightIcon;
+  ChevronLeftIcon = LayoutPanelLeftIcon;
+  ChevronRightIcon = LayoutGridIcon;
 
   topics: ILinks[] = [
     { id: 1, name: 'Home', slug: '', icon: HomeIcon },
