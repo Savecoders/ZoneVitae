@@ -5,7 +5,7 @@ import { SeguimientoReporte } from './seguimiento-reporte.model';
 import { Foto } from './foto.model';
 
 export interface ReporteCompleto {
-  ID?: number;
+  id?: number;
   titulo: string;
   contenido: string;
   anonimo: boolean;

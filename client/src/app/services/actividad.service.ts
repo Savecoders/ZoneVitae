@@ -42,7 +42,7 @@ export class ActividadService extends BaseService<Actividad> {
     );
   }
 
-  // Get activity by ID
+  // Get activity by id
   getActividadById(id: number): Observable<Actividad> {
     return this.getById(id);
   }

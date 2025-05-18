@@ -3,7 +3,7 @@ import { Comunidad } from './comunidad.model';
 import { RolComunidad } from './rol-comunidad.model';
 
 export interface UsuarioCompleto {
-  ID?: number;
+  id?: number;
   nombre_usuario: string;
   email: string;
   foto_perfil?: string | null;
