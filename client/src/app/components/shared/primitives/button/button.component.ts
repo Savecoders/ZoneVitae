@@ -6,16 +6,18 @@ import {
   SizeVariant,
 } from '../../../../models/ui.model';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule, LucideIconData, PlusIcon } from 'lucide-angular';
 
 @Component({
   selector: 'app-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: `./button.component.html`,
   styles: [],
 })
 export class ButtonComponent {
   @Input() color: ColorVariant = 'default';
+  @Input() icon: LucideIconData = PlusIcon;
   @Input() size: SizeVariant = 'md';
   @Input() radius: RadiusVariant = 'md';
   @Input() intensity: IntensityVariant = 'solid';
