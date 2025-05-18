@@ -29,7 +29,7 @@ export class CloudinaryService {
   uploadImage(file: File): Observable<string> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'zone_vitae');
+    formData.append('upload_preset', 'ml_default');
 
     return this.http
       .post<CloudinaryResponse>(
