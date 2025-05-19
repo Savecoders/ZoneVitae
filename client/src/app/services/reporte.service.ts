@@ -51,9 +51,9 @@ export class ReporteService extends BaseService<ReporteCompleto> {
     );
   }
 
-   /*updateReporte(id: number, reporte: Partial<Reporte>): Observable<Reporte> {
+   updateReporte(id: number, reporte: Partial<Reporte>): Observable<Reporte> {
     return this.update(id, reporte);
-   }*/
+   }
    
 crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
   return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);

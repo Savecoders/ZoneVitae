@@ -27,26 +27,26 @@
   ],
   "roles": [
     {
-      "id": "1",
+      "id": 1,
       "nombre": "admin"
     },
     {
-      "id": "2",
+      "id": 2,
       "nombre": "user"
     },
     {
-      "id": "3",
+      "id": 3,
       "nombre": "moderator"
     }
   ],
   "usuario_roles": [
     {
-      "id": "1",
+      "id": 1,
       "id_usuario": 1,
       "id_rol": 1
     },
     {
-      "id": "2",
+      "id": 2,
       "id_usuario": 2,
       "id_rol": 2
     }
@@ -98,10 +98,9 @@
       "contenido": "La farola ubicada en la esquina de la calle principal está dañada y no funciona desde hace una semana.",
       "anonimo": 0,
       "estado": "Pendiente de Revision",
-      "estado_seguimiento": "Pendiente de Revision",
+      "estado_seguimiento": "Resuelto",
       "create_at": "2023-03-10T16:20:00",
-      "update_at": "2025-05-19T21:10:42.040Z",
-      "nombreComunidad": "Comunidad Vecinal Las Flores"
+      "update_at": "2025-05-18T22:16:57.627Z"
     },
     {
       "id": "2",
