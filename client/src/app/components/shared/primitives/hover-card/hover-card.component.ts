@@ -1,5 +1,12 @@
-import { Component, Input, HostListener, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  Input,
+  HostListener,
+  ElementRef,
+  Inject,
+  PLATFORM_ID,
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 export type HoverCardPlacement = 'top' | 'right' | 'bottom' | 'left';
 
@@ -51,8 +58,11 @@ export class HoverCardComponent {
   isVisible = false;
   private openTimeout: any;
   private closeTimeout: any;
+  private isBrowser: boolean;
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef, @Inject(PLATFORM_ID) platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   get placementClasses(): string {
     const placements: Record<HoverCardPlacement, string> = {
@@ -91,7 +101,7 @@ export class HoverCardComponent {
   @HostListener('window:scroll')
   onWindowScroll(): void {
     // Hide the hover card when scrolling
-    if (this.isVisible) {
+    if (this.isBrowser && this.isVisible) {
       this.isVisible = false;
     }
   }
