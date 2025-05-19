@@ -42,6 +42,7 @@ export interface DialogOptions {
   contentClassName?: string;
   overlayClassName?: string;
   data?: any;
+  confirmButtonDisabled?: boolean;
 }
 
 export interface DialogRef {
@@ -99,6 +100,14 @@ export class DialogService {
         : true;
     instance.showCloseButton =
       options.showCloseButton !== undefined ? options.showCloseButton : true;
+    instance.confirmButtonDisabled =
+      options.confirmButtonDisabled !== undefined
+        ? options.confirmButtonDisabled
+        : false;
+    instance.confirmButtonDisabled =
+      options.confirmButtonDisabled !== undefined
+        ? options.confirmButtonDisabled
+        : false;
     instance.closeOnBackdropClick =
       options.closeOnBackdropClick !== undefined
         ? options.closeOnBackdropClick
@@ -110,6 +119,7 @@ export class DialogService {
     instance.className = options.className || '';
     instance.contentClassName = options.contentClassName || '';
     instance.overlayClassName = options.overlayClassName || '';
+    instance.data = options.data; // Add the data to the instance
 
     // Set the content template if it exists
     if (options.content) {
