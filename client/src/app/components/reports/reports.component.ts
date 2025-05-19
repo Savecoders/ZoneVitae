@@ -173,13 +173,22 @@ export class ReportsComponent implements OnInit {
     }
 
     const reportForm = this.form.value;
+    // Validar que todos los tags tengan un nombre definido
     const tagsNom: string[] = reportForm.tags
+      .filter((t: any) => t && t.nombre) // Asegurar que el tag tenga propiedad nombre
       .map((t: any) => (t.nombre as string).trim().toLowerCase())
       .filter((nombre: string) => nombre.length > 0);
 
+    if (tagsNom.length === 0) {
+      this.toastService.error('Debes agregar al menos un tag válido');
+      return;
+    }
+
     const tagsCreacion$ = tagsNom.map((nombre: string) =>
       this.tagService.getTags().pipe(
-        map((tags) => tags.find((tag) => tag.nombre.toLowerCase() === nombre)),
+        map((tags) =>
+          tags.find((tag) => tag?.nombre?.toLowerCase() === nombre)
+        ), // Añadimos validación adicional
         switchMap((tagExistente) => {
           if (tagExistente) {
             return of(tagExistente);
@@ -209,25 +218,48 @@ export class ReportsComponent implements OnInit {
         };
 
         if (this.isEditMode && this.reporteEditando) {
-          this.reporteService.editReporte(nuevoReporte).subscribe(() => {
-            this.cargarReportes();
-            this.resetFormulario();
-            this.mostrarFormulario = false;
-            this.isEditMode = false;
-            this.reporteEditando = null;
-            this.toastService.success('¡Reporte guardado exitosamente!');
+          this.reporteService.editReporte(nuevoReporte).subscribe({
+            next: () => {
+              this.toastService.success('¡Reporte guardado exitosamente!');
+
+              // Primero hacer todas las actualizaciones de estado
+              this.resetFormulario();
+              this.mostrarFormulario = false;
+              this.isEditMode = false;
+              this.reporteEditando = null;
+
+              // Luego cargar los reportes para evitar problemas de refresco
+              setTimeout(() => this.cargarReportes(), 100);
+            },
+            error: (err) => {
+              console.error('Error al editar reporte:', err);
+              this.toastService.error('Error al guardar el reporte');
+            },
           });
         } else {
-          this.reporteService.createReporte(nuevoReporte).subscribe(() => {
-            this.cargarReportes();
-            this.resetFormulario();
-            this.mostrarFormulario = false;
-            this.toastService.success('¡Reporte guardado exitosamente!');
+          this.reporteService.createReporte(nuevoReporte).subscribe({
+            next: () => {
+              this.toastService.success('¡Reporte guardado exitosamente!');
+
+              // Primero hacer todas las actualizaciones de estado
+              this.resetFormulario();
+              this.mostrarFormulario = false;
+
+              // Luego cargar los reportes para evitar problemas de refresco
+              setTimeout(() => this.cargarReportes(), 100);
+            },
+            error: (err) => {
+              console.error('Error al crear reporte:', err);
+              this.toastService.error('Error al guardar el reporte');
+            },
           });
         }
       },
       error: (err) => {
         console.error('Error creando tags:', err);
+        this.toastService.error(
+          'Error al guardar el reporte. Verifica los datos ingresados.'
+        );
       },
     });
   }
@@ -298,16 +330,23 @@ export class ReportsComponent implements OnInit {
   }
 
   agregarTag(nombre: string): void {
+    // Validar que el nombre no sea nulo o vacío
+    if (!nombre) {
+      return;
+    }
+
     const nombreNormalizado = nombre.trim().toLowerCase();
     if (
       !nombreNormalizado ||
       this.tags.length >= 5 ||
       this.tags.value.some(
-        (t: Tag) => t.nombre.trim().toLowerCase() === nombreNormalizado
+        (t: Tag) =>
+          t && t.nombre && t.nombre.trim().toLowerCase() === nombreNormalizado
       )
     )
       return;
 
+    // Crear un objeto Tag correctamente conformado
     this.tags.push(this.fb.control({ nombre: nombreNormalizado }));
   }
 
