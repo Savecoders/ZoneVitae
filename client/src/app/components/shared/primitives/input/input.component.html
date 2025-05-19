@@ -33,7 +33,8 @@
       (blur)="onBlur()"
       (focus)="onFocus()"
       [ngClass]="[
-        'outline-none transition-all duration-200 bg-content1',
+        'outline-none transition-all duration-200 bg-content1 w-full',
+        className || '',
         startContent ? 'pl-10' : 'pl-3',
         endContent ? 'pr-10' : 'pr-3',
         radiusClasses,

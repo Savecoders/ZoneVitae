@@ -74,7 +74,10 @@ import { ColorVariant } from '../../../../models/ui.model';
           [style.max-height]="scrollable ? '70vh' : 'auto'"
         >
           @if (contentTemplate) {
-          <ng-container [ngTemplateOutlet]="contentTemplate"></ng-container>
+          <ng-container
+            [ngTemplateOutlet]="contentTemplate"
+            [ngTemplateOutletContext]="{ $implicit: data, dialogData: data }"
+          ></ng-container>
           } @else if (content) {
           {{ content }}
           } @else {
@@ -99,6 +102,7 @@ import { ColorVariant } from '../../../../models/ui.model';
           <app-button
             [color]="confirmButtonColor"
             [loading]="loading"
+            [disabled]="confirmButtonDisabled"
             (buttonClick)="onConfirm()"
           >
             {{ confirmButtonText }}
@@ -136,10 +140,12 @@ export class DialogComponent implements AfterViewInit {
   @Input() closeOnEsc = true;
   @Input() scrollable = true;
   @Input() loading = false;
+  @Input() confirmButtonDisabled = false;
   @Input() className = '';
   @Input() overlayClassName = '';
   @Input() contentClassName = '';
   @Input() content = ''; // For string content
+  @Input() data: any; // Data to be passed to the template context
 
   @ContentChild('header') headerTemplate?: TemplateRef<any>;
   @ContentChild('footer') footerTemplate?: TemplateRef<any>;
@@ -202,6 +208,7 @@ export class DialogComponent implements AfterViewInit {
     this.isOpen = true;
     this.setupEscListener();
     this.opened.emit();
+    console.log('Dialog opened with data:', this.data);
 
     // Only modify DOM in browser environment
     if (this.isBrowser) {
