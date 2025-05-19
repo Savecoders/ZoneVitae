@@ -12,6 +12,7 @@ import { AvatarComponent } from '../../shared/primitives/avatar/avatar.component
 import { ButtonComponent } from '../../shared/primitives/button/button.component';
 import { AuthService } from '../../../services/auth.service';
 import { UsuarioService } from '../../../services/usuario.service';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../../../models/auth.model';
 import {
@@ -54,6 +55,7 @@ export class ProfileComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private usuarioService: UsuarioService,
+    private cloudinaryService: CloudinaryService,
     private router: Router,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
