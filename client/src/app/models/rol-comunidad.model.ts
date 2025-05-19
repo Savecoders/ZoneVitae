@@ -1,4 +1,4 @@
 export interface RolComunidad {
-  ID?: number;
+  id?: number;
   nombre: string;
 }

@@ -180,7 +180,7 @@ export class ToastService {
   }
 
   /**
-   * Remove a toast by ID
+   * Remove a toast by id
    */
   remove(id: string): void {
     const toast = this.toasts$.value.find((t) => t.id === id);
@@ -229,7 +229,7 @@ export class ToastService {
   }
 
   /**
-   * Generate a unique ID for a toast
+   * Generate a unique id for a toast
    */
   private generateId(): string {
     return `toast-${Date.now()}-${Math.floor(Math.random() * 1000)}`;

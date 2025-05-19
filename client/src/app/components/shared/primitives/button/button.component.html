@@ -37,7 +37,8 @@
     </svg>
   </span>
   }
-  <span [ngClass]="{ 'opacity-0': loading }">
+  <span [ngClass]="{ 'opacity-0': loading }" class="flex items-center gap-2">
+    <i-lucide [img]="icon" class="my-icon"></i-lucide>
     <ng-content></ng-content>
   </span>
 </button>

@@ -12,7 +12,7 @@ export enum SeguimientoReporteEnum {
 }
 
 export interface Reporte {
-  ID?: number;
+  id?: number;
   comunidad_id?: number | null;
   autor_id?: number | null;
   titulo: string;

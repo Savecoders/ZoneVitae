@@ -20,6 +20,7 @@ export class ReporteService extends BaseService<ReporteCompleto> {
     return this.http.get<ReporteCompleto[]>(this.jsonUrl);
   }
 
+
   //Agregar Reporte
   createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
     return this.http.post<ReporteCompleto>(this.jsonUrl, reporte)

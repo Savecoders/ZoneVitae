@@ -16,7 +16,7 @@ export interface AuthResponse {
   token: string;
   expires: Date | string;
   user: {
-    ID: number;
+    id: number;
     nombre_usuario: string;
     email: string;
     foto_perfil?: string | null;

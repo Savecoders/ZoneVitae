@@ -17,7 +17,7 @@ export class TagService extends BaseService<Tag> {
     return this.getAll();
   }
 
-  // Get tag by ID
+  // Get tag by id
   getTagById(id: number): Observable<Tag> {
     return this.getById(id);
   }

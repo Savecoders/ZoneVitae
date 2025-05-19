@@ -12,7 +12,10 @@ import {
 } from '@angular/platform-browser';
 import { DEFAULT_UI_CONFIG, UI_CONFIG } from './config/ui.config';
 import { ThemeService } from './services/theme.service';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+
+// Import the CloudinaryModule Docs
+import { CloudinaryModule } from '@cloudinary/ng';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     { provide: UI_CONFIG, useValue: DEFAULT_UI_CONFIG },
     ThemeService,
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
+    CloudinaryModule,
   ],
 };

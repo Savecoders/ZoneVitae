@@ -31,7 +31,7 @@ export class ComunidadService extends BaseService<Comunidad> {
     );
   }
 
-  // Get community by ID
+  // Get community by id
   getComunidadById(id: number): Observable<Comunidad> {
     return this.getById(id);
   }

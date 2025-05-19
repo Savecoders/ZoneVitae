@@ -1,7 +1,7 @@
 {
   "usuarios": [
     {
-      "ID": 1,
+      "id": 1,
       "nombre_usuario": "juanperez",
       "email": "juan.perez@example.com",
       "password": "hashedpassword123",
@@ -13,7 +13,7 @@
       "update_at": "2023-01-15T10:30:00"
     },
     {
-      "ID": 2,
+      "id": 2,
       "nombre_usuario": "mariagomez",
       "email": "maria.gomez@example.com",
       "password": "hashedpassword456",
@@ -27,29 +27,29 @@
   ],
   "tags": [
     {
-      "ID": 1,
+      "id": 1,
       "nombre": "Medio Ambiente"
     },
     {
-      "ID": 2,
+      "id": 2,
       "nombre": "Seguridad"
     },
     {
-      "ID": 3,
+      "id": 3,
       "nombre": "Infraestructura"
     }
   ],
   "roles": [
     {
-      "ID": 1,
+      "id": 1,
       "nombre": "Administrador"
     },
     {
-      "ID": 2,
+      "id": 2,
       "nombre": "Usuario"
     },
     {
-      "ID": 3,
+      "id": 3,
       "nombre": "Moderador"
     }
   ],
@@ -65,21 +65,21 @@
   ],
   "roles_comunidades": [
     {
-      "ID": 1,
+      "id": 1,
       "nombre": "Administrador"
     },
     {
-      "ID": 2,
+      "id": 2,
       "nombre": "Miembro"
     },
     {
-      "ID": 3,
+      "id": 3,
       "nombre": "Moderador"
     }
   ],
   "comunidades": [
     {
-      "ID": 1,
+      "id": 1,
       "nombre": "Comunidad Vecinal Las Flores",
       "descripcion": "Comunidad de vecinos del barrio Las Flores dedicada a mejorar la calidad de vida en el vecindario.",
       "logo": null,
@@ -90,7 +90,7 @@
       "update_at": "2023-02-01T09:00:00"
     },
     {
-      "ID": 2,
+      "id": 2,
       "nombre": "Amigos del Parque Central",
       "descripcion": "Grupo comunitario dedicado a la preservación y mejora del Parque Central.",
       "logo": null,
@@ -103,7 +103,7 @@
   ],
   "reports": [
     {
-      "ID": 1,
+      "id": 1,
       "comunidad_id": 1,
       "autor_id": 2,
       "titulo": "Farola dañada en calle principal",
@@ -115,7 +115,7 @@
       "update_at": "2023-03-10T16:20:00"
     },
     {
-      "ID": 2,
+      "id": 2,
       "comunidad_id": 2,
       "autor_id": 1,
       "titulo": "Basura acumulada en el parque",
@@ -129,15 +129,15 @@
   ],
   "comentarios": [
     {
-      "ID": 1,
-      "actividades_Id": 1,
+      "id": 1,
+      "actividades_id": 1,
       "autor_id": 2,
       "contenido": "¡Gran iniciativa! Estaré presente.",
       "fecha_comentario": "2023-04-02T15:45:00"
     },
     {
-      "ID": 2,
-      "actividades_Id": 1,
+      "id": 2,
+      "actividades_id": 1,
       "autor_id": 1,
       "contenido": "¿Se requiere llevar algún material específico?",
       "fecha_comentario": "2023-04-03T09:20:00"
@@ -145,7 +145,7 @@
   ],
   "actividades": [
     {
-      "ID": 1,
+      "id": 1,
       "comunidad_id": 1,
       "nombre": "Limpieza comunitaria del barrio",
       "descripcion": "Actividad de limpieza general en las calles del barrio Las Flores.",
@@ -160,7 +160,7 @@
       "update_at": "2023-04-01T10:00:00"
     },
     {
-      "ID": 2,
+      "id": 2,
       "comunidad_id": 2,
       "nombre": "Taller de jardinería",
       "descripcion": "Taller de jardinería básica para mantener las áreas verdes del parque.",
@@ -177,12 +177,12 @@
   ],
   "fotos": [
     {
-      "ID": 1,
+      "id": 1,
       "image": null,
       "reports_id": 1
     },
     {
-      "ID": 2,
+      "id": 2,
       "image": null,
       "reports_id": 2
     }
@@ -233,12 +233,12 @@
   ],
   "galeria_comunidad": [
     {
-      "ID": 1,
+      "id": 1,
       "comunidad_id": 1,
       "imagen": null
     },
     {
-      "ID": 2,
+      "id": 2,
       "comunidad_id": 2,
       "imagen": null
     }
@@ -265,7 +265,7 @@
   ],
   "seguimiento_reportes": [
     {
-      "ID": 1,
+      "id": 1,
       "reporte_id": 2,
       "usuario_id": 1,
       "estado_anterior": "Pendiente de Revision",

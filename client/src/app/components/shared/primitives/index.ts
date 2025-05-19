@@ -13,4 +13,7 @@ export * from './separator/separator.component';
 export * from './toast/toast.component';
 export * from './sonner/sonner.component';
 export * from './breadcrumb/breadcrumb.component';
-export * from './fault/fault.component';
+export * from './alert-dialog/alert-dialog.component';
+export * from './hover-card/hover-card.component';
+export * from './dialog/dialog.component';
+export * from './dropdown-menu/dropdown-menu.component';

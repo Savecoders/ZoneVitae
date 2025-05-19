@@ -1,7 +1,7 @@
 {
   "usuarios": [
     {
-      "id": 1,
+      "id": "1",
       "nombre_usuario": "juanperez",
       "email": "juan.perez@example.com",
       "password": "hashedpassword123",
@@ -13,7 +13,7 @@
       "update_at": "2023-01-15T10:30:00"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre_usuario": "mariagomez",
       "email": "maria.gomez@example.com",
       "password": "hashedpassword456",
@@ -27,59 +27,61 @@
   ],
   "tags": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "Medio Ambiente"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "Seguridad"
     },
     {
-      "id": 3,
+      "id": "3",
       "nombre": "Infraestructura"
     }
   ],
   "roles": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "Administrador"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "Usuario"
     },
     {
-      "id": 3,
+      "id": "3",
       "nombre": "Moderador"
     }
   ],
   "usuarios_roles": [
     {
       "id_usuario": 1,
-      "id_rol": 1
+      "id_rol": 1,
+      "id": "9654"
     },
     {
       "id_usuario": 2,
-      "id_rol": 2
+      "id_rol": 2,
+      "id": "3df5"
     }
   ],
   "roles_comunidades": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "Administrador"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "Miembro"
     },
     {
-      "id": 3,
+      "id": "3",
       "nombre": "Moderador"
     }
   ],
   "comunidades": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "Comunidad Vecinal Las Flores",
       "descripcion": "Comunidad de vecinos del barrio Las Flores dedicada a mejorar la calidad de vida en el vecindario.",
       "logo": null,
@@ -90,7 +92,7 @@
       "update_at": "2023-02-01T09:00:00"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "Amigos del Parque Central",
       "descripcion": "Grupo comunitario dedicado a la preservación y mejora del Parque Central.",
       "logo": null,
@@ -103,7 +105,7 @@
   ],
   "reports": [
     {
-      "id": 1,
+      "id": "1",
       "comunidad_id": 1,
       "autor_id": 2,
       "titulo": "Farola dañada en calle principal",
@@ -115,7 +117,7 @@
       "update_at": "2023-03-10T16:20:00"
     },
     {
-      "id": 2,
+      "id": "2",
       "comunidad_id": 2,
       "autor_id": 1,
       "titulo": "Basura acumulada en el parque",
@@ -129,14 +131,14 @@
   ],
   "comentarios": [
     {
-      "id": 1,
+      "id": "1",
       "actividades_id": 1,
       "autor_id": 2,
       "contenido": "¡Gran iniciativa! Estaré presente.",
       "fecha_comentario": "2023-04-02T15:45:00"
     },
     {
-      "id": 2,
+      "id": "2",
       "actividades_id": 1,
       "autor_id": 1,
       "contenido": "¿Se requiere llevar algún material específico?",
@@ -145,22 +147,19 @@
   ],
   "actividades": [
     {
-      "id": 1,
-      "comunidad_id": 1,
       "nombre": "Limpieza comunitaria del barrio",
       "descripcion": "Actividad de limpieza general en las calles del barrio Las Flores.",
       "fecha_inicio": "2023-04-15",
       "fecha_fin": "2023-04-15",
       "ubicacion": "Plaza central del barrio Las Flores",
-      "virtual": 0,
-      "frecuencia": "Única vez",
-      "cover": null,
-      "fecha": "2023-04-01T10:00:00",
-      "create_at": "2023-04-01T10:00:00",
-      "update_at": "2023-04-01T10:00:00"
+      "virtual": false,
+      "frecuencia": "once",
+      "comunidad_id": 1,
+      "url": "http://localhost:4200/admin/activities",
+      "id": "1"
     },
     {
-      "id": 2,
+      "id": "2",
       "comunidad_id": 2,
       "nombre": "Taller de jardinería",
       "descripcion": "Taller de jardinería básica para mantener las áreas verdes del parque.",
@@ -177,12 +176,12 @@
   ],
   "fotos": [
     {
-      "id": 1,
+      "id": "1",
       "image": null,
       "reports_id": 1
     },
     {
-      "id": 2,
+      "id": "2",
       "image": null,
       "reports_id": 2
     }
@@ -190,25 +189,30 @@
   "reports_tags": [
     {
       "reports_id": 1,
-      "tag_id": 3
+      "tag_id": 3,
+      "id": "dab0"
     },
     {
       "reports_id": 2,
-      "tag_id": 1
+      "tag_id": 1,
+      "id": "f91d"
     }
   ],
   "comunidad_tags": [
     {
       "comunidad_id": 1,
-      "tag_id": 2
+      "tag_id": 2,
+      "id": "567f"
     },
     {
       "comunidad_id": 1,
-      "tag_id": 3
+      "tag_id": 3,
+      "id": "8525"
     },
     {
       "comunidad_id": 2,
-      "tag_id": 1
+      "tag_id": 1,
+      "id": "e9df"
     }
   ],
   "usuarios_comunidades_roles": [
@@ -216,29 +220,32 @@
       "usuario_id": 1,
       "comunidad_id": 1,
       "rol_id": 1,
-      "fecha_asignacion": "2023-02-01T09:00:00"
+      "fecha_asignacion": "2023-02-01T09:00:00",
+      "id": "0d95"
     },
     {
       "usuario_id": 2,
       "comunidad_id": 1,
       "rol_id": 2,
-      "fecha_asignacion": "2023-02-03T16:45:00"
+      "fecha_asignacion": "2023-02-03T16:45:00",
+      "id": "2ed2"
     },
     {
       "usuario_id": 2,
       "comunidad_id": 2,
       "rol_id": 1,
-      "fecha_asignacion": "2023-02-05T11:30:00"
+      "fecha_asignacion": "2023-02-05T11:30:00",
+      "id": "71f2"
     }
   ],
   "galeria_comunidad": [
     {
-      "id": 1,
+      "id": "1",
       "comunidad_id": 1,
       "imagen": null
     },
     {
-      "id": 2,
+      "id": "2",
       "comunidad_id": 2,
       "imagen": null
     }
@@ -246,26 +253,30 @@
   "me_encanta": [
     {
       "usuario_id": 2,
-      "reports_id": 1
+      "reports_id": 1,
+      "id": "e3b5"
     },
     {
       "usuario_id": 1,
-      "reports_id": 2
+      "reports_id": 2,
+      "id": "8a5d"
     }
   ],
   "follows": [
     {
       "usuario_id": 1,
-      "comunidad_id": 2
+      "comunidad_id": 2,
+      "id": "5b40"
     },
     {
       "usuario_id": 2,
-      "comunidad_id": 1
+      "comunidad_id": 1,
+      "id": "db9e"
     }
   ],
   "seguimiento_reportes": [
     {
-      "id": 1,
+      "id": "1",
       "reporte_id": 2,
       "usuario_id": 1,
       "estado_anterior": "Pendiente de Revision",
