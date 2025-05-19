@@ -28,7 +28,7 @@ export class SeguimientoService extends BaseService<SeguimientoReporte> {
   }
 
   // Actualizar seguimiento
-  updateSeguimiento(id: string, seguimiento: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
+  updateSeguimiento(id: number, seguimiento: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
     return this.update(id, seguimiento);
   }
 

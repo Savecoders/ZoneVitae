@@ -20,6 +20,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { HttpClient } from '@angular/common/http';
 import { SeguimientoService } from '../../services/seguimiento.service';
+import { CloudinaryService } from '../../services/cloudinary.service';
+import { InputComponent } from '../shared/primitives';
 
 @Component({
   selector: 'app-auditoria',
@@ -60,13 +62,18 @@ export class AuditoriaComponent  {
   // Opciones para los selects
   seguimientoOptions = ['Denegado', 'Revisado', 'Resuelto'];
   prioridadOptions = ['Baja', 'Media', 'Alta', 'Crítica'];
+  selectedImage: File | null = null;
+imagePreview: string | ArrayBuffer | null = null;
+
 
   constructor(
     private reporteService: ReporteService,
     private comunidadService: ComunidadService ,
       private seguimientoService: SeguimientoService,
   private fb: FormBuilder,
-  private http: HttpClient
+  private http: HttpClient,
+  private cloudinaryService: CloudinaryService
+  
   ) {
     this.editForm = this.fb.group({
       estado: ['', Validators.required],
@@ -211,10 +218,10 @@ if (!this.editForm.valid) {
 };
               
               // Convertir el ID a string (según tu servicio)
-              const seguimientoId = seguimientoExistente.id.toString();
+              const seguimientoId = seguimientoExistente.id;
               
               this.seguimientoService.updateSeguimiento(
-                seguimientoId, 
+                Number(seguimientoId), 
                 seguimientoActualizado
               ).subscribe({
                 next: () => {
@@ -259,16 +266,28 @@ if (!this.editForm.valid) {
    this.showSeguimientoForm = true;
 
    // Aquí NO uses reporte.prioridad ni reporte.acciones_realizadas
-  // Mejor deja los campos vacíos o con valores por defecto
+  
   this.seguimientoForm.patchValue({
-    estadoSeguimiento: '', // o el valor actual si lo tienes
+    estadoSeguimiento: '', 
     prioridad: 'Media',
     acciones: ''
   });
  }
 
-guardarSeguimiento() {
+async guardarSeguimiento() {
   if (this.seguimientoForm.valid && this.currentSeguimientoReport) {
+    let imageUrl = null;
+    
+    // Subir imagen si existe
+    if (this.selectedImage) {
+      try {
+        imageUrl = await this.cloudinaryService.uploadImage(this.selectedImage).toPromise();
+      } catch (error) {
+        console.error('Error al subir la imagen:', error);
+        return; // Detener el proceso si falla la subida
+      }
+    }
+
     // Buscar el seguimiento existente por reporte_id
     this.seguimientoService.getSeguimientosByReporte(this.currentSeguimientoReport.id!)
       .subscribe(seguimientos => {
@@ -281,19 +300,21 @@ guardarSeguimiento() {
             estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
             prioridad: this.seguimientoForm.value.prioridad,
             accion_realizada: this.seguimientoForm.value.acciones,
-            update_at: new Date().toISOString()
+            update_at: new Date().toISOString(),
+            imagen: imageUrl || seguimientoExistente.imagen // Mantener la anterior si no hay nueva
           };
 
+          // Resto del código permanece igual...
           this.seguimientoService.updateSeguimiento(
-            seguimientoExistente.id!.toString(),
+            seguimientoExistente.id!,
             seguimientoActualizado
           ).subscribe({
             next: () => {
-              // Actualizar el campo estado_seguimiento del reporte
+              // Actualizar el reporte
               this.reporteService.updateReporte(
                 this.currentSeguimientoReport!.id!,
                 { 
-                  id: this.currentSeguimientoReport!.id,
+                 id: this.currentSeguimientoReport!.id,
                   comunidad_id: this.currentSeguimientoReport!.comunidad_id,
                   autor_id: this.currentSeguimientoReport!.autor_id,
                   
@@ -303,28 +324,26 @@ guardarSeguimiento() {
                   estado: this.currentSeguimientoReport!.estado,
                   estado_seguimiento: this.seguimientoForm.value.estadoSeguimiento,
                   create_at: this.currentSeguimientoReport!.create_at,
-                update_at: new Date().toISOString()}
+                update_at: new Date().toISOString()
+                }
               ).subscribe({
                 next: () => {
                   this.cargarDatos();
                   this.cerrarFormularioSeguimiento();
+                  this.selectedImage = null;
+                  this.imagePreview = null;
                 },
-                error: (err) => {
-                  console.error('Error al actualizar estado_seguimiento del reporte', err);
-                }
+                error: (err) => console.error(err)
               });
             },
-            error: (err) => {
-              console.error('Error al actualizar seguimiento', err);
-            }
+            error: (err) => console.error(err)
           });
         } else {
-          // Si no existe, crea uno nuevo (opcional)
+          // Lógica para crear nuevo seguimiento si no existe
         }
       });
   }
 }
-
   // Método para cancelar la edición
   cancelarEdicionSeguimiento() {
     this.cerrarFormularioSeguimiento();
@@ -350,8 +369,8 @@ guardarSeguimiento() {
 
   const reporteActualizado: Partial<Reporte> = {
     ...reporte,
-    estado: EstadoReporte.PENDIENTE_REVISION,
-    estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION,
+    estado: EstadoReporte.PENDIENTE_REVISION,  // Usar el enum
+    estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION,  // Usar el enum
     update_at: new Date().toISOString()
   };
 
@@ -360,6 +379,24 @@ guardarSeguimiento() {
       next: () => this.cargarDatos(),
       error: (err) => console.error('Error al restablecer el reporte', err)
     });
+}
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    this.selectedImage = input.files[0];
+    
+    // Mostrar vista previa
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result;
+    };
+    reader.readAsDataURL(this.selectedImage);
+  }
+}
+
+removeImage(): void {
+  this.selectedImage = null;
+  this.imagePreview = null;
 }
 
 }

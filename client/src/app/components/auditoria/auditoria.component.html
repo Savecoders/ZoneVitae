@@ -1,4 +1,5 @@
 <app-layout>
+  <div main-content>
 <!-- Formulario de edición (se muestra cuando showEditForm es true) -->
 
     <!-- Formulario de comentarios (aparece al cambiar estado) -->
@@ -85,7 +86,46 @@
         <mat-label>Acciones realizadas</mat-label>
         <textarea matInput formControlName="acciones" rows="4"></textarea>
       </mat-form-field>
-
+        
+      <!-- Sección para subir imagen -->
+      <div class="mt-4">
+        <label class="block text-sm font-medium mb-2">Imagen de seguimiento</label>
+        
+        <!-- Vista previa de la imagen -->
+        <div *ngIf="imagePreview" class="mb-4">
+          <img [src]="imagePreview" class="max-h-40 rounded-md">
+          <button 
+            type="button" 
+            (click)="removeImage()"
+            class="mt-2 text-sm text-red-600 hover:text-red-800"
+          >
+            Eliminar imagen
+          </button>
+        </div>
+        
+        <!-- Input para subir archivo -->
+        <div class="flex items-center">
+          <input 
+            type="file" 
+            id="seguimientoImage"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="hidden"
+          >
+          <label 
+            for="seguimientoImage"
+            class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md cursor-pointer"
+          >
+            Seleccionar imagen
+          </label>
+          <span class="ml-3 text-sm" *ngIf="!selectedImage">
+            No se ha seleccionado ninguna imagen
+          </span>
+          <span class="ml-3 text-sm" *ngIf="selectedImage">
+            {{ selectedImage.name }}
+          </span>
+        </div>
+      </div>
       <!-- Checkbox de confirmación -->
       <mat-checkbox formControlName="confirmar">
         Confirmo los cambios realizados
@@ -116,7 +156,7 @@
 
 <div class="w-full">
   <form (submit)="aplicarFiltro(); $event.preventDefault()">
-      <mat-form-field >
+      <mat-form-field  class="w-full max-w-2xl">
     <mat-label >Buscar por titulo o comunidad</mat-label>
     <input 
         matInput 
@@ -125,6 +165,7 @@
         placeholder="Escribe para buscar..."
         (keyup.enter)="aplicarFiltro()"
       >
+      
        <button 
         matSuffix 
         mat-icon-button 
@@ -135,8 +176,7 @@
 
   </mat-form-field>
   </form>
-  
-<table mat-table [dataSource]="dataSource" class="bg-default-100">
+  <table mat-table [dataSource]="dataSource" class="bg-default-50">
   <!-- Título Column -->
   <ng-container matColumnDef="titulo">
     <th mat-header-cell *matHeaderCellDef > TÍTULO </th>
@@ -199,6 +239,7 @@
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
 
+</div>
 </div>
   
 </app-layout>

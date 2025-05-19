@@ -135,7 +135,7 @@ export class HomeComponent implements OnInit {
             map(({ communities, authors, likes, reportComments }) => {
               // Create a map for quick lookups
               const communityMap = new Map(communities.map((c) => [c.id, c]));
-              const authorMap = new Map(authors.map((a) => [a.ID, a]));
+              const authorMap = new Map(authors.map((a) => [a.id, a]));
 
               // Transform reports into PostData format
               return reports.map((report) => {
@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit {
                     ? `https://source.unsplash.com/random/800x500?report,${report.estado.toLowerCase()}`
                     : undefined,
                   author: {
-                    id: (author?.ID as number) || 0,
+                    id: (author?.id as number) || 0,
                     name: author?.nombre_usuario || 'Anonymous',
                     avatarUrl: author?.foto_perfil || undefined,
                   },
@@ -346,7 +346,7 @@ export class HomeComponent implements OnInit {
             map(({ communities, authors, likes, reportComments }) => {
               // Create a map for quick lookups
               const communityMap = new Map(communities.map((c) => [c.id, c]));
-              const authorMap = new Map(authors.map((a) => [a.ID, a]));
+              const authorMap = new Map(authors.map((a) => [a.id, a]));
 
               // Transform reports into PostData format
               return reports.map((report) => {
@@ -372,7 +372,7 @@ export class HomeComponent implements OnInit {
                     ? `https://source.unsplash.com/random/800x500?report,${report.estado.toLowerCase()}`
                     : undefined,
                   author: {
-                    id: (author?.ID as number) || 0,
+                    id: (author?.id as number) || 0,
                     name: author?.nombre_usuario || 'Anonymous',
                     avatarUrl: author?.foto_perfil || undefined,
                   },
