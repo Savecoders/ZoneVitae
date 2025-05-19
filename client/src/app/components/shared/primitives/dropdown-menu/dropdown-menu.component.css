@@ -1,0 +1,20 @@
+:host {
+  display: inline-block;
+}
+
+.dropdown-menu-animation {
+  animation: dropdownSlideIn 150ms ease-out forwards;
+  transform-origin: top;
+  opacity: 0;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

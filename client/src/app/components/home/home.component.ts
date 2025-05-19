@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
 import { Comunidad } from '../../models/comunidad.model';
 import { Tag } from '../../models/tag.model';
 import { Actividad } from '../../models/actividad.model';
-import { LayoutComponent } from "../shared/layout/layout.component";
+import { LayoutComponent } from '../shared/layout/layout.component';
 
 @Component({
   selector: 'app-home',
@@ -32,8 +32,8 @@ import { LayoutComponent } from "../shared/layout/layout.component";
     FooterComponent,
     PostCardComponent,
     FollowSectionComponent,
-    LayoutComponent
-],
+    LayoutComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -157,7 +157,6 @@ export class HomeComponent implements OnInit {
 
                 return {
                   id: report.id as number,
-                  ID: report.id as number, // Adding this to ensure compatibility with track ID
                   title: report.titulo,
                   content: report.contenido,
                   // You would need to add a field for images in your model or get them from the fotos table
@@ -365,7 +364,6 @@ export class HomeComponent implements OnInit {
 
                 return {
                   id: report.id as number,
-                  ID: report.id as number, // Adding this to ensure compatibility with track ID
                   title: report.titulo,
                   content: report.contenido,
                   imageUrl: report.id

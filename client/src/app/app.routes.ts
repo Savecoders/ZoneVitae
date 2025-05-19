@@ -2,10 +2,18 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     loadComponent: () =>
       import('./components/home/home.component').then((m) => m.HomeComponent),
   },
+
+  // redirect to Home
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
+
   {
     path: 'comunities',
     loadComponent: () =>
@@ -60,6 +68,27 @@ export const routes: Routes = [
       import('./components/sign-up/sign-up.component').then(
         (m) => m.SignUpComponent
       ),
+  },
+
+  // admin paths
+  {
+    path: 'admin',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./components/admin/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import(
+            './components/admin/crud-activities/crud-activities.component'
+          ).then((m) => m.CrudActivitiesComponent),
+      },
+    ],
   },
 
   // zone vitae paths

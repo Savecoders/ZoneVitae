@@ -57,12 +57,12 @@
     {
       "id_usuario": 1,
       "id_rol": 1,
-      "id": "d0ac"
+      "id": "9654"
     },
     {
       "id_usuario": 2,
       "id_rol": 2,
-      "id": "65c8"
+      "id": "3df5"
     }
   ],
   "roles_comunidades": [
@@ -105,7 +105,7 @@
   ],
   "reports": [
     {
-      "id": 1,
+      "id": "1",
       "comunidad_id": 1,
       "autor_id": 2,
       "titulo": "Farola dañada en calle principal",
@@ -148,19 +148,16 @@
   ],
   "actividades": [
     {
-      "id": "1",
-      "comunidad_id": 1,
       "nombre": "Limpieza comunitaria del barrio",
       "descripcion": "Actividad de limpieza general en las calles del barrio Las Flores.",
       "fecha_inicio": "2023-04-15",
       "fecha_fin": "2023-04-15",
       "ubicacion": "Plaza central del barrio Las Flores",
-      "virtual": 0,
-      "frecuencia": "Única vez",
-      "cover": null,
-      "fecha": "2023-04-01T10:00:00",
-      "create_at": "2023-04-01T10:00:00",
-      "update_at": "2023-04-01T10:00:00"
+      "virtual": false,
+      "frecuencia": "once",
+      "comunidad_id": 1,
+      "url": "http://localhost:4200/admin/activities",
+      "id": "1"
     },
     {
       "id": "2",
@@ -194,29 +191,29 @@
     {
       "reports_id": 1,
       "tag_id": 3,
-      "id": "bcf0"
+      "id": "dab0"
     },
     {
       "reports_id": 2,
       "tag_id": 1,
-      "id": "378f"
+      "id": "f91d"
     }
   ],
   "comunidad_tags": [
     {
       "comunidad_id": 1,
       "tag_id": 2,
-      "id": "977d"
+      "id": "567f"
     },
     {
       "comunidad_id": 1,
       "tag_id": 3,
-      "id": "1a03"
+      "id": "8525"
     },
     {
       "comunidad_id": 2,
       "tag_id": 1,
-      "id": "f729"
+      "id": "e9df"
     }
   ],
   "usuarios_comunidades_roles": [
@@ -225,21 +222,21 @@
       "comunidad_id": 1,
       "rol_id": 1,
       "fecha_asignacion": "2023-02-01T09:00:00",
-      "id": "d344"
+      "id": "0d95"
     },
     {
       "usuario_id": 2,
       "comunidad_id": 1,
       "rol_id": 2,
       "fecha_asignacion": "2023-02-03T16:45:00",
-      "id": "a289"
+      "id": "2ed2"
     },
     {
       "usuario_id": 2,
       "comunidad_id": 2,
       "rol_id": 1,
       "fecha_asignacion": "2023-02-05T11:30:00",
-      "id": "ea56"
+      "id": "71f2"
     }
   ],
   "galeria_comunidad": [
@@ -258,29 +255,29 @@
     {
       "usuario_id": 2,
       "reports_id": 1,
-      "id": "b811"
+      "id": "e3b5"
     },
     {
       "usuario_id": 1,
       "reports_id": 2,
-      "id": "219b"
+      "id": "8a5d"
     }
   ],
   "follows": [
     {
       "usuario_id": 1,
       "comunidad_id": 2,
-      "id": "3e9b"
+      "id": "5b40"
     },
     {
       "usuario_id": 2,
       "comunidad_id": 1,
-      "id": "5525"
+      "id": "db9e"
     }
   ],
   "seguimiento_reportes": [
     {
-      "id": 1,
+      "id": "1",
       "reporte_id": 2,
       "usuario_id": 1,
       "estado_anterior": "Aprobado",

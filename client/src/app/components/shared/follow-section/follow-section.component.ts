@@ -67,8 +67,7 @@ export class FollowSectionComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private comunidadService: ComunidadService,
-    private http: HttpClient
+    private comunidadService: ComunidadService
   ) {}
 
   ngOnInit(): void {
@@ -111,7 +110,7 @@ export class FollowSectionComponent implements OnInit {
   }
 
   followCommunity(communityId: number): void {
-    console.log(`Following community with ID: ${communityId}`);
+    console.log(`Following community with id: ${communityId}`);
     // In a real app, you would actually create a follow relationship
     // For now, we'll just log it
 
@@ -126,7 +125,7 @@ export class FollowSectionComponent implements OnInit {
   }
 
   followUser(userId: number): void {
-    console.log(`Following user with ID: ${userId}`);
+    console.log(`Following user with id: ${userId}`);
     // Implement actual follow logic here
   }
 }

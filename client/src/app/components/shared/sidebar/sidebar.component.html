@@ -1,7 +1,6 @@
 <div
-  class="flex flex-col gap-1 bg-default-50 sticky top-2 m-4 rounded-lg border-2 border-default-400 shadow-md overflow-y-auto max-h-[calc(100vh-2rem)]"
-  [class.max-w-50]="!isCollapsed"
-  [class.max-w-20]="isCollapsed"
+  class="flex flex-col gap-1 bg-default-50 sticky top-2 m-4 rounded-lg border-2 border-default-400 shadow-md overflow-y-auto max-h-[calc(100vh-2rem)] transition-all duration-300"
+  [ngClass]="{ 'w-50': !isCollapsed, 'w-20': isCollapsed }"
 >
   <!-- Collapse Button -->
   <app-card class="p-4 bg-default-50">
@@ -21,6 +20,7 @@
   </app-card>
 
   <app-separator className="mx-4 bg-default-400 h-[1px]" />
+
   <!-- User links -->
   <app-card class="p-4">
     <div class="flex flex-col gap-4">
@@ -58,6 +58,28 @@
           <i-lucide [img]="topic.icon" class="my-icon"></i-lucide>
         </span>
         <span [class.hidden]="isCollapsed">{{ topic.name }}</span>
+      </a>
+      }
+    </div>
+  </app-card>
+
+  <app-separator className="mx-4 bg-default-400 h-[1px]" />
+
+  <!-- Moderation -->
+  <app-card class="p-4 bg-default-50">
+    <div class="flex flex-col gap-4">
+      @for (moderation_link of admin_section; track $index) {
+      <a
+        [routerLink]="['/admin', moderation_link.slug]"
+        class="text-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-muted flex items-center"
+        [class.justify-center]="isCollapsed"
+        [class.gap-2]="!isCollapsed"
+        [title]="moderation_link.name"
+      >
+        <span class="text-foreground-muted">
+          <i-lucide [img]="moderation_link.icon" class="my-icon"></i-lucide>
+        </span>
+        <span [class.hidden]="isCollapsed">{{ moderation_link.name }}</span>
       </a>
       }
     </div>

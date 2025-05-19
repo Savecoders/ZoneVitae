@@ -1,0 +1,406 @@
+<admin-layout>
+  <section banner-container></section>
+  <!-- section content -->
+  <section main-container>
+    <div
+      class="flex flex-wrap w-full rounded-2xl border border-default-400 bg-default-200 p-6 justify-between"
+    >
+      <article class="flex-1 mr-6 space-y-4">
+        <h2 class="text-2xl font-semibold">Modulo de Actividades</h2>
+        <p class="text-default-700">
+          En esta sección puedes crear, editar y eliminar actividades. Las
+          actividades son eventos o tareas que los usuarios pueden realizar en
+          la plataforma. Puedes definir el nombre, la descripción, la fecha y
+          otros detalles relevantes para cada actividad.
+        </p>
+      </article>
+      <!-- add activitie -->
+      <app-button
+        [color]="'success'"
+        [intensity]="'soft'"
+        [size]="'md'"
+        [icon]="IconActivities"
+        (buttonClick)="openAddActivityDialog()"
+      >
+        Add Activity
+      </app-button>
+    </div>
+
+    <!-- Material design Table and search -->
+    <div class="mt-8 space-y-8">
+      <!-- Search and filter controls -->
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="relative flex-1 min-w-[280px]">
+          <div
+            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-default-500"
+          ></div>
+          <input
+            type="text"
+            (keyup)="applyFilter($event)"
+            placeholder="Search activities..."
+            class="w-full pl-10 pr-4 py-2 rounded-lg border border-content2 bg-content1 text-foreground focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      <!-- Table with activities -->
+      <div class="overflow-x-auto rounded-xl border border-content2">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          class="w-full bg-default-100"
+        >
+          <!-- Name Column -->
+          <ng-container matColumnDef="nombre" class="bg-transparent">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+            <td mat-cell *matCellDef="let activity">{{ activity.nombre }}</td>
+          </ng-container>
+
+          <!-- Start Date Column -->
+          <ng-container matColumnDef="fecha_inicio">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Start Date
+            </th>
+            <td mat-cell *matCellDef="let activity">
+              {{ activity.fecha_inicio | date : "mediumDate" }}
+            </td>
+          </ng-container>
+
+          <!-- End Date Column -->
+          <ng-container matColumnDef="fecha_fin">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>End Date</th>
+            <td mat-cell *matCellDef="let activity">
+              {{ activity.fecha_fin | date : "mediumDate" }}
+            </td>
+          </ng-container>
+
+          <!-- Location Column -->
+          <ng-container matColumnDef="ubicacion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Location</th>
+            <td mat-cell *matCellDef="let activity">
+              {{ activity.ubicacion }}
+            </td>
+          </ng-container>
+
+          <!-- Virtual Column -->
+          <ng-container matColumnDef="virtual">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let activity">
+              @if (activity.virtual) {
+              <app-badge [intensity]="'soft'" [color]="'success'"
+                >Virtual</app-badge
+              >
+              } @else {
+              <app-badge [intensity]="'soft'" [color]="'primary'"
+                >In Person</app-badge
+              >
+              }
+            </td>
+          </ng-container>
+
+          <!-- URL Column -->
+          <ng-container matColumnDef="url">
+            <th mat-header-cell *matHeaderCellDef>URL</th>
+            <td mat-cell *matCellDef="let activity">
+              @if (activity.url) {
+              <app-button
+                [color]="'primary'"
+                [intensity]="'soft'"
+                [size]="'sm'"
+                (buttonClick)="openExternalLink(activity.url)"
+              >
+                Link
+              </app-button>
+              } @else {
+              <span class="text-default-500">No link</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="w-[150px]">Actions</th>
+            <td mat-cell *matCellDef="let activity" class="space-x-2">
+              <app-dropdown-menu
+                [items]="actionItems"
+                [label]="'asdad'"
+                [showChevron]="false"
+                [align]="'right'"
+                [buttonClass]="
+                  'inline-flex justify-center rounded-full w-9 h-9 border border-default-300 bg-content1 p-2 text-sm text-default-700 hover:bg-default-200 focus:outline-none focus:ring-2 focus:ring-primary'
+                "
+                (itemSelected)="handleActionSelected($event, activity)"
+              >
+                <ng-template #triggerTemplate>
+                  <span
+                    class="text-foreground-muted flex items-center justify-center"
+                  >
+                    <i-lucide [img]="IconOptions" class="my-icon"></i-lucide>
+                  </span>
+                </ng-template>
+              </app-dropdown-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+          <!-- No data row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td
+              class="mat-cell py-8 text-center text-default-500"
+              [attr.colspan]="displayedColumns.length"
+            >
+              @if (isLoading) {
+              <div class="flex justify-center items-center">
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"
+                ></div>
+              </div>
+              } @else { No activities found matching your search. }
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        aria-label="Select page of activities"
+      >
+      </mat-paginator>
+    </div>
+  </section>
+</admin-layout>
+
+<!-- Activity Form Template -->
+<ng-template #activityFormTemplate let-dialogData>
+  <div class="container-fluid">
+    <form [formGroup]="activityForm" class="space-y-4">
+      <!-- Form content stays the same -->
+      <!-- Name Field -->
+      <div class="form-group">
+        <label
+          for="nombre"
+          class="block text-sm font-medium text-default-700 mb-1"
+          >Activity Name*</label
+        >
+        <app-input
+          id="nombre"
+          [className]="'border-default-500'"
+          formControlName="nombre"
+          [placeholder]="'Enter activity name'"
+          [type]="'text'"
+          [validation]="{
+          state: activityForm.get('nombre')?.invalid && activityForm.get('nombre')?.touched ? 'invalid' : 'undefined',
+          message: activityForm.get('nombre')?.errors?.['required'] ? 'Name is required' :
+                   activityForm.get('nombre')?.errors?.['minlength'] ? 'Name must be at least 3 characters' : ''
+        }"
+        ></app-input>
+      </div>
+
+      <!-- Description Field -->
+      <div class="form-group">
+        <label
+          for="descripcion"
+          class="block text-sm font-medium text-default-700 mb-1"
+          >Description</label
+        >
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="3"
+          class="w-full px-3 py-2 border border-content2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          [ngClass]="{
+            'border-danger':
+              activityForm.get('descripcion')?.invalid &&
+              activityForm.get('descripcion')?.touched
+          }"
+          placeholder="Describe the activity"
+        ></textarea>
+        <div
+          *ngIf="
+            activityForm.get('descripcion')?.invalid &&
+            activityForm.get('descripcion')?.touched
+          "
+          class="text-danger text-sm mt-1"
+        >
+          Description must be at least 10 characters
+        </div>
+      </div>
+
+      <!-- Dates Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label
+            for="fecha_inicio"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Start Date*</label
+          >
+          <app-input
+            id="fecha_inicio"
+            formControlName="fecha_inicio"
+            [className]="'border-default-500'"
+            [type]="'date'"
+            [validation]="{
+              state:
+                (activityForm.get('fecha_inicio')?.invalid &&
+                activityForm.get('fecha_inicio')?.touched) ||
+                activityForm.hasError('dateRangeInvalid') ||
+                activityForm.hasError('startDatePast')
+                  ? 'invalid'
+                  : 'undefined',
+              message: activityForm.get('fecha_inicio')?.errors?.['required']
+                ? 'Start date is required'
+                : activityForm.hasError('startDatePast')
+                ? 'Start date cannot be earlier than today'
+                : activityForm.hasError('dateRangeInvalid')
+                ? 'Start date must be before end date'
+                : ''
+            }"
+          ></app-input>
+        </div>
+        <div class="form-group">
+          <label
+            for="fecha_fin"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >End Date*</label
+          >
+          <app-input
+            id="fecha_fin"
+            formControlName="fecha_fin"
+            [className]="'border-default-500'"
+            [type]="'date'"
+            [validation]="{
+              state:
+                (activityForm.get('fecha_fin')?.invalid &&
+                activityForm.get('fecha_fin')?.touched) ||
+                activityForm.hasError('dateRangeInvalid')
+                  ? 'invalid'
+                  : 'undefined',
+              message: activityForm.get('fecha_fin')?.errors?.['required']
+                ? 'End date is required'
+                : ''
+            }"
+          ></app-input>
+        </div>
+      </div>
+
+      <!-- Location and Event Type Row -->
+      <div class="flex flex-col gap-4">
+        <div class="form-group w-full">
+          <label
+            for="ubicacion"
+            class="block text-sm font-medium text-default-700"
+            >Location*</label
+          >
+          <app-input
+            id="ubicacion"
+            formControlName="ubicacion"
+            [placeholder]="'Enter activity location'"
+            [type]="'text'"
+            [className]="'border-default-500'"
+            [validation]="{
+              state:
+                activityForm.get('ubicacion')?.invalid &&
+                activityForm.get('ubicacion')?.touched
+                  ? 'invalid'
+                  : 'undefined',
+              message: 'Location is required'
+            }"
+          ></app-input>
+        </div>
+        <div class="form-group">
+          <label
+            for="frecuencia"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Frequency*</label
+          >
+          <select
+            id="frecuencia"
+            formControlName="frecuencia"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors border-default-500"
+          >
+            <option value="" disabled selected>Select frequency</option>
+            <option value="once">One-time event</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom</option>
+          </select>
+          <div
+            *ngIf="
+              activityForm.get('frecuencia')?.invalid &&
+              activityForm.get('frecuencia')?.touched
+            "
+            class="text-danger text-sm mt-1"
+          >
+            Frequency is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Community and Virtual Event Row -->
+      <!-- Comming Soon when have comunities crud -->
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label
+            for="comunidad_id"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Community</label
+          >
+          <select
+            id="comunidad_id"
+            formControlName="comunidad_id"
+            class="w-full px-3 py-2 border border-content2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          >
+            <option value="" disabled selected>Select community</option>
+            <option value="1">Community 1</option>
+            <option value="2">Community 2</option>
+          </select>
+        </div> -->
+      <div class="form-group flex items-center mt-8">
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="virtual"
+            formControlName="virtual"
+            class="w-4 h-4 text-primary focus:ring-primary border-default-300 rounded"
+          />
+          <label
+            for="virtual"
+            class="ml-2 block text-sm font-medium text-default-700"
+          >
+            This is a virtual event
+          </label>
+        </div>
+      </div>
+
+      <!-- URL Field (Conditional) -->
+      <div class="form-group" *ngIf="activityForm.get('virtual')?.value">
+        <label for="url" class="block text-sm font-medium text-default-700 mb-1"
+          >Event URL</label
+        >
+        <app-input
+          id="url"
+          [className]="'w-full'"
+          formControlName="url"
+          [placeholder]="
+            'Enter virtual event URL (e.g. https://example.com or https://example.com?param=value)'
+          "
+          [type]="'url'"
+          [validation]="{
+            state:
+              activityForm.get('url')?.invalid &&
+              activityForm.get('url')?.touched
+                ? 'invalid'
+                : 'undefined',
+            message: activityForm.get('url')?.errors?.['pattern']
+              ? 'Please enter a valid URL including http:// or https:// (query parameters are supported)'
+              : ''
+          }"
+        ></app-input>
+      </div>
+    </form></div
+></ng-template>
