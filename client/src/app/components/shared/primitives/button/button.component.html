@@ -9,6 +9,7 @@
     hasSpinner ? 'relative' : '',
     className || ''
   ]"
+  [class]="className"
   [disabled]="disabled || loading"
   [type]="type"
   (click)="onClick($event)"
