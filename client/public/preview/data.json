@@ -27,26 +27,26 @@
   ],
   "roles": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "user"
     },
     {
-      "id": 3,
+      "id": "3",
       "nombre": "moderator"
     }
   ],
   "usuario_roles": [
     {
-      "id": 1,
+      "id": "1",
       "id_usuario": 1,
       "id_rol": 1
     },
     {
-      "id": 2,
+      "id": "2",
       "id_usuario": 2,
       "id_rol": 2
     }
@@ -92,27 +92,47 @@
   "reports": [
     {
       "id": "1",
-      "comunidad_id": 1,
-      "autor_id": 2,
       "titulo": "Farola dañada en calle principal",
       "contenido": "La farola ubicada en la esquina de la calle principal está dañada y no funciona desde hace una semana.",
-      "anonimo": 0,
-      "estado": "Pendiente de Revision",
-      "estado_seguimiento": "Pendiente de Revision",
+      "anonimo": true,
       "create_at": "2023-03-10T16:20:00",
-      "update_at": "2023-03-10T16:20:00"
+      "comunidad_id": "1",
+      "fotos": [
+        {
+          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747682766/logo-cashmoney_ewwjsd.png",
+          "reports_id": null
+        }
+      ],
+      "tags": [
+        {
+          "id": "141a",
+          "nombre": "asdada"
+        }
+      ],
+      "estado": "Pendiente de Revision",
+      "estado_seguimiento": "Pendiente de Revision"
     },
     {
       "id": "2",
-      "comunidad_id": 2,
-      "autor_id": 1,
       "titulo": "Basura acumulada en el parque",
       "contenido": "Se ha acumulado mucha basura alrededor de los bancos del sector norte del parque.",
       "anonimo": 1,
-      "estado": "Aprobado",
-      "estado_seguimiento": "Revisado",
       "create_at": "2023-03-15T10:10:00",
-      "update_at": "2023-03-16T14:30:00"
+      "comunidad_id": "2",
+      "fotos": [
+        {
+          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747682741/logo-cashmoney_pwmrvt.png",
+          "reports_id": null
+        }
+      ],
+      "tags": [
+        {
+          "id": "b30a",
+          "nombre": "asdasd"
+        }
+      ],
+      "estado": "Pendiente de Revision",
+      "estado_seguimiento": "Pendiente de Revision"
     }
   ],
   "comentarios": [
@@ -182,6 +202,14 @@
       "reports_id": 2,
       "tag_id": 1,
       "id": "f91d"
+    },
+    {
+      "id": "b30a",
+      "nombre": "asdasd"
+    },
+    {
+      "id": "141a",
+      "nombre": "asdada"
     }
   ],
   "comunidad_tags": [
