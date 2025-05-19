@@ -5,7 +5,6 @@ import { Foto } from './foto.model';
 import { EstadoReporte, SeguimientoReporteEnum } from './reporte.model';
 import { SeguimientoReporte } from './seguimiento-reporte.model';
 
-
 export interface ReporteCompleto {
   id?: number;
   titulo: string;
@@ -15,10 +14,12 @@ export interface ReporteCompleto {
   estado_seguimiento: SeguimientoReporteEnum;
   create_at?: Date | string;
   update_at?: Date | string;
-  autor?: Usuario | null; 
+  autor?: Usuario | null;
+  autor_id?: number;
   comunidad?: Comunidad;
+  comunidad_id: number;
   fotos?: Foto[];
-  tags?: Tag[]; 
+  tags?: Tag[];
   me_encanta_count?: number;
   usuarios_me_encanta?: Usuario[];
   seguimientos?: SeguimientoReporte[];

@@ -1,15 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { ReporteService } from '../../services/reporte.service';
-import { UsuarioCompleto, ReporteCompleto, MeEncanta, Comunidad, Tag, Foto, 
-EstadoReporte, SeguimientoReporteEnum } from '../../models';
-import { FormBuilder, FormGroup, FormArray, FormsModule, 
-ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
+import {
+  UsuarioCompleto,
+  ReporteCompleto,
+  MeEncanta,
+  Comunidad,
+  Tag,
+  Foto,
+  EstadoReporte,
+  SeguimientoReporteEnum,
+} from '../../models';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { CommonModule } from '@angular/common';
-import { ButtonComponent } from "../shared/primitives/button/button.component";
+import { ButtonComponent } from '../shared/primitives/button/button.component';
 import { MeEncantaService } from '../../services/me_encanta.service';
 import { TagService } from '../../services/tag.service';
-import { FooterComponent } from "../shared/footer/footer.component";
+import { FooterComponent } from '../shared/footer/footer.component';
 import { ComunidadService } from '../../services/comunidad.service';
 import { CloudinaryService } from '../../services/cloudinary.service';
 import { RouterModule } from '@angular/router';
@@ -17,28 +32,46 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { SidebarComponent } from '../shared/sidebar/sidebar.component';
 import { FollowSectionComponent } from '../shared/follow-section/follow-section.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { map, switchMap} from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { of, forkJoin } from 'rxjs';
 import { ToastService } from 'app/services/toast.service';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [NgFor, NgIf, CommonModule, RouterModule, ButtonComponent,HeaderComponent,SidebarComponent,FollowSectionComponent,
-    FooterComponent,ReactiveFormsModule, FormsModule,MatCheckboxModule,],
+  imports: [
+    NgFor,
+    NgIf,
+    CommonModule,
+    RouterModule,
+    ButtonComponent,
+    HeaderComponent,
+    SidebarComponent,
+    FollowSectionComponent,
+    FooterComponent,
+    ReactiveFormsModule,
+    FormsModule,
+    MatCheckboxModule,
+  ],
   templateUrl: './reports.component.html',
-  styleUrl: './reports.component.css'
+  styleUrl: './reports.component.css',
 })
 export class ReportsComponent implements OnInit {
-  constructor(private reporteService: ReporteService,private comunidadService: ComunidadService,
-    private meEncantaService: MeEncantaService,private toastService: ToastService,
-    private fb: FormBuilder,private tagService: TagService,private cloudinaryService:CloudinaryService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private comunidadService: ComunidadService,
+    private meEncantaService: MeEncantaService,
+    private toastService: ToastService,
+    private fb: FormBuilder,
+    private tagService: TagService,
+    private cloudinaryService: CloudinaryService
+  ) {}
 
   form!: FormGroup;
   isEditMode: boolean = false;
   reporteEditando: ReporteCompleto | null = null;
   reportes: ReporteCompleto[] = [];
-  reportesFiltrados: ReporteCompleto[] = []; 
+  reportesFiltrados: ReporteCompleto[] = [];
   comunidades: Comunidad[] = [];
   usuarioActual: UsuarioCompleto | null = null;
   menuAbiertoId: number | null = null;
@@ -64,10 +97,17 @@ export class ReportsComponent implements OnInit {
       comunidad: [null, Validators.required],
       fotos: this.fb.array([], (control: AbstractControl) => {
         const array = control as FormArray;
-        return array.length > 0 ? null : { required: true };}),
-      tags: this.fb.array([], [(control: AbstractControl) => {
-        const array = control as FormArray;
-        return array.length > 0 ? null : { required: true };}])
+        return array.length > 0 ? null : { required: true };
+      }),
+      tags: this.fb.array(
+        [],
+        [
+          (control: AbstractControl) => {
+            const array = control as FormArray;
+            return array.length > 0 ? null : { required: true };
+          },
+        ]
+      ),
     });
   }
 
@@ -79,13 +119,13 @@ export class ReportsComponent implements OnInit {
   }
 
   nuevoReporte() {
-  this.mostrarFormulario = true;
-  this.isEditMode = false;
-  this.form.reset();
-  this.fotos.clear();
-  this.tags.value.map((t: Tag) => ({ id: t.id, nombre: t.nombre }))  
-  this.imagePreview = null;
-  this.menuAbiertoId = null;
+    this.mostrarFormulario = true;
+    this.isEditMode = false;
+    this.form.reset();
+    this.fotos.clear();
+    this.tags.value.map((t: Tag) => ({ id: t.id, nombre: t.nombre }));
+    this.imagePreview = null;
+    this.menuAbiertoId = null;
   }
 
   resetFormulario(): void {
@@ -110,14 +150,19 @@ export class ReportsComponent implements OnInit {
       this.reportes = datos;
       this.reportesFiltrados = datos;
       this.reportes
-        .filter(reporte => reporte.id !== undefined)
-        .forEach(reporte => this.verificarMeEncanta(reporte.id!));
+        .filter((reporte) => reporte.id !== undefined)
+        .forEach((reporte) => this.verificarMeEncanta(reporte.id!));
     });
   }
 
   puedeCrear(): boolean {
-    const roles = this.usuarioActual?.roles?.map(r => r.nombre.toLowerCase()) || [];
-    return roles.includes('administrador') || roles.includes('usuario')|| roles.includes('moderador');
+    const roles =
+      this.usuarioActual?.roles?.map((r) => r.nombre.toLowerCase()) || [];
+    return (
+      roles.includes('administrador') ||
+      roles.includes('usuario') ||
+      roles.includes('moderador')
+    );
   }
 
   //Guardar Reporte
@@ -126,16 +171,16 @@ export class ReportsComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-  
+
     const reportForm = this.form.value;
     const tagsNom: string[] = reportForm.tags
       .map((t: any) => (t.nombre as string).trim().toLowerCase())
       .filter((nombre: string) => nombre.length > 0);
-  
+
     const tagsCreacion$ = tagsNom.map((nombre: string) =>
       this.tagService.getTags().pipe(
-        map(tags => tags.find(tag => tag.nombre.toLowerCase() === nombre)),
-        switchMap(tagExistente => {
+        map((tags) => tags.find((tag) => tag.nombre.toLowerCase() === nombre)),
+        switchMap((tagExistente) => {
           if (tagExistente) {
             return of(tagExistente);
           } else {
@@ -144,7 +189,7 @@ export class ReportsComponent implements OnInit {
         })
       )
     );
-  
+
     forkJoin(tagsCreacion$).subscribe({
       next: (tagsCreadoOExistentes: Tag[]) => {
         const nuevoReporte: ReporteCompleto = {
@@ -153,13 +198,16 @@ export class ReportsComponent implements OnInit {
           contenido: reportForm.contenido,
           anonimo: reportForm.anonimo,
           create_at: reportForm.create_at || new Date(),
-          comunidad: reportForm.comunidad,
+          comunidad_id: reportForm.comunidad.id,
           fotos: this.fotos.value as Foto[],
-          tags: tagsCreadoOExistentes, 
+          tags: tagsCreadoOExistentes,
+          autor_id: localStorage.getItem('user_data')
+            ? JSON.parse(localStorage.getItem('user_data')!).id
+            : null,
           estado: EstadoReporte.PENDIENTE_REVISION,
           estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION,
         };
-  
+
         if (this.isEditMode && this.reporteEditando) {
           this.reporteService.editReporte(nuevoReporte).subscribe(() => {
             this.cargarReportes();
@@ -180,44 +228,48 @@ export class ReportsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creando tags:', err);
-      }
+      },
     });
   }
-    //Editar Reporte
-    editarReporte(id: number): void {
-      const reporte = this.reportes.find(r => r.id === id);
-      if (!reporte) return;
-    
-      this.isEditMode = true;
-      this.reporteEditando = reporte;
-      this.mostrarFormulario = true;
-      const comunidad = this.comunidades.find(c => c.ID === reporte.comunidad?.ID);
-    
-      this.form.patchValue({
-        titulo: reporte.titulo,
-        contenido: reporte.contenido,
-        anonimo: reporte.anonimo,
-        comunidad: comunidad ?? null,
-        create_at: reporte.create_at,
+  //Editar Reporte
+  editarReporte(id: number): void {
+    const reporte = this.reportes.find((r) => r.id === id);
+    if (!reporte) return;
+
+    this.isEditMode = true;
+    this.reporteEditando = reporte;
+    this.mostrarFormulario = true;
+    const comunidad = this.comunidades.find(
+      (c) => c.id === reporte.comunidad_id
+    );
+
+    this.form.patchValue({
+      titulo: reporte.titulo,
+      contenido: reporte.contenido,
+      anonimo: reporte.anonimo,
+      comunidad: comunidad ?? null,
+      create_at: reporte.create_at,
+    });
+
+    this.tags.clear();
+    reporte.tags?.forEach((tag) => {
+      this.tags.push(this.fb.control({ nombre: tag.nombre }));
+    });
+
+    this.fotos.clear();
+    if (reporte.fotos) {
+      reporte.fotos.forEach((foto) => {
+        this.fotos.push(this.fb.control(foto));
       });
-    
-      this.tags.clear();
-      reporte.tags?.forEach(tag => {
-        this.tags.push(this.fb.control({ nombre: tag.nombre }));    
-      });
-    
-      this.fotos.clear();
-      if (reporte.fotos) {
-        reporte.fotos.forEach(foto => {
-          this.fotos.push(this.fb.control(foto));
-        });
-      }
     }
-  
+  }
+
   //Eliminar Reporte
   eliminarReporte(id: number): void {
-    const confirmado = confirm("¿Estás seguro de que deseas eliminar este reporte?");
-    
+    const confirmado = confirm(
+      '¿Estás seguro de que deseas eliminar este reporte?'
+    );
+
     if (confirmado) {
       this.reporteService.deleteReporte(id).subscribe({
         next: () => {
@@ -227,118 +279,129 @@ export class ReportsComponent implements OnInit {
         },
         error: (err) => {
           this.toastService.error('Error al eliminar el reporte:', err);
-        }
+        },
       });
     }
-
-  } 
-
+  }
 
   //Ver Lista de Reporte
   cancelarFormulario(): void {
     this.mostrarFormulario = false;
-    console.log('Formulario cancelado, mostrarFormulario =', this.mostrarFormulario);
-
+    console.log(
+      'Formulario cancelado, mostrarFormulario =',
+      this.mostrarFormulario
+    );
   }
 
   eliminarTag(index: number): void {
     this.tags.removeAt(index);
   }
-  
+
   agregarTag(nombre: string): void {
     const nombreNormalizado = nombre.trim().toLowerCase();
     if (
       !nombreNormalizado ||
       this.tags.length >= 5 ||
-      this.tags.value.some((t: Tag) => t.nombre.trim().toLowerCase() === nombreNormalizado)
-    ) return;
-  
+      this.tags.value.some(
+        (t: Tag) => t.nombre.trim().toLowerCase() === nombreNormalizado
+      )
+    )
+      return;
+
     this.tags.push(this.fb.control({ nombre: nombreNormalizado }));
   }
 
-
-    //Me Gusta
-    verificarMeEncanta(reporteId: number): void {
-      const idUsuario = this.usuarioActual?.ID;
-      if (!idUsuario) return;
-      this.meEncantaService.getUsuario_Reporte(idUsuario, reporteId).subscribe(res => {
+  //Me Gusta
+  verificarMeEncanta(reporteId: number): void {
+    const idUsuario = localStorage.getItem('user_data')
+      ? JSON.parse(localStorage.getItem('user_data')!).id
+      : null;
+    if (!idUsuario) return;
+    this.meEncantaService
+      .getUsuario_Reporte(idUsuario, reporteId)
+      .subscribe((res) => {
         this.meEncantaReporte[reporteId] = res.length > 0;
       });
-    }
-  
-    toggleMeGusta(reporteId: number): void {
-      const idUsuario = this.usuarioActual?.ID;
-      if (!idUsuario) return;
-      this.meEncantaService.getUsuario_Reporte(idUsuario, reporteId).subscribe(res => {
+  }
+
+  toggleMeGusta(reporteId: number): void {
+    const idUsuario = localStorage.getItem('user_data')
+      ? JSON.parse(localStorage.getItem('user_data')!).id
+      : null;
+    if (!idUsuario) return;
+    this.meEncantaService
+      .getUsuario_Reporte(idUsuario, reporteId)
+      .subscribe((res) => {
         if (res.length > 0) {
           const meEncanta = res[0];
           if (meEncanta.id) {
-            this.meEncantaService.quitarMeEncanta(meEncanta.id).subscribe(() => {
-              this.meEncantaReporte[reporteId] = false;
-            });
+            this.meEncantaService
+              .quitarMeEncanta(meEncanta.id)
+              .subscribe(() => {
+                this.meEncantaReporte[reporteId] = false;
+              });
           }
         } else {
           const nuevo: MeEncanta = {
             usuario_id: idUsuario,
-            reports_id: reporteId
+            reports_id: reporteId,
           };
           this.meEncantaService.darMeEncanta(nuevo).subscribe(() => {
             this.meEncantaReporte[reporteId] = true;
           });
         }
       });
+  }
+
+  //Menu acciones
+  toggleMenu(id: number): void {
+    this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
+  }
+
+  //Fotos
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+
+      this.cloudinaryService.uploadImage(file).subscribe({
+        next: (url) => {
+          console.log('Subido a:', url);
+
+          this.fotos.push(
+            this.fb.group({
+              image: [url],
+              reports_id: [null],
+            })
+          );
+        },
+        error: (err) => this.toastService.error('Error al subir:', err),
+      });
     }
-  
-    //Menu acciones
-    toggleMenu(id: number): void {
-      this.menuAbiertoId = this.menuAbiertoId === id ? null : id;
-    }
-    
-    //Fotos
-    onFileSelected(event: Event): void {
-      const file = (event.target as HTMLInputElement).files?.[0];
-    
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.imagePreview = reader.result as string;
-        };
-        reader.readAsDataURL(file);
-    
-        this.cloudinaryService.uploadImage(file).subscribe({
-          next: (url) => {
-            console.log('Subido a:', url);
-            
-            this.fotos.push(
-              this.fb.group({
-                image: [url],
-                reports_id: [null]
-              })
-            );
-          },
-          error: (err) => this.toastService.error('Error al subir:', err),
-        });
-      }
-    }
-  
-  
+  }
+
   eliminarFoto(index: number): void {
     this.fotos.removeAt(index);
   }
 
-  
   filtrarTag(tag: string): void {
-    this.reportesFiltrados = this.reportes.filter(r =>
-      Array.isArray(r.tags) &&
-      r.tags.some(t => t.nombre.toLowerCase() === tag.toLowerCase())
+    this.reportesFiltrados = this.reportes.filter(
+      (r) =>
+        Array.isArray(r.tags) &&
+        r.tags.some((t) => t.nombre.toLowerCase() === tag.toLowerCase())
     );
     this.toastService.success(`Se filtraron los reportes por el tag ${tag}`);
-
   }
 
   quitarFiltro() {
-  this.reportesFiltrados = this.reportes;
-  this.toastService.success('Se limpió el filtro, mostrando todos los reportes.');
+    this.reportesFiltrados = this.reportes;
+    this.toastService.success(
+      'Se limpió el filtro, mostrando todos los reportes.'
+    );
   }
-
 }
