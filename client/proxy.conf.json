@@ -1,0 +1,23 @@
+{
+  "/api": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/cloudinary-proxy": {
+    "target": "https://api.cloudinary.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/cloudinary-proxy": ""
+    },
+    "headers": {
+      "Connection": "keep-alive"
+    }
+  },
+  "/cloudinary": {
+    "target": "https://res.cloudinary.com",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

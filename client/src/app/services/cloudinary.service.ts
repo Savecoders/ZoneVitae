@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -15,31 +15,54 @@ import {
 })
 export class CloudinaryService {
   private cloudinary: Cloudinary;
+  private uploadUrl: string;
+  private cloudName: string;
+  private uploadPreset: string = 'ml_default'; // Set your upload preset here
 
   constructor(private http: HttpClient) {
+    this.cloudName = environment.cloudinary.cloud_name;
+
     // Initialize the Cloudinary SDK
     this.cloudinary = new Cloudinary({
       cloud: {
-        cloudName: environment.cloudinary.cloud_name,
+        cloudName: this.cloudName,
       },
     });
+
+    // Use direct URL for Cloudinary uploads
+    this.uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
   }
 
   // Upload an image and return URL or public id
   uploadImage(file: File): Observable<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'ml_default');
-
-    return this.http
-      .post<CloudinaryResponse>(
-        `https://api.cloudinary.com/v1_1/${environment.cloudinary.cloud_name}/image/upload`,
-        formData
-      )
-      .pipe(
-        map((response) => response.secure_url),
-        catchError(this.handleError)
+    return new Observable<string>((observer) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append(
+        'upload_preset',
+        environment.cloudinary.upload_preset || this.uploadPreset
       );
+      formData.append('cloud_name', this.cloudName);
+
+      fetch(this.uploadUrl, {
+        method: 'POST',
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data: CloudinaryResponse) => {
+          observer.next(data.secure_url);
+          observer.complete();
+        })
+        .catch((err) => {
+          console.error('Upload error:', err);
+          observer.error(err);
+        });
+    });
   }
 
   // Get a transformed image URL
@@ -72,6 +95,9 @@ export class CloudinaryService {
       errorMessage = `Error de Cloudinary: ${error.error.message}`;
     } else if (error.status) {
       errorMessage = `Error HTTP ${error.status}: ${error.statusText}`;
+    } else if (error.name === 'HttpErrorResponse' && error.status === 0) {
+      errorMessage =
+        'Error de conexión con Cloudinary. Compruebe su conexión a Internet o si hay problemas de CORS.';
     }
 
     console.error(errorMessage, error);

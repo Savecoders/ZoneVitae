@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guard/auth.guard';
 
 export const routes: Routes = [
   {
@@ -49,30 +50,43 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadComponent: () =>
-      import('./components/profile/profile.component').then(
+      import('./components/user/profile/profile.component').then(
         (m) => m.ProfileComponent
       ),
   },
 
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./components/login/login.component').then(
-        (m) => m.LoginComponent
-      ),
-  },
+  // auth paths
 
   {
-    path: 'sign-up',
-    loadComponent: () =>
-      import('./components/sign-up/sign-up.component').then(
-        (m) => m.SignUpComponent
-      ),
+    path: 'auth',
+    children: [
+      {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full',
+      },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./components/user/login/login.component').then(
+            (m) => m.LoginComponent
+          ),
+      },
+
+      {
+        path: 'sign-up',
+        loadComponent: () =>
+          import('./components/user/sign-up/sign-up.component').then(
+            (m) => m.SignUpComponent
+          ),
+      },
+    ],
   },
 
   // admin paths
   {
     path: 'admin',
+    canActivate: [AuthGuard],
     children: [
       {
         path: '',
@@ -91,6 +105,16 @@ export const routes: Routes = [
     ],
   },
 
+  // protected autoridy paths
+  {
+    path: 'auditoria',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./components/auditoria/auditoria.component').then(
+        (m) => m.AuditoriaComponent
+      ),
+  },
+
   // zone vitae paths
 
   {
@@ -106,6 +130,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/helps/helps.component').then(
         (m) => m.HelpsComponent
+      ),
+  },
+
+  {
+    path: 'unauthorized',
+    loadComponent: () =>
+      import('./components/unauthorized/unauthorized.component').then(
+        (m) => m.UnauthorizedComponent
       ),
   },
 
