@@ -97,14 +97,14 @@ export class HomeComponent implements OnInit {
           const communityIds = [
             ...new Set(
               reports
-                .map((report) => report.comunidad)
+                .map((report) => report.comunidad_id)
                 .filter((id) => id !== null)
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
-                .map((report) => report.autor)
+                .map((report) => report.autor_id)
                 .filter((id) => id !== null)
             ),
           ];
@@ -139,11 +139,11 @@ export class HomeComponent implements OnInit {
 
               // Transform reports into PostData format
               return reports.map((report) => {
-                const community = report.comunidad
-                  ? communityMap.get(report.comunidad)
+                const community = report.comunidad_id
+                  ? communityMap.get(report.id)
                   : null;
-                const author = report.autor
-                  ? authorMap.get(report.autor)
+                const author = report.autor_id
+                  ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
                   (like: any) => like.reports_id === report.id
@@ -307,14 +307,14 @@ export class HomeComponent implements OnInit {
           const communityIds = [
             ...new Set(
               reports
-                .map((report) => report.comunidad)
+                .map((report) => report.comunidad_id)
                 .filter((id) => id !== null)
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
-                .map((report) => report.autor)
+                .map((report) => report.autor_id)
                 .filter((id) => id !== null)
             ),
           ];
@@ -325,7 +325,7 @@ export class HomeComponent implements OnInit {
               communityIds.length > 0
                 ? forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number)
+                      this.comunidadService.getById(id  as number)
                     )
                   )
                 : of([]),
@@ -333,7 +333,7 @@ export class HomeComponent implements OnInit {
               authorIds.length > 0
                 ? forkJoin(
                     authorIds.map((id) =>
-                      this.usuarioService.getById(id as number)
+                      this.usuarioService.getById(id  as number)
                     )
                   )
                 : of([]),
@@ -349,11 +349,11 @@ export class HomeComponent implements OnInit {
 
               // Transform reports into PostData format
               return reports.map((report) => {
-                const community = report.comunidad
-                  ? communityMap.get(report.comunidad)
+                const community = report.comunidad_id
+                  ? communityMap.get(report.comunidad_id)
                   : null;
-                const author = report.autor
-                  ? authorMap.get(report.autor)
+                const author = report.autor_id
+                  ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
                   (like: any) => like.reports_id === report.id

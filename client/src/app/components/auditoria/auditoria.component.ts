@@ -22,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { SeguimientoService } from '../../services/seguimiento.service';
 import { CloudinaryService } from '../../services/cloudinary.service';
 import { InputComponent } from '../shared/primitives';
+import { ReportenorService } from 'app/services/reportenor.service';
 
 @Component({
   selector: 'app-auditoria',
@@ -67,7 +68,7 @@ imagePreview: string | ArrayBuffer | null = null;
 
 
   constructor(
-    private reporteService: ReporteService,
+    private reporteService: ReportenorService,
     private comunidadService: ComunidadService ,
       private seguimientoService: SeguimientoService,
   private fb: FormBuilder,
