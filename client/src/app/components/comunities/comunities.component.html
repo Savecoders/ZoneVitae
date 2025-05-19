@@ -1,1 +1,62 @@
-<app-layout> </app-layout>
+<app-layout>
+  <div main-content>
+    <div class="flex gap-8 ml-8">
+      <app-button 
+        color="primary" 
+        size="sm" 
+        [icon]="group" 
+        (buttonClick)="frmRegistrar()">
+        Crear comunidad
+      </app-button>
+
+      <app-button 
+        color="secondary" 
+        size="sm"
+        [icon]="dashboard"  
+        (buttonClick)="admComunidades()">
+        Administrar comunidades
+      </app-button>
+    </div>
+
+    @if (communities.length === 0) {
+      <p class="text-center text-gray-500 mt-8">No hay comunidades para mostrar</p>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 px-8 mt-6">
+        @for (community of communities; track $index) {
+          <div class="max-w-sm rounded-lg overflow-hidden shadow-lg bg-zinc-900">
+            @if (community.cover) {
+            <img class="w-full h-50" 
+              [src]="community.cover" 
+              [alt]="community.nombre"
+              #portada
+              (mouseenter)="activar(portada)" 
+              (mouseleave)="desactivar(portada)"/> 
+            }@else{
+               <div class="w-full h-50 flex items-center justify-center bg-zinc-700 text-white font-bold text-5xl rounded">
+                {{ community.nombre.charAt(0).toUpperCase() }}
+              </div>
+            }
+            <div class="px-6 py-4">
+              <div class="font-bold text-xl mb-2 text-white"
+              >{{ community.nombre | uppercase }}</div>
+              <p class="text-white-700 text-base">
+                {{community.descripcion}}
+              </p>
+            </div>
+              
+            <ng-container *ngIf="community.tags && community.tags.length > 0">
+              <div class="px-6 pt-4 pb-2">
+                <span *ngFor="let tag of community.tags"
+                      class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                  #{{ tag.nombre }}
+                </span>
+              </div>
+            </ng-container>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-layout>
+
+
