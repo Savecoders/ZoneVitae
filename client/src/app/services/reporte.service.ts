@@ -10,42 +10,41 @@ import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl:string = "http://localhost:5000/reports";
+  private jsonUrl: string = 'http://localhost:5000/reports';
 
   constructor(http: HttpClient) {
     super(http, 'reports');
   }
 
   //carga los datos del reporte
-  getReporte():Observable<ReporteCompleto[]>{
+  getReporte(): Observable<ReporteCompleto[]> {
     return this.http.get<ReporteCompleto[]>(this.jsonUrl);
   }
 
-
   //Agregar Reporte
   createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte)
+    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte);
   }
 
   //Editar Reporte
   editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    const url= `${this.jsonUrl}/${reporte.id}`;
+    const url = `${this.jsonUrl}/${reporte.id}`;
     return this.http.put<ReporteCompleto>(url, reporte);
   }
-  
+
   //Eliminar Reporte
   deleteReporte(id: number): Observable<void> {
     const url = `${this.jsonUrl}/${id}`;
     return this.http.delete<void>(url);
   }
-  
+
   //BuscarTag
   buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
     const nombreTagLower = nombreTag.toLowerCase();
     return this.getReporte().pipe(
-      map(reportes =>
-        reportes.filter(r =>
-          r.tags?.some(tag => tag.nombre.toLowerCase() === nombreTagLower)
+      map((reportes) =>
+        reportes.filter((r) =>
+          r.tags?.some((tag) => tag.nombre.toLowerCase() === nombreTagLower)
         )
       )
     );
