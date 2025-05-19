@@ -61,7 +61,8 @@
               "buildTarget": "ZoneVitae:build:production"
             },
             "development": {
-              "buildTarget": "ZoneVitae:build:development"
+              "buildTarget": "ZoneVitae:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
