@@ -23,6 +23,27 @@ export const routes: Routes = [
       ),
   },
   {
+  path: 'crud-communities',
+  loadComponent: () =>
+    import('./components/crud-communities/crud-communities.component').then(
+      (m) => m.CrudComunitiesComponent
+    ),
+  },
+  {
+  path: 'form-communities',
+  loadComponent: () =>
+    import('./components/form-community/form-community.component').then(
+      (m) => m.FormCommunityComponent
+    ),
+  },
+  {
+  path: 'form-communities/:id',
+  loadComponent: () =>
+    import('./components/form-community/form-community.component').then(
+      (m) => m.FormCommunityComponent
+    ),
+  },
+  {
     path: 'reports',
     loadComponent: () =>
       import('./components/reports/reports.component').then(
