@@ -1,0 +1,41 @@
+.container {
+  max-width: 50%;
+  height: calc(100vh - 2rem);
+}
+
+/* Animation for form appearance */
+form {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Make the form more compact on smaller screens */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+  }
+
+  form {
+    padding: 1rem;
+  }
+}
+
+/* Add some depth to the form */
+form {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+form:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}

@@ -18,6 +18,8 @@ import {
   ChevronDownIcon,
   LucideIconData,
 } from 'lucide-angular';
+import { UIModule } from '../../ui.module';
+import { AvatarComponent } from '../avatar/avatar.component';
 
 export interface DropdownItem {
   id: string | number;
@@ -32,8 +34,7 @@ export interface DropdownItem {
 
 @Component({
   selector: 'app-dropdown-menu',
-  standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, AvatarComponent, UIModule],
   templateUrl: './dropdown-menu.component.html',
   styleUrls: ['./dropdown-menu.component.css'],
 })
@@ -51,6 +52,7 @@ export class DropdownMenuComponent implements OnInit {
   @Input() align: 'left' | 'right' = 'left';
   @Input() selectedItem: DropdownItem | null = null;
   @Input() showSelectedCheck = false;
+  @Input() AvatarImage: AvatarComponent | null = null;
   @Input() buttonClass =
     'inline-flex justify-center w-full rounded-md border border-content2 bg-content1 px-4 py-2 text-sm font-medium text-default-700 hover:bg-content2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary';
   @Input() menuClass = 'bg-content1 text-default-700 max-h-60';

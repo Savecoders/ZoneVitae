@@ -25,44 +25,30 @@
       "update_at": "2023-01-16T14:45:00"
     }
   ],
-  "tags": [
-    {
-      "id": "1",
-      "nombre": "Medio Ambiente"
-    },
-    {
-      "id": "2",
-      "nombre": "Seguridad"
-    },
-    {
-      "id": "3",
-      "nombre": "Infraestructura"
-    }
-  ],
   "roles": [
     {
-      "id": "1",
-      "nombre": "Administrador"
+      "id": 1,
+      "nombre": "admin"
     },
     {
-      "id": "2",
-      "nombre": "Usuario"
+      "id": 2,
+      "nombre": "user"
     },
     {
-      "id": "3",
-      "nombre": "Moderador"
+      "id": 3,
+      "nombre": "moderator"
     }
   ],
-  "usuarios_roles": [
+  "usuario_roles": [
     {
+      "id": 1,
       "id_usuario": 1,
-      "id_rol": 1,
-      "id": "9654"
+      "id_rol": 1
     },
     {
+      "id": 2,
       "id_usuario": 2,
-      "id_rol": 2,
-      "id": "3df5"
+      "id_rol": 2
     }
   ],
   "roles_comunidades": [

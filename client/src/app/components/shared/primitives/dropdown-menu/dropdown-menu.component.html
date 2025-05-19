@@ -1,6 +1,9 @@
 <div class="inline-block text-left" #dropdownContainer>
   <!-- Trigger button -->
   <div>
+    @if(AvatarImage){
+    <app-avatar> </app-avatar>
+    } @else {
     <button
       type="button"
       [class]="buttonClass"
@@ -24,6 +27,7 @@
 
       } }
     </button>
+    }
   </div>
 
   <!-- Dropdown menu -->
