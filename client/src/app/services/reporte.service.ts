@@ -8,80 +8,46 @@ import { ReporteCompleto } from '../models';
 @Injectable({
   providedIn: 'root',
 })
-export class ReporteService extends BaseService<Reporte> {
+export class ReporteService extends BaseService<ReporteCompleto> {
+  private jsonUrl:string = "http://localhost:5000/reports";
+
   constructor(http: HttpClient) {
     super(http, 'reports');
   }
 
-  // Get all reports with optional filtering
-  getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
-    return this.getAll().pipe(
-      map((reportes) =>
-        reportes.filter(
-          (reporte) =>
-            (titulo
-              ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
-              : true) && (estado ? reporte.estado === estado : true)
+  //carga los datos del reporte
+  getReporte():Observable<ReporteCompleto[]>{
+    return this.http.get<ReporteCompleto[]>(this.jsonUrl);
+  }
+
+
+  //Agregar Reporte
+  createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
+    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte)
+  }
+
+  //Editar Reporte
+  editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
+    const url= `${this.jsonUrl}/${reporte.id}`;
+    return this.http.put<ReporteCompleto>(url, reporte);
+  }
+  
+  //Eliminar Reporte
+  deleteReporte(id: number): Observable<void> {
+    const url = `${this.jsonUrl}/${id}`;
+    return this.http.delete<void>(url);
+  }
+  
+  //BuscarTag
+  buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
+    const nombreTagLower = nombreTag.toLowerCase();
+    return this.getReporte().pipe(
+      map(reportes =>
+        reportes.filter(r =>
+          r.tags?.some(tag => tag.nombre.toLowerCase() === nombreTagLower)
         )
       )
     );
   }
-
-  // Get report by id
-  getReporteById(id: number): Observable<Reporte> {
-    return this.getById(id);
-  }
-
-  // Create a new report
-  createReporte(reporte: Reporte): Observable<Reporte> {
-    return this.create(reporte);
-  }
-
-  // Update report
-  updateReporte(id: number, reporte: Partial<Reporte>): Observable<Reporte> {
-    return this.update(id, reporte);
-  }
-
-  // Delete report
-  deleteReporte(id: number): Observable<void> {
-    return this.delete(id);
-  }
-
-  // Get reports by community
-  getReportesByComunidad(comunidadId: number): Observable<Reporte[]> {
-    return this.getAll().pipe(
-      map((reportes) =>
-        reportes.filter((reporte) => reporte.comunidad_id === comunidadId)
-      )
-    );
-  }
-
-  // Get reports by author
-  getReportesByAutor(autorId: number): Observable<Reporte[]> {
-    return this.getAll().pipe(
-      map((reportes) =>
-        reportes.filter((reporte) => reporte.autor_id === autorId)
-      )
-    );
-  }
-
-  // Get reports by tag
-  getReportesByTag(tagId: number): Observable<Reporte[]> {
-    // First get the report-tag relations
-    return this.http
-      .get<ReporteCompleto[]>(
-        `${this.baseUrl.replace('/reports', '')}/reports_tags?tag_id=${tagId}`
-      )
-      .pipe(
-        map((relations) => relations.map((relation) => relation.tags)),
-        switchMap((reportIds) => {
-          if (reportIds.length === 0) {
-            return of([] as Reporte[]);
-          }
-          // Construct query params for multiple IDs
-          const queryParams = reportIds.map((id) => `id=${id}`).join('&');
-          return this.http.get<Reporte[]>(`${this.baseUrl}?${queryParams}`);
-        })
-      );
-  }
+  
 }
