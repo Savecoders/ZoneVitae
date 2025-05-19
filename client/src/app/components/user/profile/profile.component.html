@@ -1,0 +1,138 @@
+<app-layout>
+  <div class="profile-container">
+    <div class="profile-header">
+      <h1 class="text-3xl font-bold text-default-800">My Profile</h1>
+      <p class="text-default-600">
+        Manage your personal information and account preferences
+      </p>
+    </div>
+
+    <div class="profile-content">
+      <!-- Profile sidebar with avatar -->
+      <div class="profile-sidebar">
+        <div class="profile-avatar-container">
+          <app-avatar
+            [size]="'xl'"
+            [name]="user?.nombre_usuario || ''"
+            [src]="user?.foto_perfil || ''"
+            [alt]="'Profile Picture'"
+            [bordered]="true"
+            class="profile-avatar"
+          ></app-avatar>
+
+          <button
+            (click)="uploadProfileImage()"
+            class="upload-button"
+            title="Change profile picture"
+          >
+            <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
+          </button>
+        </div>
+
+        <div class="username-display">
+          <h2 class="text-xl font-semibold">{{ user?.nombre_usuario }}</h2>
+          <span class="text-default-500">{{ user?.email }}</span>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-value">42</span>
+            <span class="stat-label">Activities</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">128</span>
+            <span class="stat-label">Communities</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">56</span>
+            <span class="stat-label">Reports</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile form -->
+      <div class="profile-form-container">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <!-- Success and error messages -->
+          <div *ngIf="success" class="message success-message">
+            <span>Profile updated successfully!</span>
+          </div>
+
+          <div *ngIf="error" class="message error-message">
+            <span>{{ error }}</span>
+          </div>
+
+          <div class="form-row">
+            <app-input
+              [id]="'nombre'"
+              [label]="'First Name'"
+              formControlName="nombre"
+              [required]="true"
+              [fullWidth]="true"
+              [validation]="{
+                state: submitted && f['nombre'].errors ? 'invalid' : 'undefined',
+                message: submitted && f['nombre'].errors?.['required'] ? 'First name is required' : ''
+              }"
+            ></app-input>
+
+            <app-input
+              [id]="'apellido'"
+              [label]="'Last Name'"
+              formControlName="apellido"
+              [required]="true"
+              [fullWidth]="true"
+              [validation]="{
+                state: submitted && f['apellido'].errors ? 'invalid' : 'undefined',
+                message: submitted && f['apellido'].errors?.['required'] ? 'Last name is required' : ''
+              }"
+            ></app-input>
+          </div>
+
+          <app-input
+            [id]="'nombre_usuario'"
+            [label]="'Username'"
+            formControlName="nombre_usuario"
+            [required]="true"
+            [fullWidth]="true"
+            [validation]="{
+              state: submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
+              message: submitted && f['nombre_usuario'].errors?.['required'] ? 'Username is required' : ''
+            }"
+          ></app-input>
+
+          <app-input
+            [id]="'email'"
+            [label]="'Email'"
+            formControlName="email"
+            [type]="'email'"
+            [required]="true"
+            [fullWidth]="true"
+            [validation]="{
+              state: submitted && f['email'].errors ? 'invalid' : 'undefined',
+              message: (submitted && f['email'].errors?.['required']) ? 'Email is required' :
+                (submitted && f['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
+            }"
+          ></app-input>
+
+          <app-input
+            [id]="'bio'"
+            [label]="'Bio'"
+            formControlName="bio"
+            [placeholder]="'Tell us a bit about yourself'"
+            [fullWidth]="true"
+          ></app-input>
+
+          <div class="form-actions">
+            <app-button
+              [type]="'submit'"
+              [disabled]="loading"
+              [icon]="saveIcon"
+            >
+              {{ loading ? "Saving..." : "Save Changes" }}
+            </app-button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</app-layout>
