@@ -9,7 +9,7 @@ import { Tag } from '../models/tag.model';
 })
 export class TagService extends BaseService<Tag> {
   constructor(http: HttpClient) {
-    super(http, 'tags');
+    super(http, 'reports_tags');
   }
 
   // Get all tags

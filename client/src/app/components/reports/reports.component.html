@@ -6,41 +6,57 @@
   <!-- Main content area with header -->
   <div class="flex flex-col flex-grow overflow-y-auto relative">
     <div class="sticky top-0 z-50 w-full">
-      <app-header>
-      </app-header>
+      <app-header> </app-header>
     </div>
     <main class="flex-1 mx-auto w-full p-4 mt-8 bg-default-50 pb-12 pt-4">
       <section class="grid grid-cols-12 gap-6 p-6">
         <!-- Main content area -->
         <div class="col-span-8 space-y-6 mt-6">
           <div class="p-6">
-            <section class="w-full col-span-8 space-y-6 mt-6 ">
+            <section class="w-full col-span-8 space-y-6 mt-6">
               <ng-content>
                 <div>
                   <div>
-              
                     <div class="p-4">
                       <!-- Botón para mostrar el formulario -->
                       <div class="w-full flex justify-end mb-4">
                         <app-button
-                        *ngIf="!mostrarFormulario" size="sm" color="primary"
-                        intensity="soft" (click)="nuevoReporte()" class="mb-4">
-                        Nuevo Reporte
+                          *ngIf="!mostrarFormulario"
+                          size="sm"
+                          color="primary"
+                          intensity="soft"
+                          (click)="nuevoReporte()"
+                          class="mb-4"
+                        >
+                          Nuevo Reporte
                         </app-button>
                       </div>
-                  
+
                       <!-- Formulario de reporte -->
-                      <form *ngIf="mostrarFormulario" [formGroup]="form" class="space-y-12">
+                      <form
+                        *ngIf="mostrarFormulario"
+                        [formGroup]="form"
+                        class="space-y-12"
+                      >
                         <div class="border-b border-gray-700 pb-12">
-                          <h2 class="text-base font-semibold text-white mb-4 text-center">
-                            {{ isEditMode ? 'Editar Reporte' : 'Nuevo Reporte' }}
+                          <h2
+                            class="text-base font-semibold text-white mb-4 text-center"
+                          >
+                            {{
+                              isEditMode ? "Editar Reporte" : "Nuevo Reporte"
+                            }}
                           </h2>
-                      
-                          <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                      
+
+                          <div
+                            class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"
+                          >
                             <!-- Título -->
                             <div class="sm:col-span-4">
-                              <label for="titulo" class="block text-sm font-bold text-white">Título</label>
+                              <label
+                                for="titulo"
+                                class="block text-sm font-bold text-white"
+                                >Título</label
+                              >
                               <div class="mt-2 relative">
                                 <input
                                   type="text"
@@ -50,74 +66,151 @@
                                   class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
                                   placeholder="Título del reporte (máx. 100 caracteres)"
                                 />
-                                <div class="absolute bottom-1 right-3 text-xs text-gray-400">
-                                  {{ form.get('titulo')?.value?.length || 0 }}/100
+                                <div
+                                  class="absolute bottom-1 right-3 text-xs text-gray-400"
+                                >
+                                  {{
+                                    form.get("titulo")?.value?.length || 0
+                                  }}/100
                                 </div>
                               </div>
-                              <div *ngIf="form.get('titulo')?.invalid && form.get('titulo')?.touched" class="text-red-500 text-sm mt-1">
-                                El título es obligatorio y no debe superar los 100 caracteres.
+                              <div
+                                *ngIf="
+                                  form.get('titulo')?.invalid &&
+                                  form.get('titulo')?.touched
+                                "
+                                class="text-red-500 text-sm mt-1"
+                              >
+                                El título es obligatorio y no debe superar los
+                                100 caracteres.
                               </div>
                             </div>
-                      
+
                             <!-- Comunidad -->
                             <div class="sm:col-span-2">
-                              <label for="comunidad" class="block text-sm font-bold text-white">Comunidad</label>
+                              <label
+                                for="comunidad"
+                                class="block text-sm font-bold text-white"
+                                >Comunidad</label
+                              >
                               <select
                                 id="comunidad"
                                 formControlName="comunidad"
                                 class="mt-2 block w-full rounded-md bg-gray-900 text-white px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
                               >
-                                <option [ngValue]="null" disabled>Selecciona una comunidad</option>
-                                <option *ngFor="let comunidad of comunidades" [ngValue]="comunidad">{{ comunidad.nombre }}</option>
+                                <option [ngValue]="null" disabled>
+                                  Selecciona una comunidad
+                                </option>
+                                <option
+                                  *ngFor="let comunidad of comunidades"
+                                  [ngValue]="comunidad"
+                                >
+                                  {{ comunidad.nombre }}
+                                </option>
                               </select>
-                              <div *ngIf="form.get('comunidad')?.invalid && form.get('comunidad')?.touched" class="text-red-500 text-sm mt-1">
+                              <div
+                                *ngIf="
+                                  form.get('comunidad')?.invalid &&
+                                  form.get('comunidad')?.touched
+                                "
+                                class="text-red-500 text-sm mt-1"
+                              >
                                 Debes seleccionar una comunidad.
                               </div>
                             </div>
-                      
+
                             <!-- Contenido -->
                             <div class="sm:col-span-6">
-                              <label for="contenido" class="block text-sm font-bold text-white">Contenido</label>
+                              <label
+                                for="contenido"
+                                class="block text-sm font-bold text-white"
+                                >Contenido</label
+                              >
                               <div class="mt-2 relative">
-                                <textarea id="contenido" rows="4" formControlName="contenido" maxlength="280"
-                                  class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 
-                                  placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
-                                  placeholder="¿Qué está pasando?" ></textarea>
-                                <div class="absolute bottom-2 right-3 text-xs text-gray-400">
-                                  {{ form.get('contenido')?.value?.length || 0 }}/280
+                                <textarea
+                                  id="contenido"
+                                  rows="4"
+                                  formControlName="contenido"
+                                  maxlength="280"
+                                  class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+                                  placeholder="¿Qué está pasando?"
+                                ></textarea>
+                                <div
+                                  class="absolute bottom-2 right-3 text-xs text-gray-400"
+                                >
+                                  {{
+                                    form.get("contenido")?.value?.length || 0
+                                  }}/280
                                 </div>
                               </div>
-                              <div *ngIf="form.get('contenido')?.invalid && form.get('contenido')?.touched" class="text-red-500 text-sm mt-1">
-                                El contenido es obligatorio y no puede superar los 280 caracteres.
+                              <div
+                                *ngIf="
+                                  form.get('contenido')?.invalid &&
+                                  form.get('contenido')?.touched
+                                "
+                                class="text-red-500 text-sm mt-1"
+                              >
+                                El contenido es obligatorio y no puede superar
+                                los 280 caracteres.
                               </div>
                             </div>
-                      
+
                             <!-- Anónimo -->
                             <div class="sm:col-span-6">
-                              <label class="block text-sm font-bold text-white">Enviar como anónimo</label>
-                              <mat-checkbox formControlName="anonimo" color="primary"></mat-checkbox>
+                              <label class="block text-sm font-bold text-white"
+                                >Enviar como anónimo</label
+                              >
+                              <mat-checkbox
+                                formControlName="anonimo"
+                                color="primary"
+                              ></mat-checkbox>
                             </div>
-                      
+
                             <!-- Tags -->
                             <div class="sm:col-span-6">
-                              <label class="block text-sm font-bold text-white mb-2">Tags</label>
-                      
-                              <div class="inline-block cursor-pointer" (click)="mostrarInput = true" *ngIf="!mostrarInput">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                  stroke-linecap="round" stroke-linejoin="round"
-                                  class="lucide lucide-circle-plus-icon text-indigo-500 hover:text-indigo-400">
+                              <label
+                                class="block text-sm font-bold text-white mb-2"
+                                >Tags</label
+                              >
+
+                              <div
+                                class="inline-block cursor-pointer"
+                                (click)="mostrarInput = true"
+                                *ngIf="!mostrarInput"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="lucide lucide-circle-plus-icon text-indigo-500 hover:text-indigo-400"
+                                >
                                   <circle cx="12" cy="12" r="10" />
                                   <path d="M8 12h8" />
                                   <path d="M12 8v8" />
                                 </svg>
                               </div>
-                                <div *ngIf="form.get('tags')?.invalid && form.get('tags')?.touched" class="text-red-400 text-sm mt-1">
-                                  Debes agregar al menos un tag.
-                                </div>
-                      
-                              <div *ngIf="mostrarInput" class="mt-2 flex items-center gap-2">
-                                <input #nuevoTagInput
+                              <div
+                                *ngIf="
+                                  form.get('tags')?.invalid &&
+                                  form.get('tags')?.touched
+                                "
+                                class="text-red-400 text-sm mt-1"
+                              >
+                                Debes agregar al menos un tag.
+                              </div>
+
+                              <div
+                                *ngIf="mostrarInput"
+                                class="mt-2 flex items-center gap-2"
+                              >
+                                <input
+                                  #nuevoTagInput
                                   type="text"
                                   class="bg-gray-900 border border-gray-600 rounded px-3 py-1 text-base text-white focus:outline-indigo-600"
                                   placeholder="Escribe un tag"
@@ -125,20 +218,29 @@
                                 <button
                                   type="button"
                                   class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
-                                  (click)="agregarTag(nuevoTagInput.value); nuevoTagInput.value=''; mostrarInput = false">
+                                  (click)="
+                                    agregarTag(nuevoTagInput.value);
+                                    nuevoTagInput.value = '';
+                                    mostrarInput = false
+                                  "
+                                >
                                   Agregar
                                 </button>
                                 <button
                                   type="button"
                                   class="text-gray-400 px-2 py-1 rounded hover:text-gray-200"
-                                  (click)="mostrarInput = false">
+                                  (click)="mostrarInput = false"
+                                >
                                   Cancelar
                                 </button>
                               </div>
-                      
+
                               <div class="mt-4 flex flex-wrap gap-2">
                                 <span
-                                  *ngFor="let tagCtrl of tags.controls; let i = index"
+                                  *ngFor="
+                                    let tagCtrl of tags.controls;
+                                    let i = index
+                                  "
                                   class="bg-indigo-800 text-white px-3 py-1 rounded-full flex items-center gap-1"
                                 >
                                   {{ tagCtrl.value.nombre }}
@@ -147,177 +249,322 @@
                                     (click)="eliminarTag(i)"
                                     class="text-red-300 hover:text-red-500 font-bold"
                                     aria-label="Eliminar tag"
-                                  >&times;</button>
+                                  >
+                                    &times;
+                                  </button>
                                 </span>
                               </div>
-                             </div>
-                      
-                             <!-- Imágenes -->
-                                <div class="sm:col-span-6">
-                                    <label class="block text-sm font-bold text-white">Subir imagen</label>
-                                    <!-- Input para seleccionar imagen -->
-                                    <input
-                                      type="file" id="imagen" accept="image/*"
-                                      (change)="onFileSelected($event)"
-                                      class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4
-                                      file:rounded-full file:border-0 file:text-sm file:font-semibold
-                                      file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"/>
-                                  <div *ngIf="form.get('fotos')?.invalid && form.get('fotos')?.touched" class="text-red-400 text-sm mt-1">
-                                    Debes subir al menos una foto.
-                                  </div>
-                                  
-                                    <!-- Vista previa -->
-                                    <div *ngIf="imagePreview" class="mt-4">
-                                      <label class="block text-white text-sm mb-2">Vista previa:</label>
-                                      <img [src]="imagePreview" alt="Vista previa" class="rounded-md w-40 h-auto shadow border border-gray-400" />
-                                    </div>
-                                  </div>
-                      
-                              <div class="flex gap-2 mt-4 flex-wrap">
-                                <div *ngFor="let foto of fotos.controls; let i = index" class="relative">
-                                  <img [src]="foto.value.image" alt="imagen" class="w-24 h-24 object-cover rounded border border-gray-600" />
-                                  <button type="button" (click)="eliminarFoto(i)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs">&times;</button>
-                                </div>
+                            </div>
+
+                            <!-- Imágenes -->
+                            <div class="sm:col-span-6">
+                              <label class="block text-sm font-bold text-white"
+                                >Subir imagen</label
+                              >
+                              <!-- Input para seleccionar imagen -->
+                              <input
+                                type="file"
+                                id="imagen"
+                                accept="image/*"
+                                (change)="onFileSelected($event)"
+                                class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
+                              />
+                              <div
+                                *ngIf="
+                                  form.get('fotos')?.invalid &&
+                                  form.get('fotos')?.touched
+                                "
+                                class="text-red-400 text-sm mt-1"
+                              >
+                                Debes subir al menos una foto.
+                              </div>
+
+                              <!-- Vista previa -->
+                              <div *ngIf="imagePreview" class="mt-4">
+                                <label class="block text-white text-sm mb-2"
+                                  >Vista previa:</label
+                                >
+                                <img
+                                  [src]="imagePreview"
+                                  alt="Vista previa"
+                                  class="rounded-md w-40 h-auto shadow border border-gray-400"
+                                />
                               </div>
                             </div>
-                      
-                            <!-- Botones -->
-                            <div class="sm:col-span-6 flex justify-center gap-6 mt-8">
-                              <button
-                                type="submit"
-                                (click)="guardarReporte()"
-                                class="bg-indigo-600 text-white px-8 py-3 rounded-md shadow-md hover:bg-indigo-700 
-                                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"                              >
-                                {{ isEditMode ? 'Actualizar Reporte' : 'Guardar Reporte' }}
-                              </button>
-                              <button
-                                type="button"
-                                (click)="cancelarFormulario()"
-                                class="bg-gray-800 text-white px-8 py-3 rounded-md shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition"
+
+                            <div class="flex gap-2 mt-4 flex-wrap">
+                              <div
+                                *ngFor="
+                                  let foto of fotos.controls;
+                                  let i = index
+                                "
+                                class="relative"
                               >
-                                Cancelar
-                              </button>
+                                <img
+                                  [src]="foto.value.image"
+                                  alt="imagen"
+                                  class="w-24 h-24 object-cover rounded border border-gray-600"
+                                />
+                                <button
+                                  type="button"
+                                  (click)="eliminarFoto(i)"
+                                  class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs"
+                                >
+                                  &times;
+                                </button>
+                              </div>
                             </div>
                           </div>
+
+                          <!-- Botones -->
+                          <div
+                            class="sm:col-span-6 flex justify-center gap-6 mt-8"
+                          >
+                            <button
+                              type="submit"
+                              (click)="guardarReporte()"
+                              class="bg-indigo-600 text-white px-8 py-3 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition"
+                            >
+                              {{
+                                isEditMode
+                                  ? "Actualizar Reporte"
+                                  : "Guardar Reporte"
+                              }}
+                            </button>
+                            <button
+                              type="button"
+                              (click)="cancelarFormulario()"
+                              class="bg-gray-800 text-white px-8 py-3 rounded-md shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
                       </form>
                     </div>
 
-
-          
                     <!-- Lista de Reportes -->
-                    <div *ngIf="!mostrarFormulario" >
+                    <div *ngIf="!mostrarFormulario">
                       <div>
-                        <div *ngFor="let reporte of reportesFiltrados"
-                             class="w-full bg-background rounded-lg shadow p-4 mb-4 relative">           
-                        <!-- Botón de -->
-                        <div class="absolute top-2 right-2">
+                        <div
+                          *ngFor="let reporte of reportesFiltrados"
+                          class="w-full bg-background rounded-lg shadow p-4 mb-4 relative"
+                        >
+                          <!-- Botón de -->
+                          <div class="absolute top-2 right-2">
+                            <button
+                              (click)="toggleMenu(reporte.id!)"
+                              class="text-foreground-muted hover:text-primary text-xl font-bold"
+                            >
+                              ⋯
+                            </button>
+                            <div
+                              *ngIf="menuAbiertoId === reporte.id"
+                              class="absolute right-0 mt-1 bg-background shadow rounded z-10 w-32"
+                            >
+                              <button
+                                (click)="editarReporte(reporte.id!)"
+                                class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="1"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="lucide lucide-square-pen-icon lucide-square-pen"
+                                >
+                                  <path
+                                    d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                  />
+                                  <path
+                                    d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
+                                  /></svg
+                                >Editar
+                              </button>
 
-                          <button (click)="toggleMenu(reporte.id!)" class="text-foreground-muted hover:text-primary text-xl font-bold">⋯</button>
-                          <div *ngIf="menuAbiertoId === reporte.id" class="absolute right-0 mt-1 bg-background shadow rounded z-10 w-32">
-                            <button (click)="editarReporte(reporte.id!)" class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
-                                   fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" 
-                                   stroke-linejoin="round" class="lucide lucide-square-pen-icon lucide-square-pen">
-                                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
-                              </svg>Editar
-                            </button>
-
-                            <button (click)="eliminarReporte(reporte.id!)" class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
-                                   fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" 
-                                   stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash">
-                                <path d="M3 6h18"/>
-                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                              </svg>
-                              Eliminar
-                            </button>
-                            <button *ngIf="reportesFiltrados.length !== reportes.length" (click)="quitarFiltro()" class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                              fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" 
-                              class="lucide lucide-brush-cleaning-icon lucide-brush-cleaning"><path d="m16 22-1-4"/>
-                              <path d="M19 13.99a1 1 0 0 0 1-1V12a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 
-                              1 0 0 1-1 1H6a2 2 0 0 0-2 2v.99a1 1 0 0 0 1 1"/>
-                              <path d="M5 14h14l1.973 6.767A1 1 0 0 1 20 22H4a1 1 0 0 1-.973-1.233z"/>
-                              <path d="m8 22 1-4"/></svg>
-                              Limpiar
-                            </button>
-                          </div>
-                        </div>
-              
-                        <!-- Encabezado -->
-                        <div class="flex items-center gap-3">
-                          <div class="bg-muted text-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-                            {{ reporte.anonimo ? 'A' : (reporte.autor?.nombre_usuario) }}
-                          </div>
-                          <div>
-                            <div class="text-sm font-medium">
-                              {{ reporte.anonimo ? 'Anonymous' : reporte.autor?.nombre_usuario }}
+                              <button
+                                (click)="eliminarReporte(reporte.id!)"
+                                class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="1"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="lucide lucide-trash-icon lucide-trash"
+                                >
+                                  <path d="M3 6h18" />
+                                  <path
+                                    d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
+                                  />
+                                  <path
+                                    d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+                                  />
+                                </svg>
+                                Eliminar
+                              </button>
+                              <button
+                                *ngIf="
+                                  reportesFiltrados.length !== reportes.length
+                                "
+                                (click)="quitarFiltro()"
+                                class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="1"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="lucide lucide-brush-cleaning-icon lucide-brush-cleaning"
+                                >
+                                  <path d="m16 22-1-4" />
+                                  <path
+                                    d="M19 13.99a1 1 0 0 0 1-1V12a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1
+                              1 0 0 1-1 1H6a2 2 0 0 0-2 2v.99a1 1 0 0 0 1 1"
+                                  />
+                                  <path
+                                    d="M5 14h14l1.973 6.767A1 1 0 0 1 20 22H4a1 1 0 0 1-.973-1.233z"
+                                  />
+                                  <path d="m8 22 1-4" />
+                                </svg>
+                                Limpiar
+                              </button>
                             </div>
-                            <p class="text-xs text-foreground-muted">
-                              {{ reporte.create_at | date: 'medium' }}
+                          </div>
+
+                          <!-- Encabezado -->
+                          <div class="flex items-center gap-3">
+                            <div
+                              class="bg-muted text-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm"
+                            >
+                              {{
+                                reporte.anonimo
+                                  ? "A"
+                                  : reporte.autor?.nombre_usuario
+                              }}
+                            </div>
+                            <div>
+                              <div class="text-sm font-medium">
+                                {{
+                                  reporte.anonimo
+                                    ? "Anonymous"
+                                    : reporte.autor?.nombre_usuario
+                                }}
+                              </div>
+                              <p class="text-xs text-foreground-muted">
+                                {{ reporte.create_at | date : "medium" }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <!-- Título -->
+                          <div class="px-4 pb-2">
+                            <h3 class="text-lg font-medium mb-2">
+                              {{ reporte.titulo }}
+                            </h3>
+                            <p class="text-foreground-muted">
+                              {{ reporte.contenido }}
                             </p>
                           </div>
-                        </div>
-              
-                        <!-- Título -->
-                        <div class="px-4 pb-2">
-                          <h3 class="text-lg font-medium mb-2">{{ reporte.titulo }}</h3>
-                          <p class="text-foreground-muted">{{ reporte.contenido }}</p>
-                        </div> 
-                        <div class="px-4 pb-2">
-                          <button (click)="filtrarTag(tag.nombre)"
-                            *ngFor="let tag of reporte.tags"
-                            class="bg-indigo-800 text-white px-3 py-1 rounded-full flex items-center gap-1 cursor-pointer">
-                            {{tag.nombre}}
-                        </button>
-                        </div>
-              
-                        <!-- Imagen -->
-                        <div class="mt-2 mb-3">
-                          <img
-                            [src]="reporte.fotos?.[0]?.image|| 'https://i.pinimg.com/736x/47/56/8e/47568ef7d81c8c5f3cfcab6f56e73274.jpg'"
-                            alt="Imagen del reporte"
-                            class="w-full h-auto max-h-80 object-cover"
-                          />
-                        </div>
-              
-                        <!-- Acciones -->
-                        <div class="px-4 py-3 border-t border-border flex items-center justify-between">
-                          <div class="flex items-center gap-4">
+                          <div class="px-4 pb-2">
                             <button
-                              class="flex items-center gap-1 text-sm hover:text-primary transition-colors"
-                              [class.text-primary]="meEncantaReporte[reporte.id!]"
-                              (click)="toggleMeGusta(reporte.id!)"
-                              [disabled]="!usuarioActual"
+                              (click)="filtrarTag(tag.nombre)"
+                              *ngFor="let tag of reporte.tags"
+                              class="bg-indigo-800 text-white px-3 py-1 rounded-full flex items-center gap-1 cursor-pointer"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                                   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                   stroke-linejoin="round" class="lucide lucide-heart-icon lucide-heart">
-                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                              </svg>
-                              {{ reporte.me_encanta_count || 0 }}
+                              {{ tag.nombre }}
                             </button>
                           </div>
-                          <button class="flex items-center gap-1 text-sm text-foreground-muted hover:text-primary transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                            stroke-linejoin="round" class="lucide lucide-share-icon lucide-share">
-                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/>
-                            <line x1="12" x2="12" y1="2" y2="15"/></svg>
-                            Share
-                          </button>
+
+                          <!-- Imagen -->
+                          <div class="mt-2 mb-3">
+                            <img
+                              [src]="reporte.fotos?.[0]?.image|| 'https://i.pinimg.com/736x/47/56/8e/47568ef7d81c8c5f3cfcab6f56e73274.jpg'"
+                              alt="Imagen del reporte"
+                              class="w-full h-auto max-h-80 object-cover"
+                            />
+                          </div>
+
+                          <!-- Acciones -->
+                          <div
+                            class="px-4 py-3 border-t border-border flex items-center justify-between"
+                          >
+                            <div class="flex items-center gap-4">
+                              <button
+                                class="flex items-center gap-1 text-sm hover:text-primary transition-colors"
+                                [class.text-primary]="
+                                  meEncantaReporte[reporte.id!]
+                                "
+                                (click)="toggleMeGusta(reporte.id!)"
+                                [disabled]="!usuarioActual"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  class="lucide lucide-heart-icon lucide-heart"
+                                >
+                                  <path
+                                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+                                  />
+                                </svg>
+                                {{ reporte.me_encanta_count || 0 }}
+                              </button>
+                            </div>
+                            <button
+                              class="flex items-center gap-1 text-sm text-foreground-muted hover:text-primary transition-colors"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="lucide lucide-share-icon lucide-share"
+                              >
+                                <path
+                                  d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
+                                />
+                                <polyline points="16 6 12 2 8 6" />
+                                <line x1="12" x2="12" y1="2" y2="15" />
+                              </svg>
+                              Share
+                            </button>
+                          </div>
                         </div>
-                    </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </ng-content>
-      </section>
-    </div>
-  </div>
+              </ng-content>
+            </section>
+          </div>
+        </div>
         <!--
             -->
 
