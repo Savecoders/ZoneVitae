@@ -24,6 +24,12 @@ export interface AuthResponse {
   };
 }
 
+// Mock token info for json-server
+export interface MockTokenInfo {
+  userId: number;
+  expiresAt: string;
+}
+
 export interface PasswordResetRequest {
   email: string;
 }
