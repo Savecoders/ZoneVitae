@@ -3,7 +3,7 @@
 <!-- Formulario de edición (se muestra cuando showEditForm es true) -->
 
     <!-- Formulario de comentarios (aparece al cambiar estado) -->
-  <div *ngIf="showCommentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div *ngIf="showCommentForm" class="bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
       <h2 class="text-xl font-semibold mb-4">Confirmar cambio de estado</h2>
       <p class="mb-4">Estás cambiando el estado a: <strong>{{currentStatusChange}}</strong></p>
@@ -55,7 +55,7 @@
   </div>
 
   <!-- Formulario de edición de seguimiento -->
-<div *ngIf="showSeguimientoForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div *ngIf="showSeguimientoForm" class=" bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
     <h2 class="text-xl font-semibold mb-4">Editar Seguimiento</h2>
     
@@ -176,16 +176,16 @@
 
   </mat-form-field>
   </form>
-  <table mat-table [dataSource]="dataSource" class="bg-default-50">
+  <table mat-table [dataSource]="dataSource" class="w-full bg-default-100">
   <!-- Título Column -->
-  <ng-container matColumnDef="titulo">
+  <ng-container matColumnDef="titulo" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > TÍTULO </th>
  
     <td mat-cell *matCellDef="let reporte" class="">   <lucide-angular [img]="FileSearch" class="my-icon"></lucide-angular>{{reporte.titulo}} </td>
   </ng-container>
 
   <!-- Comunidad Column -->
-  <ng-container matColumnDef="comunidad">
+  <ng-container matColumnDef="comunidad" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef  > COMUNIDAD </th>
     <td mat-cell *matCellDef="let reporte"> 
       {{getNombreComunidad(reporte.comunidad_id || 0)}}
@@ -194,7 +194,7 @@
   </ng-container>
 
   <!-- Fecha Column -->
-  <ng-container matColumnDef="fecha">
+  <ng-container matColumnDef="fecha" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > FECHA </th>
     <td mat-cell *matCellDef="let reporte"> 
       {{formatearFecha(reporte.create_at)}} 
@@ -202,7 +202,7 @@
   </ng-container>
 
   <!-- Estado Column -->
-<ng-container matColumnDef="estado">
+<ng-container matColumnDef="estado" class="bg-transparent">
   <th mat-header-cell *matHeaderCellDef > ESTADO </th>
   <td mat-cell *matCellDef="let reporte">
     {{ reporte.estado }}
@@ -213,7 +213,7 @@
 </ng-container>
 
   <!-- Seguimiento Column -->
-  <ng-container matColumnDef="seguimiento">
+  <ng-container matColumnDef="seguimiento" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > SEGUIMIENTO </th>
     <td mat-cell *matCellDef="let reporte">
       {{reporte.estado_seguimiento}}
@@ -223,7 +223,7 @@
     </td>
   </ng-container>
   <!-- Acciones Column -->
-  <ng-container matColumnDef="acciones">
+  <ng-container matColumnDef="acciones" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > ACCIONES </th>
     <td mat-cell *matCellDef="let reporte">
   

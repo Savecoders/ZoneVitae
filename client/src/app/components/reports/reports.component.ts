@@ -191,7 +191,7 @@ export class ReportsComponent implements OnInit {
       this.isEditMode = true;
       this.reporteEditando = reporte;
       this.mostrarFormulario = true;
-      const comunidad = this.comunidades.find(c => c.ID === reporte.comunidad?.ID);
+      const comunidad = this.comunidades.find(c => c.id === reporte.comunidad?.id);
     
       this.form.patchValue({
         titulo: reporte.titulo,
@@ -259,7 +259,7 @@ export class ReportsComponent implements OnInit {
 
     //Me Gusta
     verificarMeEncanta(reporteId: number): void {
-      const idUsuario = this.usuarioActual?.ID;
+      const idUsuario = this.usuarioActual?.id;
       if (!idUsuario) return;
       this.meEncantaService.getUsuario_Reporte(idUsuario, reporteId).subscribe(res => {
         this.meEncantaReporte[reporteId] = res.length > 0;
@@ -267,7 +267,7 @@ export class ReportsComponent implements OnInit {
     }
   
     toggleMeGusta(reporteId: number): void {
-      const idUsuario = this.usuarioActual?.ID;
+      const idUsuario = this.usuarioActual?.id;
       if (!idUsuario) return;
       this.meEncantaService.getUsuario_Reporte(idUsuario, reporteId).subscribe(res => {
         if (res.length > 0) {

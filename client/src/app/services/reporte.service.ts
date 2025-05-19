@@ -51,7 +51,9 @@ export class ReporteService extends BaseService<ReporteCompleto> {
     );
   }
 
-  
+   updateReporte(id: number, reporte: Partial<Reporte>): Observable<Reporte> {
+    return this.update(id, reporte);
+   }
    
 crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
   return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
@@ -63,7 +65,18 @@ updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<
   return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
 }
 
-
+getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
+    return this.getAll().pipe(
+      map((reportes) =>
+        reportes.filter(
+          (reporte) =>
+            (titulo
+              ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
+              : true) && (estado ? reporte.estado === estado : true)
+      )
+    )
+  );
+}
 
 
 }
