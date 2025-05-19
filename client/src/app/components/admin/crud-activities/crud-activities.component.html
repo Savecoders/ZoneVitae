@@ -172,19 +172,235 @@
       </mat-paginator>
     </div>
   </section>
-
-  <!-- Activity Modal -->
-  <app-activity-modal
-    [visible]="showModal"
-    [isEditing]="isEditing"
-    [loading]="isSubmitting"
-    [activityData]="activityForm.value"
-    (save)="onModalSave($event)"
-    (cancel)="onModalCancel()"
-  ></app-activity-modal>
-
-  <!-- Activity Form Template (for the original method, can be removed when modal is confirmed working) -->
-  <ng-template #activityFormTemplate>
-    <app-activity-form [form]="activityForm"></app-activity-form>
-  </ng-template>
 </admin-layout>
+
+<!-- Activity Form Template -->
+<ng-template #activityFormTemplate let-dialogData>
+  <div class="container-fluid">
+    <form [formGroup]="activityForm" class="space-y-4">
+      <!-- Form content stays the same -->
+      <!-- Name Field -->
+      <div class="form-group">
+        <label
+          for="nombre"
+          class="block text-sm font-medium text-default-700 mb-1"
+          >Activity Name*</label
+        >
+        <app-input
+          id="nombre"
+          [className]="'border-default-500'"
+          formControlName="nombre"
+          [placeholder]="'Enter activity name'"
+          [type]="'text'"
+          [validation]="{
+          state: activityForm.get('nombre')?.invalid && activityForm.get('nombre')?.touched ? 'invalid' : 'undefined',
+          message: activityForm.get('nombre')?.errors?.['required'] ? 'Name is required' :
+                   activityForm.get('nombre')?.errors?.['minlength'] ? 'Name must be at least 3 characters' : ''
+        }"
+        ></app-input>
+      </div>
+
+      <!-- Description Field -->
+      <div class="form-group">
+        <label
+          for="descripcion"
+          class="block text-sm font-medium text-default-700 mb-1"
+          >Description</label
+        >
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="3"
+          class="w-full px-3 py-2 border border-content2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          [ngClass]="{
+            'border-danger':
+              activityForm.get('descripcion')?.invalid &&
+              activityForm.get('descripcion')?.touched
+          }"
+          placeholder="Describe the activity"
+        ></textarea>
+        <div
+          *ngIf="
+            activityForm.get('descripcion')?.invalid &&
+            activityForm.get('descripcion')?.touched
+          "
+          class="text-danger text-sm mt-1"
+        >
+          Description must be at least 10 characters
+        </div>
+      </div>
+
+      <!-- Dates Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label
+            for="fecha_inicio"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Start Date*</label
+          >
+          <app-input
+            id="fecha_inicio"
+            formControlName="fecha_inicio"
+            [className]="'border-default-500'"
+            [type]="'date'"
+            [validation]="{
+              state:
+                (activityForm.get('fecha_inicio')?.invalid &&
+                activityForm.get('fecha_inicio')?.touched) ||
+                activityForm.hasError('dateRangeInvalid') ||
+                activityForm.hasError('startDatePast')
+                  ? 'invalid'
+                  : 'undefined',
+              message: activityForm.get('fecha_inicio')?.errors?.['required']
+                ? 'Start date is required'
+                : activityForm.hasError('startDatePast')
+                ? 'Start date cannot be earlier than today'
+                : activityForm.hasError('dateRangeInvalid')
+                ? 'Start date must be before end date'
+                : ''
+            }"
+          ></app-input>
+        </div>
+        <div class="form-group">
+          <label
+            for="fecha_fin"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >End Date*</label
+          >
+          <app-input
+            id="fecha_fin"
+            formControlName="fecha_fin"
+            [className]="'border-default-500'"
+            [type]="'date'"
+            [validation]="{
+              state:
+                (activityForm.get('fecha_fin')?.invalid &&
+                activityForm.get('fecha_fin')?.touched) ||
+                activityForm.hasError('dateRangeInvalid')
+                  ? 'invalid'
+                  : 'undefined',
+              message: activityForm.get('fecha_fin')?.errors?.['required']
+                ? 'End date is required'
+                : ''
+            }"
+          ></app-input>
+        </div>
+      </div>
+
+      <!-- Location and Event Type Row -->
+      <div class="flex flex-col gap-4">
+        <div class="form-group w-full">
+          <label
+            for="ubicacion"
+            class="block text-sm font-medium text-default-700"
+            >Location*</label
+          >
+          <app-input
+            id="ubicacion"
+            formControlName="ubicacion"
+            [placeholder]="'Enter activity location'"
+            [type]="'text'"
+            [className]="'border-default-500'"
+            [validation]="{
+              state:
+                activityForm.get('ubicacion')?.invalid &&
+                activityForm.get('ubicacion')?.touched
+                  ? 'invalid'
+                  : 'undefined',
+              message: 'Location is required'
+            }"
+          ></app-input>
+        </div>
+        <div class="form-group">
+          <label
+            for="frecuencia"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Frequency*</label
+          >
+          <select
+            id="frecuencia"
+            formControlName="frecuencia"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors border-default-500"
+          >
+            <option value="" disabled selected>Select frequency</option>
+            <option value="once">One-time event</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom</option>
+          </select>
+          <div
+            *ngIf="
+              activityForm.get('frecuencia')?.invalid &&
+              activityForm.get('frecuencia')?.touched
+            "
+            class="text-danger text-sm mt-1"
+          >
+            Frequency is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Community and Virtual Event Row -->
+      <!-- Comming Soon when have comunities crud -->
+      <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-group">
+          <label
+            for="comunidad_id"
+            class="block text-sm font-medium text-default-700 mb-1"
+            >Community</label
+          >
+          <select
+            id="comunidad_id"
+            formControlName="comunidad_id"
+            class="w-full px-3 py-2 border border-content2 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          >
+            <option value="" disabled selected>Select community</option>
+            <option value="1">Community 1</option>
+            <option value="2">Community 2</option>
+          </select>
+        </div> -->
+      <div class="form-group flex items-center mt-8">
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="virtual"
+            formControlName="virtual"
+            class="w-4 h-4 text-primary focus:ring-primary border-default-300 rounded"
+          />
+          <label
+            for="virtual"
+            class="ml-2 block text-sm font-medium text-default-700"
+          >
+            This is a virtual event
+          </label>
+        </div>
+      </div>
+
+      <!-- URL Field (Conditional) -->
+      <div class="form-group" *ngIf="activityForm.get('virtual')?.value">
+        <label for="url" class="block text-sm font-medium text-default-700 mb-1"
+          >Event URL</label
+        >
+        <app-input
+          id="url"
+          [className]="'w-full'"
+          formControlName="url"
+          [placeholder]="
+            'Enter virtual event URL (e.g. https://example.com or https://example.com?param=value)'
+          "
+          [type]="'url'"
+          [validation]="{
+            state:
+              activityForm.get('url')?.invalid &&
+              activityForm.get('url')?.touched
+                ? 'invalid'
+                : 'undefined',
+            message: activityForm.get('url')?.errors?.['pattern']
+              ? 'Please enter a valid URL including http:// or https:// (query parameters are supported)'
+              : ''
+          }"
+        ></app-input>
+      </div>
+    </form></div
+></ng-template>

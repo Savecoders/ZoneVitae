@@ -1,4 +1,12 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  TemplateRef,
+  ViewContainerRef,
+  ApplicationRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -10,6 +18,7 @@ import {
 import { ActividadService } from '../../../services/actividad.service';
 import { Actividad } from '../../../models/actividad.model';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AdminLayoutComponent } from '../layout/layout.component';
 import { ButtonComponent } from '../../shared/primitives/button/button.component';
 import {
@@ -24,6 +33,9 @@ import {
   Trash2Icon,
   EllipsisVertical,
 } from 'lucide-angular';
+import { InputComponent } from '../../shared/primitives/input/input.component';
+import { SelectComponent } from '../../shared/primitives/select/select.component';
+import { DialogComponent } from '../../shared/primitives/dialog/dialog.component';
 import { DialogRef, DialogService } from '../../../services/dialog.service';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
@@ -33,8 +45,7 @@ import {
   DropdownMenuComponent,
   DropdownItem,
 } from '../../shared/primitives/dropdown-menu/dropdown-menu.component';
-import { ActivityFormComponent } from './activity-form/activity-form.component';
-import { ActivityModalComponent } from './activity-modal/activity-modal.component';
+import { SeparatorComponent } from '../../shared/primitives/separator/separator.component';
 
 @Component({
   selector: 'app-crud-activities',
@@ -46,19 +57,21 @@ import { ActivityModalComponent } from './activity-modal/activity-modal.componen
     RouterModule,
     AdminLayoutComponent,
     ButtonComponent,
+    InputComponent,
+    SelectComponent,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
     BadgeComponent,
     DropdownMenuComponent,
     LucideAngularModule,
-    ActivityFormComponent,
-    ActivityModalComponent,
+    DialogComponent,
+    SeparatorComponent,
   ],
   templateUrl: './crud-activities.component.html',
   styleUrl: './crud-activities.component.css',
 })
-export class CrudActivitiesComponent implements OnInit {
+export class CrudActivitiesComponent implements OnInit, OnDestroy {
   // icons
   IconActivities = MegaphoneIcon;
   IconLink = LinkIcon;
@@ -94,37 +107,96 @@ export class CrudActivitiesComponent implements OnInit {
   ];
   dataSource = new MatTableDataSource<Actividad>([]);
 
-  // Activity modal properties
-  showModal = false;
-  isSubmitting = false;
+  // Form status subscription
+  formStatusSubscription?: Subscription;
+
+  // Properties to track current dialog
+  private currentDialogRef: DialogRef | null = null;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('activityFormTemplate') activityFormTemplate!: TemplateRef<any>;
-
-  // Properties to track current dialog
-  private currentDialogRef: DialogRef | null = null;
 
   constructor(
     private actividadService: ActividadService,
     private fb: FormBuilder,
     private dialogService: DialogService
   ) {
-    this.activityForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3)]],
-      descripcion: [''],
-      fecha_inicio: ['', Validators.required],
-      fecha_fin: ['', Validators.required],
-      ubicacion: ['', Validators.required],
-      virtual: [false],
-      frecuencia: ['', Validators.required],
-      comunidad_id: [null],
-      url: [''],
-    });
+    // Get today's date in YYYY-MM-DD format for the date input
+    const today = new Date();
+    const todayFormatted = today.toISOString().substring(0, 10);
+
+    this.activityForm = this.fb.group(
+      {
+        nombre: ['', [Validators.required, Validators.minLength(3)]],
+        descripcion: ['', [Validators.minLength(10)]],
+        fecha_inicio: [todayFormatted, Validators.required], // Set today as default
+        fecha_fin: ['', Validators.required],
+        ubicacion: ['', Validators.required],
+        virtual: [false],
+        frecuencia: ['', Validators.required],
+        comunidad_id: [null],
+        url: [
+          '',
+          [
+            Validators.pattern(
+              '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})([/\\w .-]*)(\\?[\\w%&=.-]*)?(#[\\w-]*)?'
+            ),
+          ],
+        ],
+      },
+      { validators: this.dateRangeValidator }
+    );
+  }
+
+  // Custom validator to ensure start date is before end date and not in the past
+  dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
+    const start = group.get('fecha_inicio')?.value;
+    const end = group.get('fecha_fin')?.value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time component for accurate date comparison
+
+    const errors: { [key: string]: any } = {};
+
+    if (start) {
+      const startDate = new Date(start);
+
+      // Check if start date is before today
+      // We'll only apply this validation when the start date control has been modified by the user
+      const startControl = group.get('fecha_inicio');
+      if (startDate < today && startControl && startControl.dirty) {
+        errors['startDatePast'] = true;
+      }
+
+      // Check if end date is after start date
+      if (end) {
+        const endDate = new Date(end);
+        if (startDate > endDate) {
+          errors['dateRangeInvalid'] = true;
+        }
+      }
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
   }
 
   ngOnInit(): void {
     this.loadActivities();
+
+    // Add conditional validation for URL field based on virtual checkbox
+    this.activityForm.get('virtual')?.valueChanges.subscribe((isVirtual) => {
+      const urlControl = this.activityForm.get('url');
+      if (isVirtual) {
+        urlControl?.setValidators([
+          Validators.pattern(
+            '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})([/\\w .-]*)(\\?[\\w%&=.-]*)?(#[\\w-]*)?'
+          ),
+        ]);
+      } else {
+        urlControl?.clearValidators();
+      }
+      urlControl?.updateValueAndValidity();
+    });
   }
 
   ngAfterViewInit() {
@@ -160,69 +232,62 @@ export class CrudActivitiesComponent implements OnInit {
   }
 
   openAddActivityDialog() {
-    this.resetForm();
+    console.log('Opening Add Activity Dialog');
     this.isEditing = false;
-    this.showModal = true;
-  }
-
-  // Modal save handler
-  onModalSave(formData: any) {
-    // Use form data directly from the modal
-    this.isSubmitting = true;
-
-    if (this.isEditing && this.currentActivityId) {
-      this.actividadService
-        .updateActividad(this.currentActivityId, formData)
-        .subscribe({
-          next: () => {
-            this.loadActivities();
-            this.resetForm();
-            this.isSubmitting = false;
-            this.showModal = false;
-            this.dialogService.success('Activity updated successfully!');
-          },
-          error: (err) => {
-            this.error = 'Error updating activity: ' + err.message;
-            this.isSubmitting = false;
-            this.dialogService.error('Error updating activity: ' + err.message);
-          },
-        });
-    } else {
-      this.actividadService.createActividad(formData).subscribe({
-        next: () => {
-          this.loadActivities();
-          this.resetForm();
-          this.isSubmitting = false;
-          this.showModal = false;
-          this.dialogService.success('Activity created successfully!');
-        },
-        error: (err) => {
-          this.error = 'Error creating activity: ' + err.message;
-          this.isSubmitting = false;
-          this.dialogService.error('Error creating activity: ' + err.message);
-        },
-      });
-    }
-  }
-
-  // Modal cancel handler
-  onModalCancel() {
-    this.showModal = false;
     this.resetForm();
+
+    // Create a dialog reference using the activityFormTemplate
+    this.currentDialogRef = this.dialogService.open({
+      title: 'Add New Activity',
+      content: this.activityFormTemplate,
+      size: 'lg',
+      confirmButtonText: 'Save',
+      confirmButtonColor: 'success',
+      cancelButtonText: 'Cancel',
+      showHeader: true,
+      showFooter: true,
+      confirmButtonDisabled: this.activityForm.invalid,
+      data: {
+        form: this.activityForm,
+        isEditing: this.isEditing,
+      },
+    });
+
+    // Debug the dialog reference
+    console.log('Dialog reference created:', this.currentDialogRef);
+
+    // Set up a form status subscription to update button state
+    this.formStatusSubscription = this.activityForm.statusChanges.subscribe(
+      (status) => {
+        if (this.currentDialogRef) {
+          this.currentDialogRef._componentRef.instance.confirmButtonDisabled =
+            this.activityForm.invalid;
+        }
+      }
+    );
+
+    // Handle dialog confirm action
+    this.currentDialogRef.onConfirm.subscribe(() => {
+      this.onSubmit();
+    });
   }
 
   // Reset form to initial state
   resetForm(): void {
+    // Get today's date in YYYY-MM-DD format for the date input
+    const today = new Date();
+    const todayFormatted = today.toISOString().substring(0, 10);
+
     this.activityForm.reset({
       nombre: '',
       descripcion: '',
-      fecha_inicio: '',
+      fecha_inicio: todayFormatted, // Set today as default start date
       fecha_fin: '',
       ubicacion: '',
       virtual: false,
       frecuencia: '',
       comunidad_id: null,
-      url: '',
+      url: '', // Will be validated only if virtual is true
     });
     this.isEditing = false;
     this.currentActivityId = undefined;
@@ -236,10 +301,60 @@ export class CrudActivitiesComponent implements OnInit {
         control?.markAsTouched();
       });
 
+      // Construct a more specific error message
+      let errorMessage = 'Please fix the following errors:';
+
+      if (this.activityForm.get('nombre')?.invalid) {
+        errorMessage +=
+          '\n• Activity name is required and must be at least 3 characters';
+      }
+
+      if (this.activityForm.get('descripcion')?.invalid) {
+        errorMessage += '\n• Description must be at least 10 characters';
+      }
+
+      if (this.activityForm.hasError('dateRangeInvalid')) {
+        errorMessage += '\n• Start date must be before end date';
+      }
+
+      if (this.activityForm.hasError('startDatePast')) {
+        errorMessage += '\n• Start date cannot be earlier than today';
+      }
+
+      if (
+        this.activityForm.get('fecha_inicio')?.invalid &&
+        !this.activityForm.hasError('dateRangeInvalid') &&
+        !this.activityForm.hasError('startDatePast')
+      ) {
+        errorMessage += '\n• Start date is required';
+      }
+
+      if (
+        this.activityForm.get('fecha_fin')?.invalid &&
+        !this.activityForm.hasError('dateRangeInvalid')
+      ) {
+        errorMessage += '\n• End date is required';
+      }
+
+      if (this.activityForm.get('ubicacion')?.invalid) {
+        errorMessage += '\n• Location is required';
+      }
+
+      if (this.activityForm.get('frecuencia')?.invalid) {
+        errorMessage += '\n• Frequency is required';
+      }
+
+      // URL validation only if virtual is checked
+      if (
+        this.activityForm.get('virtual')?.value &&
+        this.activityForm.get('url')?.invalid
+      ) {
+        errorMessage +=
+          '\n• Please provide a valid URL (e.g., https://example.com or https://example.com?param=value)';
+      }
+
       // Show error dialog but don't close the current form dialog
-      this.dialogService.error(
-        'Please fix the errors in the form before submitting.'
-      );
+      this.dialogService.error(errorMessage);
       return;
     }
 
@@ -254,7 +369,12 @@ export class CrudActivitiesComponent implements OnInit {
             this.loadActivities();
             this.resetForm();
             this.isLoading = false;
-            this.showModal = false;
+
+            // Close any open dialog
+            if (this.currentDialogRef) {
+              this.currentDialogRef.close();
+              this.currentDialogRef = null;
+            }
 
             // Show success message
             this.dialogService.success('Activity updated successfully!');
@@ -273,7 +393,12 @@ export class CrudActivitiesComponent implements OnInit {
           this.loadActivities();
           this.resetForm();
           this.isLoading = false;
-          this.showModal = false;
+
+          // Close any open dialog
+          if (this.currentDialogRef) {
+            this.currentDialogRef.close();
+            this.currentDialogRef = null;
+          }
 
           // Show success message
           this.dialogService.success('Activity created successfully!');
@@ -290,6 +415,7 @@ export class CrudActivitiesComponent implements OnInit {
   }
 
   editActivity(activity: Actividad): void {
+    console.log('Opening Edit Activity Dialog for:', activity);
     this.isEditing = true;
     this.currentActivityId = activity.id;
 
@@ -302,8 +428,46 @@ export class CrudActivitiesComponent implements OnInit {
 
     this.activityForm.patchValue(formattedActivity);
 
-    // Show the edit modal
-    this.showModal = true;
+    // Mark the form as pristine to prevent validation errors on initial load
+    // This ensures past dates won't trigger validation until the user changes them
+    this.activityForm.markAsPristine();
+
+    // Create a dialog reference using the activityFormTemplate
+    this.currentDialogRef = this.dialogService.open({
+      title: 'Edit Activity',
+      content: this.activityFormTemplate,
+      size: 'lg',
+      confirmButtonText: 'Update',
+      confirmButtonColor: 'primary',
+      cancelButtonText: 'Cancel',
+      showHeader: true,
+      showFooter: true,
+      confirmButtonDisabled: this.activityForm.invalid, // Initial state based on form validity
+      data: {
+        form: this.activityForm,
+        isEditing: this.isEditing,
+      },
+    });
+
+    // Clean up existing subscription if any
+    if (this.formStatusSubscription) {
+      this.formStatusSubscription.unsubscribe();
+    }
+
+    // Set up a form status subscription to update button state
+    this.formStatusSubscription = this.activityForm.statusChanges.subscribe(
+      (status) => {
+        if (this.currentDialogRef && this.currentDialogRef._componentRef) {
+          this.currentDialogRef._componentRef.instance.confirmButtonDisabled =
+            this.activityForm.invalid;
+        }
+      }
+    );
+
+    // Handle dialog confirm action
+    this.currentDialogRef.onConfirm.subscribe(() => {
+      this.onSubmit();
+    });
   }
 
   deleteActivity(id: number): void {
@@ -350,23 +514,18 @@ export class CrudActivitiesComponent implements OnInit {
     return date.toISOString().substring(0, 10); // YYYY-MM-DD format
   }
 
-  // Filter activities based on search term
-  get filteredActivities(): Actividad[] {
-    return this.activities.filter(
-      (activity) =>
-        activity.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        activity.descripcion
-          ?.toLowerCase()
-          .includes(this.searchTerm.toLowerCase()) ||
-        activity.ubicacion.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
-
   handleActionSelected(item: DropdownItem, activity: Actividad): void {
     if (item.id === 'edit') {
       this.editActivity(activity);
     } else if (item.id === 'delete') {
       this.deleteActivity(activity.id!);
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    if (this.formStatusSubscription) {
+      this.formStatusSubscription.unsubscribe();
     }
   }
 }
