@@ -250,6 +250,30 @@ export class AuthService {
     return !!this.currentUserSubject.value?.token;
   }
 
+  // Update user data after profile changes
+  updateUserData(userData: any): void {
+    if (!this.currentUserSubject.value) {
+      return;
+    }
+
+    const currentAuth = this.currentUserSubject.value;
+    const updatedAuth = {
+      ...currentAuth,
+      user: {
+        ...currentAuth.user,
+        ...userData,
+      },
+    };
+
+    // Update in memory
+    this.currentUserSubject.next(updatedAuth);
+
+    // Update in local storage if in browser environment
+    if (this.isBrowser) {
+      localStorage.setItem(this.userKey, JSON.stringify(updatedAuth.user));
+    }
+  }
+
   // Get current user
   getCurrentUser(): AuthResponse | null {
     return this.currentUserSubject.value;
