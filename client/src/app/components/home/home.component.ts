@@ -8,6 +8,7 @@ import {
   PostCardComponent,
   PostData,
 } from '../shared/post-card/post-card.component';
+import { Router } from '@angular/router';
 import { CommunityPostsComponent } from '../shared/community-posts/community-posts.component';
 import { FollowSectionComponent } from '../shared/follow-section/follow-section.component';
 import { ReporteService } from '../../services/reporte.service';
@@ -70,7 +71,8 @@ export class HomeComponent implements OnInit {
     private usuarioService: UsuarioService,
     private comentarioService: ComentarioService,
     private tagService: TagService,
-    private http: HttpClient
+    private http: HttpClient,
+private router: Router
   ) {}
 
   ngOnInit(): void {

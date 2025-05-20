@@ -55,6 +55,7 @@ export class SidebarComponent {
     { id: 4, name: 'Reportes', slug: 'reports', icon: ProportionsIcon },
     { id: 5, name: 'Actividades', slug: 'activities', icon: MegaphoneIcon },
     { id: 6, name: 'Todos', slug: 'reports', icon: VolleyballIcon },
+    {id: 18,name:'Auditoria' ,slug :'auditoria',icon:BetweenVerticalEnd}
   ];
 
   user_section: ILinks[] = [

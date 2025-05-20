@@ -115,47 +115,52 @@
   "reports": [
     {
       "id": "1",
+      "comunidad_id": 1,
+      "autor_id": 2,
       "titulo": "Farola dañada en calle principal",
       "contenido": "La farola ubicada en la esquina de la calle principal está dañada y no funciona desde hace una semana.",
-      "anonimo": true,
-      "create_at": "2023-03-10T16:20:00",
-      "comunidad_id": "1",
-      "fotos": [
-        {
-          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747682766/logo-cashmoney_ewwjsd.png",
-          "reports_id": null
-        }
-      ],
-      "tags": [
-        {
-          "id": "141a",
-          "nombre": "asdada"
-        }
-      ],
+      "anonimo": 0,
       "estado": "Pendiente de Revision",
-      "estado_seguimiento": "Pendiente de Revision"
+      "estado_seguimiento": "Revisado",
+      "create_at": "2023-03-10T16:20:00",
+      "update_at": "2025-05-20T00:27:12.783Z",
+      "nombreComunidad": "Comunidad Vecinal Las Flores"
     },
     {
       "id": "2",
+      "comunidad_id": 2,
+      "autor_id": 1,
       "titulo": "Basura acumulada en el parque",
       "contenido": "Se ha acumulado mucha basura alrededor de los bancos del sector norte del parque.",
       "anonimo": 1,
+      "estado": "Aprobado",
+      "estado_seguimiento": "Resuelto",
       "create_at": "2023-03-15T10:10:00",
+      "update_at": "2025-05-19T23:52:26.105Z"
+    },
+    {
+      "id": "f234",
+      "titulo": "hdshdshfd",
+      "contenido": "fdsgdagdsgdfgfds",
+      "anonimo": true,
+      "create_at": "2025-05-19T21:59:31.761Z",
       "comunidad_id": "2",
       "fotos": [
         {
-          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747682741/logo-cashmoney_pwmrvt.png",
+          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747691974/WhatsApp_Image_2025-04-28_at_5.24.26_PM_xtpgck.jpg",
           "reports_id": null
         }
       ],
       "tags": [
         {
-          "id": "b30a",
-          "nombre": "asdasd"
+          "id": "3ae8",
+          "nombre": "fgd"
         }
       ],
-      "estado": "Pendiente de Revision",
-      "estado_seguimiento": "Pendiente de Revision"
+      "autor_id": null,
+      "estado": "Aprobado",
+      "estado_seguimiento": "Pendiente de Revision",
+      "nombreComunidad": "Amigos del Parque Central"
     }
   ],
   "comentarios": [
@@ -227,12 +232,8 @@
       "id": "f91d"
     },
     {
-      "id": "b30a",
-      "nombre": "asdasd"
-    },
-    {
-      "id": "141a",
-      "nombre": "asdada"
+      "id": "3ae8",
+      "nombre": "fgd"
     }
   ],
   "comunidad_tags": [
@@ -317,15 +318,30 @@
       "reporte_id": 2,
       "usuario_id": 1,
       "estado_anterior": "Pendiente de Revision",
-      "estado_nuevo": "Revisado",
+      "estado_nuevo": "Resuelto",
       "comentario": "Se ha notificado al departamento de limpieza municipal.",
-      "accion_realizada": "Contacto con servicios municipales",
+      "accion_realizada": "dfgdshfghggdfhjfdsjfdjfdjg",
       "accion_recomendada": "Seguimiento en una semana si no se ha resuelto",
       "documentos_adjuntos": 0,
-      "prioridad": "Media",
+      "prioridad": "Baja",
       "create_at": "2023-03-16T14:30:00",
-      "update_at": "2023-03-16T14:30:00",
-      "imagen": null
+      "update_at": "2025-05-19T23:52:26.083Z",
+      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747698752/WhatsApp_Image_2025-04-28_at_5.24.26_PM_wr6hns.jpg"
+    },
+    {
+      "id": "32de",
+      "reporte_id": "1",
+      "usuario_id": 1,
+      "estado_anterior": "Aprobado",
+      "estado_nuevo": "Revisado",
+      "comentario": "",
+      "accion_realizada": "AFDSADFFSAFSAFDAS",
+      "accion_recomendada": "",
+      "documentos_adjuntos": false,
+      "prioridad": "Alta",
+      "create_at": "2025-05-20T00:23:22.816Z",
+      "update_at": "2025-05-20T00:27:12.778Z",
+      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747700839/WhatsApp_Image_2025-04-28_at_5.24.26_PM_txsmdk.jpg"
     }
   ]
 }

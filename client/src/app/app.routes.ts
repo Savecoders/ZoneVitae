@@ -37,7 +37,20 @@ export const routes: Routes = [
         (m) => m.ActivitiesComponent
       ),
   },
+  {path: 'auditoria',
+    loadComponent:() =>
+      import('./components/auditoria/auditoria.component').then(
+        (m) => m.AuditoriaComponent
+      ),
 
+  },
+  {path: 'detalle-reporte',
+    loadComponent: () =>
+      import('./components/detalle-reporte/detalle-reporte.component').then(
+        (m) => m.DetalleReporteComponent
+      ),
+
+  },
   // users paths
 
   {

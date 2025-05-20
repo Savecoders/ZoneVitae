@@ -4,7 +4,11 @@ import { Observable, map, switchMap, of } from 'rxjs';
 import { BaseService } from './base.service';
 import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
+
+import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+
 import { environment } from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
@@ -50,8 +54,41 @@ export class ReporteService extends BaseService<ReporteCompleto> {
     );
   }
 
+
+  // ...existing code...
+getReporteById(id: number): Observable<ReporteCompleto> {
+  return this.http.get<ReporteCompleto>(`${this.jsonUrl}/${id}`);
+}
+// ...existing code...
+   
+crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
+  return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
+}
+
+
+
+updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
+  return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
+}
+
+getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
+    return this.getAll().pipe(
+      map((reportes) =>
+        reportes.filter(
+          (reporte) =>
+            (titulo
+              ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
+              : true) && (estado ? reporte.estado === estado : true)
+      )
+    )
+  );
+}
+
+
+
   // Buscar reportes por autor
   getReportesByAutor(autorId: number): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(`${this.jsonUrl}?autor_id=${autorId}`);
   }
+
 }
