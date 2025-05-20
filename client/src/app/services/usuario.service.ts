@@ -12,6 +12,19 @@ export class UsuarioService extends BaseService<Usuario> {
     super(http, 'usuarios');
   }
 
+  // Get user by exact username match
+  getUserByUsername(username: string): Observable<Usuario | null> {
+    return this.getAll().pipe(
+      map((usuarios) => {
+        const user = usuarios.find(
+          (usuario) =>
+            usuario.nombre_usuario.toLowerCase() === username.toLowerCase()
+        );
+        return user || null;
+      })
+    );
+  }
+
   // Get all users with filtering
   getUsuarios(
     nombreUsuario?: string,
