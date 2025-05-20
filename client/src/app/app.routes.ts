@@ -23,25 +23,25 @@ export const routes: Routes = [
       ),
   },
   {
-  path: 'crud-communities',
-  loadComponent: () =>
-    import('./components/crud-communities/crud-communities.component').then(
-      (m) => m.CrudComunitiesComponent
-    ),
+    path: 'crud-communities',
+    loadComponent: () =>
+      import('./components/crud-communities/crud-communities.component').then(
+        (m) => m.CrudComunitiesComponent
+      ),
   },
   {
-  path: 'form-communities',
-  loadComponent: () =>
-    import('./components/form-community/form-community.component').then(
-      (m) => m.FormCommunityComponent
-    ),
+    path: 'form-communities',
+    loadComponent: () =>
+      import('./components/form-community/form-community.component').then(
+        (m) => m.FormCommunityComponent
+      ),
   },
   {
-  path: 'form-communities/:id',
-  loadComponent: () =>
-    import('./components/form-community/form-community.component').then(
-      (m) => m.FormCommunityComponent
-    ),
+    path: 'form-communities/:id',
+    loadComponent: () =>
+      import('./components/form-community/form-community.component').then(
+        (m) => m.FormCommunityComponent
+      ),
   },
   {
     path: 'reports',
@@ -58,20 +58,20 @@ export const routes: Routes = [
         (m) => m.ActivitiesComponent
       ),
   },
-  {path: 'auditoria',
-    loadComponent:() =>
+  {
+    path: 'auditoria',
+    loadComponent: () =>
       import('./components/auditoria/auditoria.component').then(
         (m) => m.AuditoriaComponent
       ),
-
   },
-  {path: 'detalle-reporte',
-    loadComponent: () =>
-      import('./components/detalle-reporte/detalle-reporte.component').then(
-        (m) => m.DetalleReporteComponent
-      ),
+  // {path: 'detalle-reporte',
+  //   loadComponent: () =>
+  //     import('./components/detalle-reporte/detalle-reporte.component').then(
+  //       (m) => m.DetalleReporteComponent
+  //     ),
 
-  },
+  // },
   // users paths
 
   {
