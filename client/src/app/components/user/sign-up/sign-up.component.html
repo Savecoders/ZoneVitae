@@ -21,49 +21,55 @@
       </p>
 
       <!-- Show error message if registration fails -->
+      @if (error) {
       <div
-        *ngIf="error"
         class="w-full max-w-[395px] bg-danger-100 text-danger-600 p-3 rounded-lg"
       >
         {{ error }}
       </div>
+      }
 
       <div class="flex flex-col gap-4 w-full max-w-[395px]">
-        <!-- First row: First and Last name -->
-        <div class="flex flex-row gap-2">
-          <app-input
-            [id]="'nombre'"
-            [label]="'First Name'"
-            formControlName="nombre"
-            placeholder="Enter your first name"
-            [required]="true"
-            [fullWidth]="true"
-            [validation]="{
-              state:
-                submitted && f['nombre'].errors ? 'invalid' : 'undefined',
-              message:
-                (submitted && f['nombre'].errors?.['required']) ? 'First name is required' :
-                (submitted && f['nombre'].errors?.['minlength']) ? 'First name must be at least 2 characters' : ''
-            }"
-          >
-          </app-input>
-
-          <app-input
-            [id]="'apellido'"
-            [label]="'Last Name'"
-            formControlName="apellido"
-            placeholder="Enter your last name"
-            [required]="true"
-            [fullWidth]="true"
-            [validation]="{
-              state:
-                submitted && f['apellido'].errors ? 'invalid' : 'undefined',
-              message:
-                (submitted && f['apellido'].errors?.['required']) ? 'Last name is required' :
-                (submitted && f['apellido'].errors?.['minlength']) ? 'Last name must be at least 2 characters' : ''
-            }"
-          >
-          </app-input>
+        <!-- Profile Image Upload -->
+        <div class="mb-4 text-center">
+          <div class="profile-image-upload relative mx-auto w-24 h-24 mb-2">
+            <img
+              [src]="previewImageUrl || defaultAvatarUrl"
+              alt="Profile Preview"
+              class="w-24 h-24 rounded-full object-cover border-2 border-default-300"
+            />
+            <label
+              for="profile-image"
+              class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full cursor-pointer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                ></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </label>
+            <input
+              type="file"
+              id="profile-image"
+              class="hidden"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
+          </div>
+          <p class="text-xs text-default-500">
+            Upload a profile picture (optional)
+          </p>
         </div>
 
         <app-input
@@ -99,6 +105,76 @@
           }"
         >
         </app-input>
+
+        <!-- Gender dropdown -->
+        <div class="mb-4">
+          <label for="genero" class="block text-default-700 font-medium mb-1"
+            >Gender <span class="text-danger-500">*</span></label
+          >
+          <select
+            id="genero"
+            formControlName="genero"
+            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+            [class.border-danger-500]="submitted && f['genero'].errors"
+            aria-describedby="genero-help"
+          >
+            <option value="">Select gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Other</option>
+          </select>
+          <p
+            class="text-xs"
+            [class.text-danger-500]="submitted && f['genero'].errors"
+            [class.text-default-500]="!(submitted && f['genero'].errors)"
+          >
+            @if (submitted && f['genero'].errors?.['required']) {
+            <span>Gender selection is required</span>
+            } @else {
+            <span>This information helps personalize your experience</span>
+            }
+          </p>
+        </div>
+
+        <!-- Birth Date input -->
+        <div class="mb-4">
+          <label
+            for="fecha_nacimiento"
+            class="block text-default-700 font-medium mb-1"
+            >Birth Date <span class="text-danger-500">*</span></label
+          >
+          <input
+            type="date"
+            id="fecha_nacimiento"
+            formControlName="fecha_nacimiento"
+            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+            [class.border-danger-500]="
+              submitted && f['fecha_nacimiento'].errors
+            "
+            aria-describedby="fecha_nacimiento-help"
+            max="{{ currentDateISO }}"
+            min="1900-01-01"
+          />
+          <p
+            class="text-xs"
+            [class.text-danger-500]="submitted && f['fecha_nacimiento'].errors"
+            [class.text-default-500]="
+              !(submitted && f['fecha_nacimiento'].errors)
+            "
+          >
+            @if (submitted && f['fecha_nacimiento'].errors?.['required']) {
+            <span>Birth date is required</span>
+            } @else if (submitted && f['fecha_nacimiento'].errors?.['minDate'])
+            {
+            <span>Birth date must be after January 1, 1900</span>
+            } @else if (submitted && f['fecha_nacimiento'].errors?.['maxDate'])
+            {
+            <span>Birth date cannot be in the future</span>
+            } @else {
+            <span>Your birth date helps personalize your experience</span>
+            }
+          </p>
+        </div>
 
         <app-input
           [id]="'password'"
@@ -139,11 +215,13 @@
 
       <button
         type="submit"
-        [disabled]="loading"
+        [disabled]="loading || uploadingImage"
         class="w-full bg-success-400 mt-2 text-white font-semibold rounded-lg p-2 hover:bg-success-300 transition-colors duration-200 max-w-[395px] cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <i-lucide [img]="iconSignUp" class="my-icon text-white"></i-lucide>
-        {{ loading ? "Creating account..." : "Sign Up" }}
+        @if (loading || uploadingImage) {
+        {{ uploadingImage ? "Uploading image..." : "Creating account..." }}
+        } @else { Sign Up }
       </button>
 
       <p class="text-default-800 text-lg">
