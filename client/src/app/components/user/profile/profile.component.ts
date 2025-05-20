@@ -20,7 +20,9 @@ import {
   SaveIcon,
   UserIcon,
   CameraIcon,
+  LockIcon,
 } from 'lucide-angular';
+import { Usuario, UsuarioGenero } from 'app/models';
 
 @Component({
   selector: 'app-profile',
@@ -39,17 +41,26 @@ import {
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
-  user: any = null;
+  passwordForm: FormGroup;
+  user: Usuario | null = null;
   loading = false;
   submitted = false;
   success = false;
   error = '';
   isBrowser: boolean;
 
+  // Password form states
+  passwordLoading = false;
+  passwordSubmitted = false;
+  passwordSuccess = false;
+  passwordError = '';
+  passwordsNotMatching = false;
+
   // Icons for buttons
   saveIcon = SaveIcon;
   userIcon = UserIcon;
   cameraIcon = CameraIcon;
+  lockIcon = LockIcon;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -60,13 +71,22 @@ export class ProfileComponent implements OnInit {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
+
+    // Initialize profile form
     this.profileForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       nombre_usuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      bio: [''],
+      genero: [''],
       foto_perfil: [''],
+    });
+
+    // Initialize password form
+    this.passwordForm = this.formBuilder.group({
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
     });
   }
 
@@ -78,16 +98,18 @@ export class ProfileComponent implements OnInit {
         return;
       }
 
-      this.user = userData.user;
+      // Convert the user data to match the Usuario type
+      this.user = {
+        ...userData.user,
+        genero: userData.user.genero as UsuarioGenero,
+      };
 
       // Patch form with current user data
       this.profileForm.patchValue({
-        nombre: this.user.nombre,
-        apellido: this.user.apellido,
-        nombre_usuario: this.user.nombre_usuario,
-        email: this.user.email,
-        bio: this.user.bio || '',
-        foto_perfil: this.user.foto_perfil || '',
+        nombre_usuario: this.user?.nombre_usuario,
+        email: this.user?.email,
+        genero: this.user?.genero || '',
+        foto_perfil: this.user?.foto_perfil || '',
       });
     });
   }
@@ -96,12 +118,21 @@ export class ProfileComponent implements OnInit {
     return this.profileForm.controls;
   }
 
+  get p() {
+    return this.passwordForm.controls;
+  }
+
   onSubmit(): void {
     this.submitted = true;
     this.success = false;
     this.error = '';
 
     if (this.profileForm.invalid) {
+      return;
+    }
+
+    if (!this.user?.id) {
+      this.error = 'User information not available. Please log in again.';
       return;
     }
 
@@ -124,6 +155,55 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
         this.error =
           err.message || 'Failed to update profile. Please try again.';
+      },
+    });
+  }
+
+  // Handle password update submission
+  onPasswordSubmit(): void {
+    this.passwordSubmitted = true;
+    this.passwordSuccess = false;
+    this.passwordError = '';
+    this.passwordsNotMatching = false;
+
+    // Check if passwords match
+    if (this.p['newPassword'].value !== this.p['confirmPassword'].value) {
+      this.passwordsNotMatching = true;
+      return;
+    }
+
+    if (this.passwordForm.invalid) {
+      return;
+    }
+
+    if (!this.user?.id) {
+      this.passwordError =
+        'User information not available. Please log in again.';
+      return;
+    }
+
+    this.passwordLoading = true;
+
+    // In a real app, we would send the current password for verification
+    const passwordData = {
+      id: this.user.id,
+      password: this.p['newPassword'].value,
+    };
+
+    this.usuarioService.update(this.user.id, passwordData).subscribe({
+      next: (response) => {
+        this.passwordLoading = false;
+        this.passwordSuccess = true;
+        this.passwordForm.reset();
+        this.passwordSubmitted = false;
+
+        // Consider whether you want to update the local user data
+        // this.authService.updateUserData(response);
+      },
+      error: (err) => {
+        this.passwordLoading = false;
+        this.passwordError =
+          err.message || 'Failed to update password. Please try again.';
       },
     });
   }

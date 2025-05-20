@@ -1,138 +1,223 @@
 <app-layout>
-  <div class="profile-container">
-    <div class="profile-header">
+  <div banner-space>
+    <div class="profile-header p-5 rounded-lg bg-default-100 shadow-sm">
       <h1 class="text-3xl font-bold text-default-800">My Profile</h1>
-      <p class="text-default-600">
+      <p class="text-default-600 text-xl mt-2">
         Manage your personal information and account preferences
       </p>
     </div>
+  </div>
 
-    <div class="profile-content">
-      <!-- Profile sidebar with avatar -->
-      <div class="profile-sidebar">
-        <div class="profile-avatar-container">
-          <app-avatar
-            [size]="'xl'"
-            [name]="user?.nombre_usuario || ''"
-            [src]="user?.foto_perfil || ''"
-            [alt]="'Profile Picture'"
-            [bordered]="true"
-            class="profile-avatar"
-          ></app-avatar>
-
-          <button
-            (click)="uploadProfileImage()"
-            class="upload-button"
-            title="Change profile picture"
-          >
-            <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
-          </button>
-        </div>
-
-        <div class="username-display">
-          <h2 class="text-xl font-semibold">{{ user?.nombre_usuario }}</h2>
-          <span class="text-default-500">{{ user?.email }}</span>
-        </div>
-
-        <div class="profile-stats">
-          <div class="stat-item">
-            <span class="stat-value">42</span>
-            <span class="stat-label">Activities</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">128</span>
-            <span class="stat-label">Communities</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">56</span>
-            <span class="stat-label">Reports</span>
-          </div>
-        </div>
+  <div main-content class="flex flex-col gap-6 mr-4">
+    <!-- Profile sidebar with avatar -->
+    <div
+      class="profile-sidebar bg-default-100 border border-default-200 rounded-xl mb-6"
+    >
+      <div class="profile-avatar-container">
+        <app-avatar
+          [size]="'xl'"
+          [name]="user?.nombre_usuario || ''"
+          [src]="user?.foto_perfil || ''"
+          [alt]="'Profile Picture'"
+          [bordered]="true"
+          class="profile-avatar"
+        ></app-avatar>
+        <button
+          (click)="uploadProfileImage()"
+          class="upload-button"
+          title="Change profile picture"
+        >
+          <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
+        </button>
       </div>
 
-      <!-- Profile form -->
-      <div class="profile-form-container">
-        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-          <!-- Success and error messages -->
-          <div *ngIf="success" class="message success-message">
-            <span>Profile updated successfully!</span>
-          </div>
+      <div class="username-display">
+        <h2 class="text-2xl font-semibold">{{ user?.nombre_usuario }}</h2>
+        <span class="text-default-600 text-xl">{{ user?.email }}</span>
+      </div>
 
-          <div *ngIf="error" class="message error-message">
-            <span>{{ error }}</span>
-          </div>
+      <div class="profile-stats">
+        <div class="stat-item">
+          <span class="stat-value">42</span>
+          <span class="stat-label">Activities</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">128</span>
+          <span class="stat-label">Communities</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">56</span>
+          <span class="stat-label">Reports</span>
+        </div>
+      </div>
+    </div>
 
-          <div class="form-row">
-            <app-input
-              [id]="'nombre'"
-              [label]="'First Name'"
-              formControlName="nombre"
-              [required]="true"
-              [fullWidth]="true"
-              [validation]="{
+    <!-- Profile navigation links -->
+
+    <h2 class="text-xl font-semibold mb-4">Profile Update</h2>
+    <!-- Profile form -->
+    <div class="profile-form-container">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <!-- Success and error messages -->
+        @if (success) {
+        <div class="message success-message">
+          <span>Profile updated successfully!</span>
+        </div>
+        } @if (error) {
+        <div class="message error-message">
+          <span>{{ error }}</span>
+        </div>
+        }
+
+        <div class="form-row">
+          <app-input
+            [id]="'nombre'"
+            [label]="'First Name'"
+            formControlName="nombre"
+            [required]="true"
+            [fullWidth]="true"
+            [validation]="{
                 state: submitted && f['nombre'].errors ? 'invalid' : 'undefined',
                 message: submitted && f['nombre'].errors?.['required'] ? 'First name is required' : ''
               }"
-            ></app-input>
-
-            <app-input
-              [id]="'apellido'"
-              [label]="'Last Name'"
-              formControlName="apellido"
-              [required]="true"
-              [fullWidth]="true"
-              [validation]="{
-                state: submitted && f['apellido'].errors ? 'invalid' : 'undefined',
-                message: submitted && f['apellido'].errors?.['required'] ? 'Last name is required' : ''
-              }"
-            ></app-input>
-          </div>
-
-          <app-input
-            [id]="'nombre_usuario'"
-            [label]="'Username'"
-            formControlName="nombre_usuario"
-            [required]="true"
-            [fullWidth]="true"
-            [validation]="{
-              state: submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
-              message: submitted && f['nombre_usuario'].errors?.['required'] ? 'Username is required' : ''
-            }"
           ></app-input>
 
           <app-input
-            [id]="'email'"
-            [label]="'Email'"
-            formControlName="email"
-            [type]="'email'"
+            [id]="'apellido'"
+            [label]="'Last Name'"
+            formControlName="apellido"
             [required]="true"
             [fullWidth]="true"
             [validation]="{
+                state: submitted && f['apellido'].errors ? 'invalid' : 'undefined',
+                message: submitted && f['apellido'].errors?.['required'] ? 'Last name is required' : ''
+              }"
+          ></app-input>
+        </div>
+
+        <app-input
+          [id]="'nombre_usuario'"
+          [label]="'Username'"
+          formControlName="nombre_usuario"
+          [required]="true"
+          [fullWidth]="true"
+          [validation]="{
+              state: submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
+              message: submitted && f['nombre_usuario'].errors?.['required'] ? 'Username is required' : ''
+            }"
+        ></app-input>
+
+        <app-input
+          [id]="'email'"
+          [label]="'Email'"
+          formControlName="email"
+          [type]="'email'"
+          [required]="true"
+          [fullWidth]="true"
+          [validation]="{
               state: submitted && f['email'].errors ? 'invalid' : 'undefined',
               message: (submitted && f['email'].errors?.['required']) ? 'Email is required' :
                 (submitted && f['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
             }"
-          ></app-input>
+        ></app-input>
 
-          <app-input
-            [id]="'bio'"
-            [label]="'Bio'"
-            formControlName="bio"
-            [placeholder]="'Tell us a bit about yourself'"
-            [fullWidth]="true"
-          ></app-input>
+        <!-- Gender dropdown -->
+        <div class="form-group mb-4">
+          <label for="genero" class="block text-default-700 font-medium mb-1"
+            >Gender</label
+          >
+          <select
+            id="genero"
+            formControlName="genero"
+            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+          >
+            <option value="">Select gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Other</option>
+          </select>
+        </div>
 
-          <div class="form-actions">
-            <app-button
-              [type]="'submit'"
-              [disabled]="loading"
-              [icon]="saveIcon"
-            >
-              {{ loading ? "Saving..." : "Save Changes" }}
-            </app-button>
-          </div>
-        </form>
-      </div>
+        <div class="form-actions">
+          <app-button [type]="'submit'" [disabled]="loading" [icon]="saveIcon">
+            {{ loading ? "Saving..." : "Save Changes" }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Password Update Section -->
+    <h2 class="text-xl font-semibold mb-4 mt-8">Change Password</h2>
+    <div class="profile-form-container">
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+        <!-- Success and error messages -->
+        @if (passwordSuccess) {
+        <div class="message success-message">
+          <span>Password updated successfully!</span>
+        </div>
+        } @if (passwordError) {
+        <div class="message error-message">
+          <span>{{ passwordError }}</span>
+        </div>
+        }
+
+        <app-input
+          [id]="'currentPassword'"
+          [label]="'Current Password'"
+          formControlName="currentPassword"
+          [type]="'password'"
+          [required]="true"
+          [fullWidth]="true"
+          [validation]="{
+            state: passwordSubmitted && p['currentPassword'].errors ? 'invalid' : 'undefined',
+            message: passwordSubmitted && p['currentPassword'].errors?.['required'] ? 'Current password is required' : ''
+          }"
+        ></app-input>
+
+        <app-input
+          [id]="'newPassword'"
+          [label]="'New Password'"
+          formControlName="newPassword"
+          [type]="'password'"
+          [required]="true"
+          [fullWidth]="true"
+          [validation]="{
+            state: passwordSubmitted && p['newPassword'].errors ? 'invalid' : 'undefined',
+            message: passwordSubmitted && p['newPassword'].errors?.['required']
+              ? 'New password is required'
+              : (passwordSubmitted && p['newPassword'].errors?.['minlength'])
+              ? 'New password must be at least 6 characters'
+              : ''
+          }"
+        ></app-input>
+
+        <app-input
+          [id]="'confirmPassword'"
+          [label]="'Confirm New Password'"
+          formControlName="confirmPassword"
+          [type]="'password'"
+          [required]="true"
+          [fullWidth]="true"
+          [validation]="{
+            state: passwordSubmitted && p['confirmPassword'].errors || passwordsNotMatching ? 'invalid' : 'undefined',
+            message: passwordSubmitted && p['confirmPassword'].errors?.['required']
+              ? 'Confirm password is required'
+              : passwordsNotMatching
+              ? 'Passwords do not match'
+              : ''
+          }"
+        ></app-input>
+
+        <div class="form-actions">
+          <app-button
+            [type]="'submit'"
+            [disabled]="passwordLoading"
+            [icon]="lockIcon"
+          >
+            {{ passwordLoading ? "Updating..." : "Update Password" }}
+          </app-button>
+        </div>
+      </form>
     </div>
   </div>
 </app-layout>
