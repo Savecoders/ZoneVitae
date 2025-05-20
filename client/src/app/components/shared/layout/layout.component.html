@@ -8,7 +8,7 @@
   <div class="flex flex-col flex-grow overflow-y-auto relative">
     <app-header />
     <main class="flex-1 mx-auto w-full p-4 mt-24 bg-default-50 pb-12 pt-4">
-      <section class="grid grid-cols-12 gap-6 px-6">
+      <section class="grid lg:grid-cols-12 gap-6 px-6">
         <!-- Main content area -->
         <div class="col-span-12">
           <div class="grid grid-cols-12 gap-6">
@@ -24,12 +24,14 @@
         <!--
         Principal content area -->
 
-        <div class="flex flex-col w-full col-span-8 space-y-6 mt-6">
+        <div
+          class="flex flex-col w-full col-span-12 md:col-span-8 space-y-6 mt-6"
+        >
           <ng-content select="[main-content]"></ng-content>
         </div>
 
         <!-- Sidebar content -->
-        <div class="col-span-4 mt-6 max-w-xs">
+        <div class="col-span-12 md:col-span-4 mt-6 md:p-4 md:max-w-xs">
           <div class="sticky top-24 space-y-6">
             <!-- Follow section -->
             <app-follow-section></app-follow-section>

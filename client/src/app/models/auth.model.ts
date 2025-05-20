@@ -19,6 +19,8 @@ export interface AuthResponse {
     id: number;
     nombre_usuario: string;
     email: string;
+    genero?: string | null;
+    fecha_nacimiento?: Date | string | null;
     foto_perfil?: string | null;
     roles: string[];
   };

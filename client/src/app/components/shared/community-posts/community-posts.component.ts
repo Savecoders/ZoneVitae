@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardComponent } from '../primitives/card/card.component';
@@ -6,7 +6,7 @@ import { ComunidadService } from '../../../services/comunidad.service';
 import { ReporteService } from '../../../services/reporte.service';
 import { catchError, forkJoin, map, of } from 'rxjs';
 
-interface CommunityPost {
+export interface CommunityPost {
   id: number;
   title: string;
   community: {
@@ -31,7 +31,7 @@ interface CommunityPost {
   ],
 })
 export class CommunityPostsComponent implements OnInit {
-  communityPosts: CommunityPost[] = [];
+  @Input() communityPosts: CommunityPost[] = [];
   isLoading = true;
 
   constructor(
@@ -40,7 +40,11 @@ export class CommunityPostsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadCommunityPosts();
+    if (this.communityPosts.length === 0) {
+      this.loadCommunityPosts();
+    } else {
+      this.isLoading = false;
+    }
   }
 
   loadCommunityPosts(): void {
