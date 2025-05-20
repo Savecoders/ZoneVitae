@@ -1,15 +1,16 @@
 <app-layout>
   <div main-content>
 <!-- Formulario de edición (se muestra cuando showEditForm es true) -->
-
+    
     <!-- Formulario de comentarios (aparece al cambiar estado) -->
   <div *ngIf="showCommentForm" class="bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
+      
       <h2 class="text-xl font-semibold mb-4">Confirmar cambio de estado</h2>
       <p class="mb-4">Estás cambiando el estado a: <strong>{{currentStatusChange}}</strong></p>
       
       <div class="space-y-4">
-        <!-- Nuevo estado -->
+      
         <mat-form-field class="w-full">
           <mat-label>Nuevo estado</mat-label>
           <mat-select [(ngModel)]="currentStatusChange" name="nuevoEstado" >
@@ -19,19 +20,17 @@
           </mat-select>
         </mat-form-field>
 
-        <!-- Textarea para comentarios -->
-        <mat-form-field class="w-full">
+        <mat-form-field class="w-full ">
           <mat-label >Comentarios sobre la decisión</mat-label>
           <textarea 
             matInput 
             [(ngModel)]="commentText" 
             name="commentText"
             rows="4"
+            style="color: #fff;"
           ></textarea>
         </mat-form-field>
 
-     
-        <!-- Botones -->
         <div class="flex justify-end gap-4 mt-6">
           <button 
             type="button" 
@@ -51,16 +50,17 @@
           </button>
         </div>
       </div>
+    
     </div>
   </div>
 
   <!-- Formulario de edición de seguimiento -->
-<div *ngIf="showSeguimientoForm" class=" bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div *ngIf="showSeguimientoForm" class="   bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-default-100 rounded-lg shadow-xl p-6 w-full max-w-2xl">
     <h2 class="text-xl font-semibold mb-4">Editar Seguimiento</h2>
     
     <form [formGroup]="seguimientoForm" class="space-y-4">
-      <!-- Selector de Estado de Seguimiento -->
+   
       <mat-form-field class="w-full">
         <mat-label>Estado de Seguimiento</mat-label>
         <mat-select formControlName="estadoSeguimiento">
@@ -70,7 +70,7 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Selector de Prioridad -->
+
       <mat-form-field class="w-full">
         <mat-label>Prioridad</mat-label>
         <mat-select formControlName="prioridad">
@@ -81,17 +81,14 @@
         </mat-select>
       </mat-form-field>
 
-      <!-- Textarea para acciones realizadas -->
-      <mat-form-field class="w-full">
-        <mat-label>Acciones realizadas</mat-label>
-        <textarea matInput formControlName="acciones" rows="4"></textarea>
+      <mat-form-field class="w-full bg-default-100">
+        <mat-label formControlName="acciones">Acciones realizadas</mat-label>
+        <textarea matInput formControlName="acciones" rows="4"  style="color: #fff;"></textarea>
       </mat-form-field>
         
-      <!-- Sección para subir imagen -->
       <div class="mt-4">
         <label class="block text-sm font-medium mb-2">Imagen de seguimiento</label>
         
-        <!-- Vista previa de la imagen -->
         <div *ngIf="imagePreview" class="mb-4">
           <img [src]="imagePreview" class="max-h-40 rounded-md">
           <button 
@@ -103,7 +100,6 @@
           </button>
         </div>
         
-        <!-- Input para subir archivo -->
         <div class="flex items-center">
           <input 
             type="file" 
@@ -126,12 +122,12 @@
           </span>
         </div>
       </div>
-      <!-- Checkbox de confirmación -->
-      <mat-checkbox formControlName="confirmar">
-        Confirmo los cambios realizados
+     
+      <mat-checkbox formControlName="confirmar"  color ="primary">
+        <label class="block text-sm font-bold text-white"
+                                >Confirmo los cambios realizados</label>
       </mat-checkbox>
 
-      <!-- Botones -->
       <div class="flex justify-end gap-4 mt-6">
         <button 
           type="button" 
@@ -153,38 +149,161 @@
   </div>
 </div>
 
+<div *ngIf="mostrandoDetalleCompleto && reporteSeleccionado" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-default-100 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">{{reporteSeleccionado.titulo}}</h2>
+        <button 
+          (click)="volverALista()"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 space-y-4">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">Descripción</h3>
+            <p class="whitespace-pre-line">{{reporteSeleccionado.contenido}}</p>
+          </div>
+          <div *ngIf="reporteSeleccionado.fotos?.length">
+            <h3 class="text-lg font-semibold mb-2">Imágenes</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div *ngFor="let foto of reporteSeleccionado.fotos" class="relative">
+                <img 
+                  [src]="foto.image" 
+                  alt="Imagen del reporte" 
+                  class="w-full h-48 object-cover rounded-lg"
+                >
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="reporteSeleccionado.tags?.length">
+            <h3 class="text-lg font-semibold mb-2">Etiquetas</h3>
+            <div class="flex flex-wrap gap-2">
+              <span 
+                *ngFor="let tag of reporteSeleccionado.tags"
+                class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+              >
+                {{tag.nombre}}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-default-200 p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3">Información del Reporte</h3>
+            
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm text-gray-500">Estado</p>
+                <p>{{reporteSeleccionado.estado}}</p>
+              </div>
+              
+              <div>
+                <p class="text-sm text-gray-500">Seguimiento</p>
+                <p>{{reporteSeleccionado.estado_seguimiento}}</p>
+              </div>
+              
+              <div>
+                <p class="text-sm text-gray-500">Comunidad</p>
+                <p>{{reporteSeleccionado.comunidad?.nombre || getNombreComunidad(reporteSeleccionado.comunidad_id)}}</p>
+              </div>
+              
+              <div>
+                <p class="text-sm text-gray-500">Fecha de creación</p>
+                <p>{{reporteSeleccionado.create_at | date:'medium'}}</p>
+              </div>
+              
+              <div *ngIf="reporteSeleccionado.autor && !reporteSeleccionado.anonimo">
+                <p class="text-sm text-gray-500">Autor</p>
+                <p>{{reporteSeleccionado.autor.nombre_usuario}}</p>
+              </div>
+              
+              <div *ngIf="reporteSeleccionado.anonimo">
+                <p class="text-sm text-gray-500">Autor</p>
+                <p>Anónimo</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguimientos -->
+          <div *ngIf="reporteSeleccionado.seguimientos?.length" class="bg-default-200 p-4 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3">Historial de Seguimiento</h3>
+            
+            <div class="space-y-4">
+              <div *ngFor="let seguimiento of reporteSeleccionado.seguimientos" class="border-b border-default-300 pb-3">
+                <div class="flex justify-between">
+                  <p class="font-medium">{{seguimiento.estado_nuevo}}</p>
+                  <p class="text-sm text-gray-500">{{seguimiento.update_at | date:'short'}}</p>
+                </div>
+                <p class="text-sm mt-1">{{seguimiento.comentario}}</p>
+                
+                <div *ngIf="seguimiento.imagen" class="mt-2">
+                  <img 
+                    [src]="seguimiento.imagen" 
+                    alt="Imagen de seguimiento"
+                    class="w-24 h-24 object-cover rounded"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="w-full">
-  <form (submit)="aplicarFiltro(); $event.preventDefault()">
-      <mat-form-field  class="w-full max-w-2xl">
-    <mat-label >Buscar por titulo o comunidad</mat-label>
-    <input 
-        matInput 
-        [(ngModel)]="filtro" 
-        name="filtro"
-        placeholder="Escribe para buscar..."
-        (keyup.enter)="aplicarFiltro()"
-      >
-      
-       <button 
-        matSuffix 
-        mat-icon-button 
-        (click)="aplicarFiltro()"
-      >
-
-      </button>
-
-  </mat-form-field>
+ <form (submit)="aplicarFiltro(); $event.preventDefault()">
+    <div class="w-full max-w-2xl relative">
+      <label for="filtro" class="block text-sm font-medium text-white mb-1">Buscar por título o comunidad</label>
+      <div class="relative">
+        <input 
+          id="filtro"
+          type="text" 
+          [(ngModel)]="filtro" 
+          name="filtro"
+          placeholder="Escribe para buscar..."
+          (keyup.enter)="aplicarFiltro()"
+          class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+        >
+        <button 
+          type="button"
+          (click)="aplicarFiltro()"
+          class="absolute inset-y-0 right-0 px-3 flex items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
   </form>
   <table mat-table [dataSource]="dataSource" class="w-full bg-default-100">
-  <!-- Título Column -->
-  <ng-container matColumnDef="titulo" class="bg-transparent">
-    <th mat-header-cell *matHeaderCellDef > TÍTULO </th>
- 
-    <td mat-cell *matCellDef="let reporte" class="">   <lucide-angular [img]="FileSearch" class="my-icon"></lucide-angular>{{reporte.titulo}} </td>
-  </ng-container>
+  <!-- Título -->
+ <ng-container matColumnDef="titulo" class="bg-transparent">
+  <th mat-header-cell *matHeaderCellDef> TÍTULO </th>
+  <td mat-cell *matCellDef="let reporte" class="">   
+    <lucide-angular 
+      [img]="FileSearch" 
+      class="my-icon cursor-pointer hover:text-primary"
+      (click)="mostrarReporteIndividual(reporte)">
+    </lucide-angular>
+    {{reporte.titulo}}
+  </td>
+</ng-container>
 
-  <!-- Comunidad Column -->
+  <!-- Comunidad  -->
   <ng-container matColumnDef="comunidad" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef  > COMUNIDAD </th>
     <td mat-cell *matCellDef="let reporte"> 
@@ -193,7 +312,7 @@
     </td>
   </ng-container>
 
-  <!-- Fecha Column -->
+  <!-- Fecha  -->
   <ng-container matColumnDef="fecha" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > FECHA </th>
     <td mat-cell *matCellDef="let reporte"> 
@@ -201,7 +320,7 @@
     </td>
   </ng-container>
 
-  <!-- Estado Column -->
+  <!-- Estado  -->
 <ng-container matColumnDef="estado" class="bg-transparent">
   <th mat-header-cell *matHeaderCellDef > ESTADO </th>
   <td mat-cell *matCellDef="let reporte">
@@ -212,7 +331,7 @@
   </td>
 </ng-container>
 
-  <!-- Seguimiento Column -->
+  <!-- Seguimiento  -->
   <ng-container matColumnDef="seguimiento" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > SEGUIMIENTO </th>
     <td mat-cell *matCellDef="let reporte">
@@ -222,7 +341,7 @@
 </button>
     </td>
   </ng-container>
-  <!-- Acciones Column -->
+  <!-- Acciones  -->
   <ng-container matColumnDef="acciones" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > ACCIONES </th>
     <td mat-cell *matCellDef="let reporte">
@@ -240,6 +359,8 @@
 </table>
 
 </div>
+
+ 
 </div>
   
 </app-layout>

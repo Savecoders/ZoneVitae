@@ -8,7 +8,7 @@ import { FooterComponent } from "../footer/footer.component";
   selector: 'app-layout',
   imports: [FollowSectionComponent, HeaderComponent, SidebarComponent, FooterComponent],
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.css'
+  styleUrl: './layout.component.css',
 })
 export class LayoutComponent {
 

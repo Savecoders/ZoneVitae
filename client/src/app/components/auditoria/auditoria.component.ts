@@ -4,7 +4,7 @@ import { FooterComponent } from "../shared/footer/footer.component";
 import {MatTableModule} from '@angular/material/table';
 import { CardComponent } from '../shared/primitives';
 import { LucideAngularModule, FileSearch, TicketPlusIcon } from 'lucide-angular';
-import { Reporte ,EstadoReporte,SeguimientoReporteEnum, PrioridadSeguimientoReporte, SeguimientoReporte } from '../../models';
+import { Reporte ,EstadoReporte,SeguimientoReporteEnum, PrioridadSeguimientoReporte, SeguimientoReporte, ReporteCompleto } from '../../models';
 import{ReporteService}from '../../services/reporte.service';
 import { ComunidadService } from '../../services/comunidad.service';
 import { Comunidad } from '../../models';
@@ -22,6 +22,8 @@ import { HttpClient } from '@angular/common/http';
 import { SeguimientoService } from '../../services/seguimiento.service';
 import { CloudinaryService } from '../../services/cloudinary.service';
 import { InputComponent } from '../shared/primitives';
+import { ReportenorService } from 'app/services/reportenor.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auditoria',
@@ -40,6 +42,8 @@ export class AuditoriaComponent  {
   filtroBusqueda: string = '';
   filtro: string = '';
 
+  mostrandoDetalleCompleto = false;
+reporteSeleccionado: ReporteCompleto | null = null;
 
  editForm: FormGroup;
   showEditForm = false;
@@ -62,18 +66,21 @@ export class AuditoriaComponent  {
   // Opciones para los selects
   seguimientoOptions = ['Denegado', 'Revisado', 'Resuelto'];
   prioridadOptions = ['Baja', 'Media', 'Alta', 'Crítica'];
+
   selectedImage: File | null = null;
 imagePreview: string | ArrayBuffer | null = null;
 
 
   constructor(
-    private reporteService: ReporteService,
+    private reporteService: ReportenorService,
     private comunidadService: ComunidadService ,
       private seguimientoService: SeguimientoService,
+      private reportecomservice: ReporteService,
   private fb: FormBuilder,
   private http: HttpClient,
-  private cloudinaryService: CloudinaryService
-  
+  private cloudinaryService: CloudinaryService,
+  private router: Router
+
   ) {
     this.editForm = this.fb.group({
       estado: ['', Validators.required],
@@ -89,24 +96,33 @@ imagePreview: string | ArrayBuffer | null = null;
   }
 
   ngOnInit(): void {
+
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const roles: string[] = usuario.roles || [];
+
+    if (!roles.includes('admin')) {
+      alert('No tienes permisos para acceder a esta sección.');
+      this.router.navigate(['/']);
+      return;
+    }
+
     this.http.get<any>('../preview/data.json').subscribe(data => {
       this.comunidadesData = data.comunidades;
-      this.cargarDatos(); // Ahora cargamos servicios después de tener el JSON
+      this.cargarDatos(); 
     });
   }
  aplicarFiltro() {
     if (!this.filtro) {
-      this.cargarDatos(); // Si no hay filtro, recargamos todos los datos
+      this.cargarDatos(); 
       return;
     }
 
     const textoBusqueda = this.filtro.toLowerCase();
     
     this.dataSource = this.dataSource.filter(reporte => {
-      // Buscar en el título
+
       const coincideTitulo = reporte.titulo.toLowerCase().includes(textoBusqueda);
-      
-      // Buscar en el nombre de la comunidad
+
       const nombreComunidad = this.getNombreComunidad(reporte.comunidad_id).toLowerCase();
       const coincideComunidad = nombreComunidad.includes(textoBusqueda);
       
@@ -160,24 +176,15 @@ imagePreview: string | ArrayBuffer | null = null;
   cambiarEstadoSelect(reporte: any, nuevoEstado: string) {
     this.selectedReport = reporte;
     this.currentStatusChange = nuevoEstado;
-    
-    // Mostrar formulario solo si no es "Pendiente de Revision"
+
     this.showCommentForm = nuevoEstado !== 'Pendiente de Revision';
-    
-    // Si es Pendiente de Revision, aplicar cambios directamente
     if (!this.showCommentForm) {
       this.aplicarCambioEstado();
     }
   }
 
-// Método para aplicar el cambio de estado
-aplicarCambioEstado() {
-/*
-if (!this.editForm.valid) {
-    this.editForm.markAllAsTouched();
-    return;
-  }*/
 
+aplicarCambioEstado() {
   if (!this.selectedReport || !this.currentStatusChange) return;
 
   const reporteActualizado = { 
@@ -185,18 +192,16 @@ if (!this.editForm.valid) {
     estado: this.currentStatusChange as EstadoReporte 
   };
 
-  // Primero actualizamos el reporte
+ 
   this.reporteService.updateReporte(this.selectedReport.id!, reporteActualizado)
     .subscribe({
       next: () => {
-        // Buscar seguimientos existentes usando el servicio de seguimiento
+ 
         this.seguimientoService.getSeguimientosByReporte(this.selectedReport.id!)
           .subscribe(seguimientos => {
             if (seguimientos.length > 0) {
-              // Actualizar el primer seguimiento encontrado
               const seguimientoExistente = seguimientos[0];
               
-              // Verificar que el seguimiento tiene ID
               if (!seguimientoExistente.id) {
                 console.error('El seguimiento existente no tiene ID');
                 this.cargarDatos();
@@ -205,21 +210,18 @@ if (!this.editForm.valid) {
               }
 
               const seguimientoActualizado: Partial<SeguimientoReporte> = {
-  ...seguimientoExistente, // Incluye todos los campos originales
-  estado_anterior: this.selectedReport.estado,
-  estado_nuevo: this.currentStatusChange,
-  comentario: this.commentText,
-  accion_realizada: 'Cambio de estado',
-  accion_recomendada: 'Revisar el reporte',
-  documentos_adjuntos: this.selectedReport.documentos_adjuntos || [],
-  prioridad: PrioridadSeguimientoReporte.MEDIA,
-  update_at: new Date().toISOString()
-  // No cambies create_at ni id si no es necesario
-};
-              
-              // Convertir el ID a string (según tu servicio)
+                ...seguimientoExistente, 
+                estado_anterior: this.selectedReport.estado,
+                estado_nuevo: this.currentStatusChange,
+                comentario: this.commentText,
+                accion_realizada: 'Cambio de estado',
+                accion_recomendada: 'Revisar el reporte',
+                documentos_adjuntos: this.selectedReport.documentos_adjuntos || [],
+                prioridad: PrioridadSeguimientoReporte.MEDIA,
+                update_at: new Date().toISOString()
+ 
+                };
               const seguimientoId = seguimientoExistente.id;
-              
               this.seguimientoService.updateSeguimiento(
                 Number(seguimientoId), 
                 seguimientoActualizado
@@ -236,6 +238,7 @@ if (!this.editForm.valid) {
             } else {
               // Crear un nuevo seguimiento...
               // (mantener el código existente para crear nuevo seguimiento)
+
             }
           });
       },
@@ -245,18 +248,15 @@ if (!this.editForm.valid) {
       }
     });
 }
-  // Método para cancelar el cambio
+ 
   cancelarCambio() {
-    // Revertir al estado anterior
     this.selectedReport.estado = 'Pendiente de Revision';
     this.resetCommentForm();
   }
 
-  // Método para resetear el formulario
   resetCommentForm() {
     this.showCommentForm = false;
     this.commentText = '';
-    //this.confirmChanges = false;
     this.selectedReport = null;
     this.currentStatusChange = '';
   }
@@ -264,8 +264,6 @@ if (!this.editForm.valid) {
  abrirFormSeguimiento(reporte: Reporte) {
    this.currentSeguimientoReport = reporte;
    this.showSeguimientoForm = true;
-
-   // Aquí NO uses reporte.prioridad ni reporte.acciones_realizadas
   
   this.seguimientoForm.patchValue({
     estadoSeguimiento: '', 
@@ -275,46 +273,72 @@ if (!this.editForm.valid) {
  }
 
 async guardarSeguimiento() {
-  if (this.seguimientoForm.valid && this.currentSeguimientoReport) {
-    let imageUrl = null;
-    
-    // Subir imagen si existe
+  
+  if (!this.seguimientoForm.valid || !this.currentSeguimientoReport) {
+    console.error('Formulario inválido o reporte no seleccionado');
+    return;
+  }
+
+  const reporte = this.currentSeguimientoReport; 
+  let imageUrl: string | null | undefined = null;
+
+  try {
     if (this.selectedImage) {
-      try {
-        imageUrl = await this.cloudinaryService.uploadImage(this.selectedImage).toPromise();
-      } catch (error) {
-        console.error('Error al subir la imagen:', error);
-        return; // Detener el proceso si falla la subida
-      }
+      imageUrl = await this.cloudinaryService.uploadImage(this.selectedImage).toPromise();
     }
+    this.seguimientoService.getSeguimientosByReporte(reporte.id!)
+      .subscribe({
+        next: (seguimientos) => {
+          if (seguimientos.length > 0) {
+           
+            const seguimientoExistente = seguimientos[0];
+            const seguimientoActualizado: Partial<SeguimientoReporte> = {
+              ...seguimientoExistente,
+              estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
+              prioridad: this.seguimientoForm.value.prioridad,
+              accion_realizada: this.seguimientoForm.value.acciones,
+              update_at: new Date().toISOString(),
+              imagen: imageUrl || seguimientoExistente.imagen
+            };
 
-    // Buscar el seguimiento existente por reporte_id
-    this.seguimientoService.getSeguimientosByReporte(this.currentSeguimientoReport.id!)
-      .subscribe(seguimientos => {
-        if (seguimientos.length > 0) {
-          const seguimientoExistente = seguimientos[0];
+            this.seguimientoService.updateSeguimiento(
+              seguimientoExistente.id!,
+              seguimientoActualizado
+            ).subscribe(/* ... */);
+          } else {
+          
+            const nuevoSeguimiento: SeguimientoReporte = {
+              reporte_id: reporte.id!,
+              usuario_id: 1,
+              estado_anterior: reporte.estado,
+              estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
+              comentario: '', 
+              accion_realizada: this.seguimientoForm.value.acciones,
+              accion_recomendada: '',
+              documentos_adjuntos: false,
+              prioridad: this.seguimientoForm.value.prioridad,
+              create_at: new Date().toISOString(),
+              update_at: new Date().toISOString(),
+              imagen: ''
+            };
 
-          // Mezcla los campos originales con los nuevos valores del formulario
-          const seguimientoActualizado: Partial<SeguimientoReporte> = {
-            ...seguimientoExistente,
-            estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
-            prioridad: this.seguimientoForm.value.prioridad,
-            accion_realizada: this.seguimientoForm.value.acciones,
-            update_at: new Date().toISOString(),
-            imagen: imageUrl || seguimientoExistente.imagen // Mantener la anterior si no hay nueva
-          };
+            this.seguimientoService.createSeguimiento(nuevoSeguimiento)
+              .subscribe(/* ... */);
+          }
 
-          // Resto del código permanece igual...
-          this.seguimientoService.updateSeguimiento(
-            seguimientoExistente.id!,
-            seguimientoActualizado
-          ).subscribe({
-            next: () => {
-              // Actualizar el reporte
-              this.reporteService.updateReporte(
-                this.currentSeguimientoReport!.id!,
-                { 
-                 id: this.currentSeguimientoReport!.id,
+          this.actualizarReporteDespuesDeSeguimiento(reporte);
+        },
+        error: (err) => console.error('Error al buscar seguimientos', err)
+      });
+  } catch (error) {
+    console.error('Error en el proceso de guardado', error);
+  }
+}
+
+
+private actualizarReporteDespuesDeSeguimiento(reporte: Reporte) {
+  this.reporteService.updateReporte(reporte.id!, {
+       id: this.currentSeguimientoReport!.id,
                   comunidad_id: this.currentSeguimientoReport!.comunidad_id,
                   autor_id: this.currentSeguimientoReport!.autor_id,
                   
@@ -325,31 +349,22 @@ async guardarSeguimiento() {
                   estado_seguimiento: this.seguimientoForm.value.estadoSeguimiento,
                   create_at: this.currentSeguimientoReport!.create_at,
                 update_at: new Date().toISOString()
-                }
-              ).subscribe({
-                next: () => {
-                  this.cargarDatos();
-                  this.cerrarFormularioSeguimiento();
-                  this.selectedImage = null;
-                  this.imagePreview = null;
-                },
-                error: (err) => console.error(err)
-              });
-            },
-            error: (err) => console.error(err)
-          });
-        } else {
-          // Lógica para crear nuevo seguimiento si no existe
-        }
-      });
-  }
+  }).subscribe({
+    next: () => {
+      this.cargarDatos();
+      this.cerrarFormularioSeguimiento();
+      this.selectedImage = null;
+      this.imagePreview = null;
+    },
+    error: (err) => console.error('Error al actualizar reporte', err)
+  });
 }
-  // Método para cancelar la edición
+  
   cancelarEdicionSeguimiento() {
     this.cerrarFormularioSeguimiento();
   }
 
-  // Método privado para cerrar el formulario
+ 
   private cerrarFormularioSeguimiento() {
     this.showSeguimientoForm = false;
     this.currentSeguimientoReport = null;
@@ -358,7 +373,7 @@ async guardarSeguimiento() {
 
   abrirCambioEstado(reporte: Reporte) {
   this.selectedReport = reporte;
-  this.currentStatusChange = reporte.estado; // valor actual por defecto
+  this.currentStatusChange = reporte.estado; 
   this.showCommentForm = true;
   this.commentText = '';
 }
@@ -399,4 +414,28 @@ removeImage(): void {
   this.imagePreview = null;
 }
 
+irADetalleReporte(reporte: any) {
+  this.router.navigate(['/reporte', reporte.id]);
+}
+
+mostrarReporteIndividual(reportecom: ReporteCompleto) {
+  if (reportecom.id === undefined) {
+    console.error('El reporte no tiene ID');
+    return;
+  }
+  this.reportecomservice.getReporteById(reportecom.id).subscribe({
+    next: (reporteCompleto) => {
+      this.reporteSeleccionado = reporteCompleto;
+      this.mostrandoDetalleCompleto = true;
+    },
+    error: (err) => console.error('Error al cargar reporte completo', err)
+  });
+}
+
+
+// Método para volver a la lista
+volverALista() {
+  this.mostrandoDetalleCompleto = false;
+  this.reporteSeleccionado = null;
+}
 }

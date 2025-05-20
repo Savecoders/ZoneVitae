@@ -8,6 +8,7 @@ import {
   PostCardComponent,
   PostData,
 } from '../shared/post-card/post-card.component';
+import { Router } from '@angular/router';
 import { CommunityPostsComponent } from '../shared/community-posts/community-posts.component';
 import { FollowSectionComponent } from '../shared/follow-section/follow-section.component';
 import { ReporteService } from '../../services/reporte.service';
@@ -70,7 +71,8 @@ export class HomeComponent implements OnInit {
     private usuarioService: UsuarioService,
     private comentarioService: ComentarioService,
     private tagService: TagService,
-    private http: HttpClient
+    private http: HttpClient,
+private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -97,14 +99,14 @@ export class HomeComponent implements OnInit {
           const communityIds = [
             ...new Set(
               reports
-                .map((report) => report.comunidad)
+                .map((report) => report.comunidad_id)
                 .filter((id) => id !== null)
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
-                .map((report) => report.autor)
+                .map((report) => report.autor_id)
                 .filter((id) => id !== null)
             ),
           ];
@@ -139,11 +141,11 @@ export class HomeComponent implements OnInit {
 
               // Transform reports into PostData format
               return reports.map((report) => {
-                const community = report.comunidad
-                  ? communityMap.get(report.comunidad)
+                const community = report.comunidad_id
+                  ? communityMap.get(report.comunidad_id)
                   : null;
-                const author = report.autor
-                  ? authorMap.get(report.autor)
+                const author = report.autor_id
+                  ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
                   (like: any) => like.reports_id === report.id
@@ -307,14 +309,14 @@ export class HomeComponent implements OnInit {
           const communityIds = [
             ...new Set(
               reports
-                .map((report) => report.comunidad)
+                .map((report) => report.comunidad_id)
                 .filter((id) => id !== null)
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
-                .map((report) => report.autor)
+                .map((report) => report.autor_id)
                 .filter((id) => id !== null)
             ),
           ];
@@ -349,11 +351,11 @@ export class HomeComponent implements OnInit {
 
               // Transform reports into PostData format
               return reports.map((report) => {
-                const community = report.comunidad
-                  ? communityMap.get(report.comunidad)
+                const community = report.comunidad_id
+                  ? communityMap.get(report.comunidad_id)
                   : null;
-                const author = report.autor
-                  ? authorMap.get(report.autor)
+                const author = report.autor_id
+                  ? authorMap.get(report.autor_id)
                   : null;
                 const postLikes = likes.filter(
                   (like: any) => like.reports_id === report.id
