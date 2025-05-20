@@ -2,10 +2,8 @@
   <div class="container hidden md:flex w-full h-full rounded-4xl">
     <img
       class="w-full h-full aspect-square object-cover rounded-3xl"
-      src="https://res.cloudinary.com/dtfdnwkao/image/upload/oc3g6ommnvuksvxzn913?_a=DATAg1AAZAA0"
-      srcset="
-        https://res.cloudinary.com/dtfdnwkao/image/upload/oc3g6ommnvuksvxzn913?_a=DATAg1AAZAA0
-      "
+      src="https://www.clave.com.ec/wp-content/uploads/2018/10/DSC_0299.jpg"
+      srcset="https://www.clave.com.ec/wp-content/uploads/2018/10/DSC_0299.jpg"
       alt="Sign Up Banner"
     />
   </div>
@@ -71,7 +69,10 @@
             Upload a profile picture (optional)
           </p>
         </div>
-
+      </div>
+      <section
+        class="flex flex-col gap-4 w-full max-w-[395px] max-h-40 overflow-y-auto"
+      >
         <app-input
           [id]="'nombre_usuario'"
           [label]="'Username'"
@@ -81,10 +82,10 @@
           [fullWidth]="true"
           [validation]="{
             state:
-              submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
+            submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
             message:
-              (submitted && f['nombre_usuario'].errors?.['required']) ? 'Username is required' :
-              (submitted && f['nombre_usuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
+            (submitted && f['nombre_usuario'].errors?.['required']) ? 'Username is required' :
+            (submitted && f['nombre_usuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
           }"
         >
         </app-input>
@@ -97,12 +98,12 @@
           [required]="true"
           [fullWidth]="true"
           [validation]="{
-            state:
-              submitted && f['email'].errors ? 'invalid' : 'undefined',
-            message:
-              (submitted && f['email'].errors?.['required']) ? 'Email is required' :
-              (submitted && f['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
-          }"
+        state:
+        submitted && f['email'].errors ? 'invalid' : 'undefined',
+        message:
+        (submitted && f['email'].errors?.['required']) ? 'Email is required' :
+        (submitted && f['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
+      }"
         >
         </app-input>
 
@@ -185,12 +186,12 @@
           [fullWidth]="true"
           [type]="'password'"
           [validation]="{
-            state:
-              submitted && f['password'].errors ? 'invalid' : 'undefined',
-            message:
-              (submitted && f['password'].errors?.['required']) ? 'Password is required' :
-              (submitted && f['password'].errors?.['minlength']) ? 'Password must be at least 6 characters' : ''
-          }"
+          state:
+          submitted && f['password'].errors ? 'invalid' : 'undefined',
+          message:
+          (submitted && f['password'].errors?.['required']) ? 'Password is required' :
+          (submitted && f['password'].errors?.['minlength']) ? 'Password must be at least 6 characters' : ''
+        }"
         >
         </app-input>
 
@@ -203,20 +204,20 @@
           [fullWidth]="true"
           [type]="'password'"
           [validation]="{
-            state:
-              submitted && (f['confirmPassword'].errors || signUpForm.errors?.['passwordMismatch']) ? 'invalid' : 'undefined',
-            message:
-              (submitted && f['confirmPassword'].errors?.['required']) ? 'Please confirm your password' :
-              (submitted && signUpForm.errors?.['passwordMismatch']) ? 'Passwords do not match' : ''
-          }"
+        state:
+        submitted && (f['confirmPassword'].errors || signUpForm.errors?.['passwordMismatch']) ? 'invalid' : 'undefined',
+        message:
+        (submitted && f['confirmPassword'].errors?.['required']) ? 'Please confirm your password' :
+        (submitted && signUpForm.errors?.['passwordMismatch']) ? 'Passwords do not match' : ''
+      }"
         >
         </app-input>
-      </div>
+      </section>
 
       <button
         type="submit"
         [disabled]="loading || uploadingImage"
-        class="w-full bg-success-400 mt-2 text-white font-semibold rounded-lg p-2 hover:bg-success-300 transition-colors duration-200 max-w-[395px] cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full bg-primary-400 mt-2 text-white font-semibold rounded-lg p-2 hover:bg-primary-300 transition-colors duration-200 max-w-[395px] cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <i-lucide [img]="iconSignUp" class="my-icon text-white"></i-lucide>
         @if (loading || uploadingImage) {
