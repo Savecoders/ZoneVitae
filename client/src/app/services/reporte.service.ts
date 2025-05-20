@@ -4,12 +4,13 @@ import { Observable, map, switchMap, of } from 'rxjs';
 import { BaseService } from './base.service';
 import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl: string = 'http://localhost:5000/reports';
+  private jsonUrl: string = `${environment.jsonServerUrl}/reports`;
 
   constructor(http: HttpClient) {
     super(http, 'reports');
@@ -47,5 +48,10 @@ export class ReporteService extends BaseService<ReporteCompleto> {
         )
       )
     );
+  }
+
+  // Buscar reportes por autor
+  getReportesByAutor(autorId: number): Observable<Reporte[]> {
+    return this.http.get<Reporte[]>(`${this.jsonUrl}?autor_id=${autorId}`);
   }
 }

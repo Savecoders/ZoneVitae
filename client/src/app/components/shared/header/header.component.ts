@@ -29,7 +29,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   isScrolled = false;
-  user: AuthResponse | null = null;
+  user: any = null; // Changed from AuthResponse to any to handle different data structures
   private isBrowser: boolean;
   showUserMenu = false;
 
@@ -57,7 +57,13 @@ export class HeaderComponent implements OnInit {
       return;
     }
     try {
-      this.user = JSON.parse(userData) as AuthResponse;
+      const parsedData = JSON.parse(userData);
+      // Process the user data to ensure we have a consistent structure
+      this.user = {
+        ...parsedData,
+        // Ensure user field is available for template
+        user: parsedData.user || parsedData,
+      };
       console.log('User data loaded from local storage:', this.user);
     } catch (error) {
       console.log('Error parsing user data from local storage:', error);

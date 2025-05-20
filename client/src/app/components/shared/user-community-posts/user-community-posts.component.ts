@@ -1,0 +1,84 @@
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { CardComponent } from '../primitives/card/card.component';
+
+interface CommunityPost {
+  id: number;
+  title: string;
+  community: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  imageUrl?: string;
+}
+
+@Component({
+  selector: 'app-user-community-posts',
+  standalone: true,
+  imports: [CommonModule, RouterModule, CardComponent],
+  template: `
+    <div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        @for (post of communityPosts; track $index) {
+        <a
+          [routerLink]="['/comunities', post.community.id]"
+          class="block group"
+        >
+          <app-card
+            class="p-0 overflow-hidden group-hover:border-primary transition-colors h-full flex flex-col"
+          >
+            @if (post.imageUrl) {
+            <div class="w-full h-32 bg-muted">
+              <img
+                [src]="post.imageUrl"
+                [alt]="post.title"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            } @else {
+            <div class="w-full h-32 bg-muted flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 text-foreground-muted"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            }
+            <div class="p-3 flex flex-col flex-1">
+              <h3
+                class="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors"
+              >
+                {{ post.title }}
+              </h3>
+              <div
+                class="mt-2 pt-2 border-t border-border text-xs text-foreground-muted"
+              >
+                {{ post.community.name }}
+              </div>
+            </div>
+          </app-card>
+        </a>
+        }
+      </div>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+})
+export class UserCommunityPostsComponent {
+  @Input() communityPosts: CommunityPost[] = [];
+}

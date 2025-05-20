@@ -1,0 +1,225 @@
+<app-layout>
+  <div banner-space>
+    <div class="profile-header p-5 rounded-lg bg-default-100 shadow-sm">
+      <h1 class="text-3xl font-bold text-default-800">User Profile</h1>
+      <p class="text-default-600 text-xl mt-2">
+        Viewing {{ userProfile ? userProfile.nombre_usuario : "" }}'s profile
+      </p>
+    </div>
+  </div>
+
+  <div main-content class="flex flex-col gap-6 mr-4">
+    <!-- Error message -->
+    @if (error) {
+    <div
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+      role="alert"
+    >
+      <strong class="font-bold">Error!</strong>
+      <span class="block sm:inline"> {{ error }}</span>
+    </div>
+    } @if (loading) {
+    <div class="flex justify-center p-16">
+      <div class="loader"></div>
+    </div>
+    } @else if (userProfile) {
+    <!-- Profile sidebar with avatar -->
+    <div
+      class="profile-sidebar bg-default-100 border border-default-200 rounded-xl mb-6 p-6"
+    >
+      <div class="flex flex-col items-center mb-6">
+        <app-avatar
+          [size]="'xl'"
+          [name]="userProfile.nombre_usuario || ''"
+          [src]="userProfile.foto_perfil || ''"
+          [alt]="'Profile Picture'"
+          [bordered]="true"
+          [className]="'w-24 h-24 mb-4'"
+        ></app-avatar>
+        <div class="text-center">
+          <h2 class="text-2xl font-semibold">
+            {{ userProfile.nombre_usuario }}
+          </h2>
+          <span class="text-default-600 text-lg">{{ userProfile.email }}</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <div class="info-item bg-default-50 p-4 rounded-lg">
+          <p class="text-default-700 text-base">
+            <i-lucide
+              [img]="calendarIcon"
+              class="my-icon inline-block mr-2"
+            ></i-lucide>
+            Birth Date:
+            <span class="font-medium">{{
+              userProfile.fecha_nacimiento | date : "longDate"
+            }}</span>
+          </p>
+        </div>
+
+        <div class="info-item bg-default-50 p-4 rounded-lg">
+          <p class="text-default-700 text-base">
+            <i-lucide
+              [img]="userIcon"
+              class="my-icon inline-block mr-2"
+            ></i-lucide>
+            Gender:
+            <span class="font-medium">
+              {{
+                userProfile.genero === "M"
+                  ? "Male"
+                  : userProfile.genero === "F"
+                  ? "Female"
+                  : userProfile.genero === "O"
+                  ? "Other"
+                  : "Not specified"
+              }}
+            </span>
+          </p>
+        </div>
+
+        <div class="info-item bg-default-50 p-4 rounded-lg">
+          <p class="text-default-700 text-base">
+            <i-lucide
+              [img]="calendarIcon"
+              class="my-icon inline-block mr-2"
+            ></i-lucide>
+            Joined on:
+            <app-badge [color]="'secondary'" [size]="'md'" [className]="'ml-2'">
+              {{ userProfile.create_at | date : "longDate" }}
+            </app-badge>
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="profile-stats grid grid-cols-3 gap-4 mt-6 bg-default-50 p-4 rounded-lg"
+      >
+        <div class="stat-item text-center">
+          <span class="stat-value block text-2xl font-bold text-primary">{{
+            stats.activities
+          }}</span>
+          <span class="stat-label block text-default-600">Activities</span>
+        </div>
+        <div class="stat-item text-center">
+          <span class="stat-value block text-2xl font-bold text-primary">{{
+            stats.communities
+          }}</span>
+          <span class="stat-label block text-default-600">Communities</span>
+        </div>
+        <div class="stat-item text-center">
+          <span class="stat-value block text-2xl font-bold text-primary">{{
+            stats.reports
+          }}</span>
+          <span class="stat-label block text-default-600">Reports</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- User's Recent Activity Section -->
+    <div class="user-activity-section mt-6">
+      <h2 class="text-xl font-semibold mb-4">Recent Activities</h2>
+
+      <div
+        class="recent-activities bg-default-100 border border-default-200 rounded-xl p-6"
+      >
+        @if (loading) {
+        <div class="flex justify-center p-8">
+          <div class="loader"></div>
+        </div>
+        } @else if (activities.length > 0) {
+        <div class="grid grid-cols-1 gap-4">
+          @for (activity of activities; track activity.id) {
+          <div
+            class="activity-item bg-default-50 p-4 rounded-lg flex items-center"
+          >
+            <i-lucide
+              [img]="activityIcon"
+              class="my-icon text-primary mr-4"
+            ></i-lucide>
+            <div class="flex-1">
+              <h3 class="font-medium">{{ activity.nombre }}</h3>
+              <p class="text-default-600 text-sm">{{ activity.descripcion }}</p>
+              <span class="text-default-500 text-xs">{{
+                activity.create_at | date : "medium"
+              }}</span>
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="empty-state text-center p-8">
+          <i-lucide
+            [img]="inboxIcon"
+            class="my-icon mx-auto mb-4 text-default-400"
+            [size]="40"
+          ></i-lucide>
+          <p class="text-default-600">No activities found for this user</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- User's Communities Section -->
+    <div class="user-communities-section mt-6">
+      <h2 class="text-xl font-semibold mb-4">Communities</h2>
+
+      <div
+        class="communities bg-default-100 border border-default-200 rounded-xl p-6"
+      >
+        @if (loading) {
+        <div class="flex justify-center p-8">
+          <div class="loader"></div>
+        </div>
+        } @else if (communityPosts.length > 0) {
+        <app-community-posts
+          [communityPosts]="communityPosts"
+        ></app-community-posts>
+        } @else {
+        <div class="empty-state text-center p-8">
+          <i-lucide
+            [img]="usersIcon"
+            class="my-icon mx-auto mb-4 text-default-400"
+            [size]="40"
+          ></i-lucide>
+          <p class="text-default-600">
+            This user hasn't joined any communities yet
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- User's Reports Section -->
+    <div class="user-reports-section mt-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">Reports</h2>
+
+      <div
+        class="reports bg-default-100 border border-default-200 rounded-xl p-6"
+      >
+        @if (loading) {
+        <div class="flex justify-center p-8">
+          <div class="loader"></div>
+        </div>
+        } @else if (userPosts.length > 0) {
+        <div class="grid grid-cols-1 gap-4">
+          @for (post of userPosts; track post.id) {
+          <app-post-card [post]="post"></app-post-card>
+          }
+        </div>
+        } @else {
+        <div class="empty-state text-center p-8">
+          <i-lucide
+            [img]="clipboardIcon"
+            class="my-icon mx-auto mb-4 text-default-400"
+            [size]="40"
+          ></i-lucide>
+          <p class="text-default-600">No reports created by this user</p>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+</app-layout>
