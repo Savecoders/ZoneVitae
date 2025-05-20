@@ -11,16 +11,17 @@
       
       <div class="space-y-4">
       
-        <mat-form-field class="w-full">
+       
           <mat-label>Nuevo estado</mat-label>
-          <mat-select [(ngModel)]="currentStatusChange" name="nuevoEstado" >
-            <mat-option *ngFor="let estado of estadoOptions" [value]="estado">
+          <mat-select [(ngModel)]="currentStatusChange" name="nuevoEstado" class="border-default-300" >
+            <mat-option *ngFor="let estado of estadoOptions" [value]="estado"  class="bg-default" >
               {{ estado }}
+
             </mat-option>
           </mat-select>
-        </mat-form-field>
+        
 
-        <mat-form-field class="w-full ">
+        
           <mat-label >Comentarios sobre la decisión</mat-label>
           <textarea 
             matInput 
@@ -28,8 +29,9 @@
             name="commentText"
             rows="4"
             style="color: #fff;"
+            class="w-full  rounded-md p-2"
           ></textarea>
-        </mat-form-field>
+        
 
         <div class="flex justify-end gap-4 mt-6">
           <button 
@@ -61,17 +63,17 @@
     
     <form [formGroup]="seguimientoForm" class="space-y-4">
    
-      <mat-form-field class="w-full">
+      
         <mat-label>Estado de Seguimiento</mat-label>
         <mat-select formControlName="estadoSeguimiento">
           <mat-option value="Denegado">Denegado</mat-option>
           <mat-option value="Revisado">Revisado</mat-option>
           <mat-option value="Resuelto">Resuelto</mat-option>
         </mat-select>
-      </mat-form-field>
+     
 
 
-      <mat-form-field class="w-full">
+     
         <mat-label>Prioridad</mat-label>
         <mat-select formControlName="prioridad">
           <mat-option value="Baja">Baja</mat-option>
@@ -79,13 +81,12 @@
           <mat-option value="Alta">Alta</mat-option>
           <mat-option value="Crítica">Crítica</mat-option>
         </mat-select>
-      </mat-form-field>
+      
 
-      <mat-form-field class="w-full bg-default-100">
-        <mat-label formControlName="acciones">Acciones realizadas</mat-label>
-        <textarea matInput formControlName="acciones" rows="4"  style="color: #fff;"></textarea>
-      </mat-form-field>
-        
+      
+        <mat-label class=" ">Acciones realizadas</mat-label>
+        <textarea matInput formControlName="acciones" rows="4"  style="color: #fff;" class="w-full  rounded-md p-2"></textarea>
+
       <div class="mt-4">
         <label class="block text-sm font-medium mb-2">Imagen de seguimiento</label>
         
