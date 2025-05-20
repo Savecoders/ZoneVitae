@@ -1,0 +1,21 @@
+textarea{
+    resize:none;
+}
+
+mat-form-field{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+app-toggle{
+    color: black;
+}
+
+
+
+
+
+
+
+
+

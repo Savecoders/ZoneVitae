@@ -32,7 +32,7 @@ export class ComunidadService extends BaseService<Comunidad> {
   }
 
   // Get community by id
-  getComunidadById(id: number): Observable<Comunidad> {
+  getComunidadById(id: number | string): Observable<Comunidad> {
     return this.getById(id);
   }
 
@@ -43,14 +43,14 @@ export class ComunidadService extends BaseService<Comunidad> {
 
   // Update community
   updateComunidad(
-    id: number,
+    id: number | string,
     comunidad: Partial<Comunidad>
   ): Observable<Comunidad> {
     return this.update(id, comunidad);
   }
 
   // Delete community
-  deleteComunidad(id: number): Observable<void> {
+  deleteComunidad(id: number | string): Observable<void> {
     return this.delete(id);
   }
 

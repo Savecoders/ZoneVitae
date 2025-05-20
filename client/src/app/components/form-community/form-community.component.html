@@ -1,0 +1,237 @@
+<app-layout>
+<div main-content>
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-3xl bg-zinc-900 p-8 rounded-2xl space-y-6">
+            <h1 class="text-2xl font-bold">{{titulo}}</h1>
+            <form [formGroup]="formGroup" (submit)="onSubmit()" class="space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                    <label class="block text-sm font-medium text-white mb-3">
+                        Logo de la comunidad:
+                    </label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        (change)="onFileSelected($event, 'logo')"
+                        class="block w-full text-sm text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-normal
+                        file:bg-black file:text-white
+                        hover:file:bg-gray-500"
+                    />
+                    </div>
+
+                    <app-button
+                        color="default"
+                        size="sm"
+                        intensity="soft"
+                        [disabled]="!fileInputs['logo']"
+                        [icon]="upload"
+                        class="self-start mt-2 md:mt-6"
+                        (click)="uploadFile('logo')"
+                        >
+                    Subir logo
+                    </app-button>
+
+                    <div *ngIf="uploadedUrls['logo']" class="md:ml-6 mt-4 md:mt-0">
+                    <img [src]="uploadedUrls['logo']" alt="Logo de la comunidad"
+                        class="w-24 h-24 object-cover rounded-full shadow" />
+                    </div>
+                </div>
+                            
+                <p *ngIf="fileInputs['logo'] as logo" class="text-sm text-gray-400">
+                    Archivo seleccionado: {{ logo.name }}
+                </p>
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex-1">
+                    <label class="block text-sm font-medium text-white mb-3">
+                        Portada de la comunidad:
+                    </label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        (change)="onFileSelected($event, 'cover')"
+                        class="block w-full text-sm text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-normal
+                        file:bg-black file:text-white
+                        hover:file:bg-gray-500"
+                    />
+                    </div>
+
+                    <app-button
+                        color="default"
+                        size="sm"
+                        intensity="soft"
+                        [icon]="upload"
+                        [disabled]="!fileInputs['cover']"
+                        class="self-start mt-2 md:mt-6"
+                        (click)="uploadFile('cover')"
+                        >
+                    Subir portada
+                    </app-button>
+
+                    
+                    <div *ngIf="uploadedUrls['cover']" class="md:ml-6 mt-4 md:mt-0">
+                    <img [src]="uploadedUrls['cover']" alt="Portada de la comunidad"
+                        class="w-24 h-24 object-cover rounded-full shadow" />
+                    </div>
+                </div>
+
+               <p *ngIf="fileInputs['cover'] as portada" class="text-sm text-gray-400">
+                    Archivo seleccionado: {{ portada.name }}
+                </p>
+
+                <label class="block text-white text-sm mb-2 mt-5">Nombre:</label>
+                <app-input
+                    class="input"
+                    formControlName="nombre"
+                    placeholder="Ingrese el nombre"
+                    [required]="true"
+                    color="primary"
+                    size="md"
+                    radius="md"
+                    [fullWidth]="true">
+                </app-input>
+
+                 <div class="text-red-700 text-sm mt-1 ml-5" *ngIf="formGroup.get('nombre')?.touched
+                  && formGroup.get('nombre')?.invalid">
+                    <div *ngIf="formGroup.get('nombre')?.errors?.['required']">
+                        El nombre es requerido*.
+                    </div>
+                    <div *ngIf="formGroup.get('nombre')?.errors?.['minlength']">
+                        Mínimo 10 letras.
+                    </div>
+                </div>
+
+                <div class="mt-7">
+                    <label class="block text-white text-sm mb-2 mt-5">Descripción:</label>
+                    <textarea 
+                        class="w-full bg-black text-white border border-gray-500 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-gray-400"
+                        formControlName="descripcion"
+                        placeholder="Escribe la descripción de tu comunidad"
+                        rows="3">
+                    </textarea>
+
+                    <div class="text-red-700 text-sm ml-5" *ngIf="formGroup.get('descripcion')?.touched
+                    && formGroup.get('descripcion')?.invalid">
+                        <div *ngIf="formGroup.get('descripcion')?.errors?.['required']">
+                            La descripcion es requerida*.
+                        </div>
+                        <div *ngIf="formGroup.get('descripcion')?.errors?.['minlength']">
+                            Mínimo 10 letras.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <label class="block text-white text-sm mb-2 mt-5">Ubicación:</label>
+                    <app-input
+                        formControlName="ubicacion"
+                        placeholder="Ingrese la ubicación"
+                        [required]="true"
+                        color="primary"
+                        size="md"
+                        radius="md"
+                        class="text-white"
+                        [fullWidth]="true">
+                    </app-input>
+
+                   <div class="text-red-700 text-sm mt-1 ml-5" *ngIf="formGroup.get('ubicacion')?.touched
+                    && formGroup.get('ubicacion')?.invalid">
+                        <div *ngIf="formGroup.get('ubicacion')?.errors?.['required']">
+                            La ubicación es requerida*.
+                        </div>
+                        <div *ngIf="formGroup.get('ubicacion')?.errors?.['minlength']">
+                            Mínimo 10 letras*.
+                        </div>
+                    </div>
+                </div>
+                
+                <mat-label class="text-white text-sm block font-semibold mt-8 mb-5">Tipo de comunidad: </mat-label>
+                <mat-radio-group class="flex flex-col gap-2" aria-label="Select an option" formControlName="tipoComunidad">
+                    <mat-radio-button class="text-white" *ngFor="let tipo of tiposComunidades" [value]="tipo.value">
+                       <span class="text-white">{{ tipo.label }}</span>
+                    </mat-radio-button>
+                    <mat-error *ngIf="formGroup.get('tipoComunidad')?.touched && formGroup.get('tipoComunidad')?.invalid" class="text-sm ml-4 text-red-600">
+                    <ng-container *ngIf="formGroup.get('tipoComunidad')?.errors?.['required']">
+                        Debe seleccionar un tipo de comunidad*.
+                    </ng-container>
+                    </mat-error>
+                </mat-radio-group>
+
+                <app-toggle
+                    formControlName="soloMayoresEdad"
+                    label="¿Solo para mayores de edad?"
+                    color="primary"
+                    size="md"
+                    class="bg-zinc-300 p-4 rounded-md"
+                ></app-toggle>
+
+                <mat-form-field appearance="fill" class="w-full bg-zinc-900">
+                    <mat-label>Selecciona los tags para tu comunidad</mat-label>
+                    <mat-select formControlName="tags"  multiple>
+                        <mat-option *ngIf="tags.length === 0" disabled>
+                        No hay tags para mostrar.
+                        </mat-option>
+                        <mat-option *ngFor="let tag of tags" [value]="tag">
+                            {{ tag.nombre }}
+                        </mat-option>
+                    </mat-select>
+
+                    <mat-error>
+                        @if(formGroup.get('tags')?.invalid && formGroup.get('tags')?.dirty 
+                        || formGroup.get('tags')?.touched){
+                            @if(formGroup.get('tags')?.errors?.['required']){
+                                Debe seleccionar tags para su comunidad.
+                            }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <div *ngIf="isEditMode">
+                <mat-form-field appearance="fill" class="w-full">
+                    <mat-label>Estado de la comunidad</mat-label>
+                    <mat-select formControlName="estado">
+                    <mat-option *ngFor="let estado of estadosComunidad" [value]="estado.value">
+                        {{ estado.label }}
+                    </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                </div>
+                
+                <div class="flex gap-12 mt-6"> 
+                    <div class="flex-1">
+                        <app-button
+                            color="success"
+                            size="md"
+                            intensity="solid"
+                            type="submit"
+                            [icon]="guardar"
+                            [fullWidth]="true"
+                            >
+                            Guardar
+                        </app-button>
+                    </div>
+
+                    <div class="flex-1">
+                        <app-button
+                            color="default"
+                            size="md"
+                            intensity="soft"
+                            [icon]="cancel"
+                            [fullWidth]="true"
+                            (click)="cancelar()"
+                            >
+                            Cancelar
+                        </app-button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</app-layout>
