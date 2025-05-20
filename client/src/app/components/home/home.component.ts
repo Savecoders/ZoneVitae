@@ -122,9 +122,9 @@ export class HomeComponent implements OnInit {
             authors:
               authorIds.length > 0
                 ? forkJoin(
-                    authorIds.filter(id => id !== undefined).map((id) =>
-                      this.usuarioService.getById(id as number)
-                    )
+                    authorIds
+                      .filter((id) => id !== undefined)
+                      .map((id) => this.usuarioService.getById(id as number))
                   )
                 : of([]),
             likes: this.http.get<any[]>(
@@ -160,9 +160,12 @@ export class HomeComponent implements OnInit {
                   title: report.titulo,
                   content: report.contenido,
                   // You would need to add a field for images in your model or get them from the fotos table
-                  imageUrl: report.id && report.estado
-                    ? `https://source.unsplash.com/random/800x500?report,${report.estado?.toLowerCase() || 'general'}`
-                    : `https://source.unsplash.com/random/800x500?report,general`,
+                  imageUrl:
+                    report.id && report.estado
+                      ? `https://source.unsplash.com/random/800x500?report,${
+                          report.estado?.toLowerCase() || 'general'
+                        }`
+                      : `https://source.unsplash.com/random/800x500?report,general`,
                   author: {
                     id: (author?.id as number) || 0,
                     name: author?.nombre_usuario || 'Anonymous',
@@ -332,9 +335,9 @@ export class HomeComponent implements OnInit {
             authors:
               authorIds.length > 0
                 ? forkJoin(
-                    authorIds.filter(id => id !== undefined).map((id) =>
-                      this.usuarioService.getById(id as number)
-                    )
+                    authorIds
+                      .filter((id) => id !== undefined)
+                      .map((id) => this.usuarioService.getById(id as number))
                   )
                 : of([]),
             likes: this.http.get<any[]>(
@@ -366,9 +369,12 @@ export class HomeComponent implements OnInit {
                   id: report.id as number,
                   title: report.titulo,
                   content: report.contenido,
-                  imageUrl: report.id && report.estado
-                    ? `https://source.unsplash.com/random/800x500?report,${report.estado?.toLowerCase() || 'general'}`
-                    : `https://source.unsplash.com/random/800x500?report,general`,
+                  imageUrl:
+                    report.id && report.estado
+                      ? `https://source.unsplash.com/random/800x500?report,${
+                          report.estado?.toLowerCase() || 'general'
+                        }`
+                      : `https://source.unsplash.com/random/800x500?report,general`,
                   author: {
                     id: (author?.id as number) || 0,
                     name: author?.nombre_usuario || 'Anonymous',
