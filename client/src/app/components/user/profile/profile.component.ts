@@ -26,10 +26,11 @@ import {
   CalendarIcon,
 } from 'lucide-angular';
 import { Usuario, UsuarioGenero } from 'app/models';
+import { UIModule } from '../../shared/ui.module';
+import { BadgeComponent } from '../../shared/primitives/badge/badge.component';
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
   imports: [
     LayoutComponent,
     CommonModule,
@@ -38,6 +39,8 @@ import { Usuario, UsuarioGenero } from 'app/models';
     AvatarComponent,
     ButtonComponent,
     LucideAngularModule,
+    BadgeComponent,
+    UIModule,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
@@ -106,9 +109,11 @@ export class ProfileComponent implements OnInit {
       }
 
       // Save basic user info from auth
+      // Handle both possible structures: userData.user or userData directly containing user data
+      const userInfo = userData.user || userData;
       this.user = {
-        ...userData.user,
-        genero: userData.user.genero as UsuarioGenero,
+        ...userInfo,
+        genero: userInfo.genero as UsuarioGenero,
       };
 
       // Fetch complete user data from the backend using the ID
@@ -282,8 +287,8 @@ export class ProfileComponent implements OnInit {
         this.passwordForm.reset();
         this.passwordSubmitted = false;
 
-        // Consider whether you want to update the local user data
-        // this.authService.updateUserData(response);
+        // Don't update the local user data with the password response
+        // as it only contains id and password, which would wipe other user data
       },
       error: (err) => {
         this.passwordLoading = false;

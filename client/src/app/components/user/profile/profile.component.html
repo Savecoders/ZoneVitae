@@ -13,56 +13,31 @@
     <div
       class="profile-sidebar bg-default-100 border border-default-200 rounded-xl mb-6"
     >
-      <div class="profile-avatar-container">
-        @if (previewImageUrl) {
-        <div class="relative">
-          <app-avatar
-            [size]="'xl'"
-            [name]="user?.nombre_usuario || ''"
-            [src]="previewImageUrl"
-            [alt]="'Profile Picture Preview'"
-            [bordered]="true"
-            class="profile-avatar"
-          ></app-avatar>
-          <div class="preview-badge">New</div>
-        </div>
-        } @else {
-        <app-avatar
-          [size]="'xl'"
-          [name]="user?.nombre_usuario || ''"
-          [src]="user?.foto_perfil || ''"
-          [alt]="'Profile Picture'"
-          [bordered]="true"
-          class="profile-avatar"
-        ></app-avatar>
-        }
-        <button
-          (click)="uploadProfileImage()"
-          class="upload-button"
-          title="Change profile picture"
-        >
-          <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
-        </button>
-      </div>
-      @if (selectedFile && !uploadingImage) {
-      <div class="text-center mt-2 text-sm">
-        <span class="text-primary"
-          >New image selected: <strong>{{ selectedFile.name }}</strong></span
-        >
-        <p class="text-default-600">
-          Click Save Changes to update your profile picture
-        </p>
-      </div>
-      } @else if (uploadingImage) {
-      <div class="text-center mt-2 text-sm flex items-center justify-center">
-        <div class="loader mr-2"></div>
-        <span class="text-primary">Uploading image...</span>
-      </div>
-      }
-
+      <app-avatar
+        [size]="'xl'"
+        [name]="user?.nombre_usuario || ''"
+        [src]="user?.foto_perfil || ''"
+        [alt]="'Profile Picture'"
+        [bordered]="true"
+        [className]="'w-24 h-24'"
+      ></app-avatar>
       <div class="username-display">
         <h2 class="text-2xl font-semibold">{{ user?.nombre_usuario }}</h2>
         <span class="text-default-600 text-xl">{{ user?.email }}</span>
+        <p class="text-default-700 text-lg mt-2">
+          Data Birth:
+          {{ user?.fecha_nacimiento | date : "longDate" }}
+        </p>
+        <p class="text-default-700 text-lg mt-2">
+          Gender:
+          {{ user?.genero === "M" ? "Male" : "Female" }}
+        </p>
+        <p class="text-default-700 text-lg mt-2">
+          Joined on:
+          <app-badge [color]="'secondary'" [size]="'md'" [className]="'ml-2'">
+            {{ user?.create_at | date : "longDate" }}
+          </app-badge>
+        </p>
       </div>
 
       <div class="profile-stats">
@@ -85,8 +60,61 @@
 
     <h2 class="text-xl font-semibold mb-4">Profile Update</h2>
     <!-- Profile form -->
-    <div class="profile-form-container">
-      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <div
+      class="profile-form-container border border-default-400 rounded-xl bg-default-100 p-6"
+    >
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="onSubmit()"
+        class="flex flex-col space-y-4 mt-4 py-4"
+      >
+        <div class="profile-image-upload relative mx-auto w-24 h-24 mb-2">
+          @if (previewImageUrl) {
+          <div class="relative">
+            <app-avatar
+              [size]="'xl'"
+              [name]="user?.nombre_usuario || ''"
+              [src]="previewImageUrl"
+              [alt]="'Profile Picture Preview'"
+              [bordered]="true"
+              [className]="'w-24 h-24'"
+            ></app-avatar>
+            <div class="preview-badge">New</div>
+          </div>
+          } @else {
+          <app-avatar
+            [size]="'xl'"
+            [name]="user?.nombre_usuario || ''"
+            [src]="user?.foto_perfil || ''"
+            [alt]="'Profile Picture'"
+            [bordered]="true"
+            [className]="'w-24 h-24'"
+          ></app-avatar>
+          }
+          <button
+            (click)="uploadProfileImage()"
+            class="upload-button"
+            title="Change profile picture"
+            type="button"
+          >
+            <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
+          </button>
+        </div>
+        @if (selectedFile && !uploadingImage) {
+        <div class="text-center mt-2 text-sm">
+          <span class="text-primary"
+            >New image selected: <strong>{{ selectedFile.name }}</strong></span
+          >
+          <p class="text-default-600">
+            Click Save Changes to update your profile picture
+          </p>
+        </div>
+        } @else if (uploadingImage) {
+        <div class="text-center mt-2 text-sm flex items-center justify-center">
+          <div class="loader mr-2"></div>
+          <span class="text-primary">Uploading image...</span>
+        </div>
+        }
         <!-- Success and error messages -->
         @if (success) {
         <div class="message success-message">
@@ -109,6 +137,9 @@
           formControlName="nombre_usuario"
           [required]="true"
           [fullWidth]="true"
+          [placeholder]="'Enter your username'"
+          [color]="'default'"
+          [type]="'text'"
           [validation]="{
               state: submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
               message: submitted && f['nombre_usuario'].errors?.['required'] ? 'Username is required' : ''
@@ -120,6 +151,7 @@
           [label]="'Email'"
           formControlName="email"
           [type]="'email'"
+          [placeholder]="'Enter your email address'"
           [required]="true"
           [fullWidth]="true"
           [validation]="{
@@ -164,20 +196,14 @@
             class="block text-default-700 font-medium mb-1"
             >Birth Date</label
           >
-          <div class="relative">
-            <input
-              id="fecha_nacimiento"
-              type="date"
-              formControlName="fecha_nacimiento"
-              class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-              [max]="currentDateISO"
-            />
-            <i-lucide
-              [img]="calendarIcon"
-              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-default-400"
-              style="pointer-events: none; width: 18px; height: 18px"
-            ></i-lucide>
-          </div>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            formControlName="fecha_nacimiento"
+            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+            [max]="currentDateISO"
+          />
+
           @if (user?.fecha_nacimiento) {
           <div class="flex items-center mt-2 text-default-600 text-sm">
             <span class="bg-default-50 px-3 py-1 rounded-md">
@@ -191,14 +217,16 @@
         </div>
 
         <div class="form-actions">
-          <app-button [type]="'submit'" [disabled]="loading">
+          <app-button
+            [type]="'submit'"
+            [disabled]="loading"
+            [icon]="saveIcon"
+            [color]="'primary'"
+          >
             @if (loading) {
             <span>Saving...</span>
             } @else {
-            <div class="flex items-center gap-2">
-              <i-lucide [img]="saveIcon"></i-lucide>
-              <span>Save Changes</span>
-            </div>
+            <span>Save Changes</span>
             }
           </app-button>
         </div>
@@ -272,6 +300,7 @@
             [type]="'submit'"
             [disabled]="passwordLoading"
             [icon]="lockIcon"
+            [color]="'secondary'"
           >
             {{ passwordLoading ? "Updating..." : "Update Password" }}
           </app-button>
