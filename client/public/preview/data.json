@@ -5,12 +5,12 @@
       "nombre_usuario": "juanperez",
       "email": "juan.perez@example.com",
       "password": "hashedpassword123",
-      "foto_perfil": "https://avatars.githubusercontent.com/u/75219404?v=4",
-      "fecha_nacimiento": "1990-05-15",
-      "genero": "M",
       "estado_cuenta": "Activo",
-      "create_at": "2023-01-15T10:30:00",
-      "update_at": "2023-01-15T10:30:00"
+      "genero": "F",
+      "fecha_nacimiento": "2003-05-05T00:00:00.000Z",
+      "foto_perfil": "https://avatars.githubusercontent.com/u/75219404?v=4",
+      "create_at": "2023-01-15T12:30:00",
+      "update_at": "2023-01-15T12:30:00"
     },
     {
       "id": "2",
@@ -23,6 +23,19 @@
       "estado_cuenta": "Activo",
       "create_at": "2023-01-16T14:45:00",
       "update_at": "2023-01-16T14:45:00"
+    },
+    {
+      "id": "f738",
+      "nombre_usuario": "Savecoders",
+      "email": "Savecoders@example.com",
+      "password": "Salvador2003!",
+      "genero": "M",
+      "rol_id": 2,
+      "foto_perfil": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747697247/Logo_1_aq6k7h.png",
+      "activo": true,
+      "estado_cuenta": "Activo",
+      "create_at": "2025-05-19T23:27:27.919Z",
+      "update_at": "2025-05-19T23:27:27.919Z"
     }
   ],
   "roles": [
@@ -48,6 +61,16 @@
     {
       "id": "2",
       "id_usuario": 2,
+      "id_rol": 2
+    },
+    {
+      "id": "c17c",
+      "id_usuario": "9899",
+      "id_rol": 2
+    },
+    {
+      "id": "d776",
+      "id_usuario": "f738",
       "id_rol": 2
     }
   ],
