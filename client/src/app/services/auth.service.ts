@@ -270,7 +270,14 @@ export class AuthService {
 
     // Update in local storage if in browser environment
     if (this.isBrowser) {
-      localStorage.setItem(this.userKey, JSON.stringify(updatedAuth.user));
+      // Store both the expires and user fields in the same structure as storeAuthData uses
+      localStorage.setItem(
+        this.userKey,
+        JSON.stringify({
+          expires: currentAuth.expires,
+          user: updatedAuth.user,
+        })
+      );
     }
   }
 
