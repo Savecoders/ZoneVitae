@@ -48,6 +48,14 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'user/:username',
+    loadComponent: () =>
+      import('./components/user/user-profile/user-profile.component').then(
+        (m) => m.UserProfileComponent
+      ),
+  },
+
   // auth paths
 
   {
