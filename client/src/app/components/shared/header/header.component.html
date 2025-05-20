@@ -43,9 +43,13 @@
       @if(user) {
       <div class="relative">
         <app-avatar
-          [name]="user.user.nombre_usuario"
+          [name]="user.user?.nombre_usuario || user.nombre_usuario"
           [size]="'md'"
-          [src]="user.user.foto_perfil ? user.user.foto_perfil : null"
+          [src]="
+            user.user?.foto_perfil || user.foto_perfil
+              ? user.user?.foto_perfil || user.foto_perfil
+              : null
+          "
           [alt]="'User Profile Picture'"
           [bordered]="true"
           (click)="toggleUserMenu()"
