@@ -14,6 +14,19 @@
       class="profile-sidebar bg-default-100 border border-default-200 rounded-xl mb-6"
     >
       <div class="profile-avatar-container">
+        @if (previewImageUrl) {
+        <div class="relative">
+          <app-avatar
+            [size]="'xl'"
+            [name]="user?.nombre_usuario || ''"
+            [src]="previewImageUrl"
+            [alt]="'Profile Picture Preview'"
+            [bordered]="true"
+            class="profile-avatar"
+          ></app-avatar>
+          <div class="preview-badge">New</div>
+        </div>
+        } @else {
         <app-avatar
           [size]="'xl'"
           [name]="user?.nombre_usuario || ''"
@@ -22,6 +35,7 @@
           [bordered]="true"
           class="profile-avatar"
         ></app-avatar>
+        }
         <button
           (click)="uploadProfileImage()"
           class="upload-button"
@@ -30,6 +44,21 @@
           <i-lucide [img]="cameraIcon" class="my-icon"></i-lucide>
         </button>
       </div>
+      @if (selectedFile && !uploadingImage) {
+      <div class="text-center mt-2 text-sm">
+        <span class="text-primary"
+          >New image selected: <strong>{{ selectedFile.name }}</strong></span
+        >
+        <p class="text-default-600">
+          Click Save Changes to update your profile picture
+        </p>
+      </div>
+      } @else if (uploadingImage) {
+      <div class="text-center mt-2 text-sm flex items-center justify-center">
+        <div class="loader mr-2"></div>
+        <span class="text-primary">Uploading image...</span>
+      </div>
+      }
 
       <div class="username-display">
         <h2 class="text-2xl font-semibold">{{ user?.nombre_usuario }}</h2>
@@ -67,33 +96,12 @@
         <div class="message error-message">
           <span>{{ error }}</span>
         </div>
-        }
-
-        <div class="form-row">
-          <app-input
-            [id]="'nombre'"
-            [label]="'First Name'"
-            formControlName="nombre"
-            [required]="true"
-            [fullWidth]="true"
-            [validation]="{
-                state: submitted && f['nombre'].errors ? 'invalid' : 'undefined',
-                message: submitted && f['nombre'].errors?.['required'] ? 'First name is required' : ''
-              }"
-          ></app-input>
-
-          <app-input
-            [id]="'apellido'"
-            [label]="'Last Name'"
-            formControlName="apellido"
-            [required]="true"
-            [fullWidth]="true"
-            [validation]="{
-                state: submitted && f['apellido'].errors ? 'invalid' : 'undefined',
-                message: submitted && f['apellido'].errors?.['required'] ? 'Last name is required' : ''
-              }"
-          ></app-input>
+        } @if (loading) {
+        <div class="loading-indicator">
+          <div class="spinner"></div>
+          <span>Loading profile data...</span>
         </div>
+        }
 
         <app-input
           [id]="'nombre_usuario'"
@@ -132,15 +140,66 @@
             class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">Select gender</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
-            <option value="O">Other</option>
+            <option value="M" [selected]="user?.genero === 'M'">Male</option>
+            <option value="F" [selected]="user?.genero === 'F'">Female</option>
+            <option value="O" [selected]="user?.genero === 'O'">Other</option>
           </select>
+          <div class="flex items-center mt-2 text-default-600 text-sm">
+            <span class="bg-default-50 px-3 py-1 rounded-md">
+              @if (user?.genero === 'M') { Currently selected:
+              <span class="font-medium">Male</span> } @else if (user?.genero ===
+              'F') { Currently selected:
+              <span class="font-medium">Female</span> } @else if (user?.genero
+              === 'O') { Currently selected:
+              <span class="font-medium">Other</span>
+              } @else { No gender selected }
+            </span>
+          </div>
+        </div>
+
+        <!-- Birth Date input -->
+        <div class="form-group mb-4">
+          <label
+            for="fecha_nacimiento"
+            class="block text-default-700 font-medium mb-1"
+            >Birth Date</label
+          >
+          <div class="relative">
+            <input
+              id="fecha_nacimiento"
+              type="date"
+              formControlName="fecha_nacimiento"
+              class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              [max]="currentDateISO"
+            />
+            <i-lucide
+              [img]="calendarIcon"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-default-400"
+              style="pointer-events: none; width: 18px; height: 18px"
+            ></i-lucide>
+          </div>
+          @if (user?.fecha_nacimiento) {
+          <div class="flex items-center mt-2 text-default-600 text-sm">
+            <span class="bg-default-50 px-3 py-1 rounded-md">
+              Currently saved:
+              <span class="font-medium">{{
+                formatDate(user?.fecha_nacimiento)
+              }}</span>
+            </span>
+          </div>
+          }
         </div>
 
         <div class="form-actions">
-          <app-button [type]="'submit'" [disabled]="loading" [icon]="saveIcon">
-            {{ loading ? "Saving..." : "Save Changes" }}
+          <app-button [type]="'submit'" [disabled]="loading">
+            @if (loading) {
+            <span>Saving...</span>
+            } @else {
+            <div class="flex items-center gap-2">
+              <i-lucide [img]="saveIcon"></i-lucide>
+              <span>Save Changes</span>
+            </div>
+            }
           </app-button>
         </div>
       </form>

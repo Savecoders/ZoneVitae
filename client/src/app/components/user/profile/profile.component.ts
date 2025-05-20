@@ -6,6 +6,8 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 import { InputComponent } from '../../shared/primitives/input/input.component';
 import { AvatarComponent } from '../../shared/primitives/avatar/avatar.component';
@@ -21,6 +23,7 @@ import {
   UserIcon,
   CameraIcon,
   LockIcon,
+  CalendarIcon,
 } from 'lucide-angular';
 import { Usuario, UsuarioGenero } from 'app/models';
 
@@ -48,6 +51,10 @@ export class ProfileComponent implements OnInit {
   success = false;
   error = '';
   isBrowser: boolean;
+  selectedFile: File | null = null;
+  previewImageUrl: string | null = null;
+  uploadingImage = false;
+  currentDateISO: string = new Date().toISOString().split('T')[0]; // Today's date in ISO format for the date input max attribute
 
   // Password form states
   passwordLoading = false;
@@ -61,6 +68,7 @@ export class ProfileComponent implements OnInit {
   userIcon = UserIcon;
   cameraIcon = CameraIcon;
   lockIcon = LockIcon;
+  calendarIcon = CalendarIcon;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -72,13 +80,12 @@ export class ProfileComponent implements OnInit {
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
 
-    // Initialize profile form
+    // Initialize profile form with fields that match the Usuario model
     this.profileForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
       nombre_usuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       genero: [''],
+      fecha_nacimiento: [null, ProfileComponent.dateValidator],
       foto_perfil: [''],
     });
 
@@ -91,26 +98,79 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Get current user
+    // Get current user from auth service
     this.authService.currentUser$.subscribe((userData: AuthResponse | null) => {
       if (!userData) {
         this.router.navigate(['/auth/login']);
         return;
       }
 
-      // Convert the user data to match the Usuario type
+      // Save basic user info from auth
       this.user = {
         ...userData.user,
         genero: userData.user.genero as UsuarioGenero,
       };
 
-      // Patch form with current user data
-      this.profileForm.patchValue({
-        nombre_usuario: this.user?.nombre_usuario,
-        email: this.user?.email,
-        genero: this.user?.genero || '',
-        foto_perfil: this.user?.foto_perfil || '',
-      });
+      // Fetch complete user data from the backend using the ID
+      if (this.user.id) {
+        this.loading = true;
+        this.usuarioService.getById(this.user.id).subscribe({
+          next: (fullUserData) => {
+            this.loading = false;
+            // Update our local user object with complete data
+            this.user = {
+              ...this.user,
+              ...fullUserData,
+              genero: fullUserData.genero as UsuarioGenero,
+            };
+
+            // Format date if it exists
+            let formattedDate = null;
+            if (this.user?.fecha_nacimiento) {
+              // Convert to YYYY-MM-DD format for the date input
+              const date = new Date(this.user.fecha_nacimiento);
+              if (!isNaN(date.getTime())) {
+                formattedDate = date.toISOString().split('T')[0];
+              }
+            }
+
+            // Patch form with complete user data
+            this.profileForm.patchValue({
+              nombre_usuario: this.user?.nombre_usuario,
+              email: this.user?.email,
+              genero: this.user?.genero || '',
+              fecha_nacimiento: formattedDate,
+              foto_perfil: this.user?.foto_perfil || '',
+            });
+          },
+          error: (err) => {
+            this.loading = false;
+            this.error =
+              'Failed to load user profile. Please refresh the page.';
+            console.error('Error loading user profile:', err);
+          },
+        });
+      } else {
+        // If no user ID, just use the auth data
+        // Format date if it exists
+        let formattedDate = null;
+        if (this.user?.fecha_nacimiento) {
+          // Convert to YYYY-MM-DD format for the date input
+          const date = new Date(this.user.fecha_nacimiento);
+          if (!isNaN(date.getTime())) {
+            formattedDate = date.toISOString().split('T')[0];
+          }
+        }
+
+        // Patch form with current user data
+        this.profileForm.patchValue({
+          nombre_usuario: this.user?.nombre_usuario,
+          email: this.user?.email,
+          genero: this.user?.genero || '',
+          fecha_nacimiento: formattedDate,
+          foto_perfil: this.user?.foto_perfil || '',
+        });
+      }
     });
   }
 
@@ -138,24 +198,48 @@ export class ProfileComponent implements OnInit {
 
     this.loading = true;
 
-    const updateData = {
-      ...this.profileForm.value,
-      id: this.user.id,
-    };
+    // Upload image first if there's a selected file
+    this.uploadImage().then((imageUrl) => {
+      // Make sure fecha_nacimiento is in proper format if it exists
+      let fechaNacimiento = this.f['fecha_nacimiento'].value;
+      if (fechaNacimiento) {
+        // Ensure it's a string in ISO format for the API
+        const date = new Date(fechaNacimiento);
+        if (!isNaN(date.getTime())) {
+          fechaNacimiento = date.toISOString();
+        }
+      }
 
-    this.usuarioService.update(this.user.id, updateData).subscribe({
-      next: (response) => {
-        this.loading = false;
-        this.success = true;
+      // Only include the properties that are in the Usuario model
+      const updateData = {
+        id: this.user!.id,
+        nombre_usuario: this.f['nombre_usuario'].value,
+        email: this.f['email'].value,
+        genero: this.f['genero'].value || null,
+        fecha_nacimiento: fechaNacimiento || null,
+        foto_perfil: imageUrl || this.user?.foto_perfil || null,
+      };
 
-        // Update the local user data
-        this.authService.updateUserData(response);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error =
-          err.message || 'Failed to update profile. Please try again.';
-      },
+      this.usuarioService.update(this.user!.id!, updateData).subscribe({
+        next: (response) => {
+          this.loading = false;
+          this.success = true;
+
+          // Update the local user data
+          this.authService.updateUserData(response);
+
+          // Update our local user object
+          this.user = {
+            ...this.user,
+            ...updateData,
+          };
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error =
+            err.message || 'Failed to update profile. Please try again.';
+        },
+      });
     });
   }
 
@@ -185,12 +269,13 @@ export class ProfileComponent implements OnInit {
     this.passwordLoading = true;
 
     // In a real app, we would send the current password for verification
+    // Only include id and password properties from the Usuario model
     const passwordData = {
       id: this.user.id,
       password: this.p['newPassword'].value,
     };
 
-    this.usuarioService.update(this.user.id, passwordData).subscribe({
+    this.usuarioService.update(this.user.id!, passwordData).subscribe({
       next: (response) => {
         this.passwordLoading = false;
         this.passwordSuccess = true;
@@ -208,11 +293,93 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // Placeholder for profile image upload
+  // Custom static validator for birth date
+  static dateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null; // Allow empty value if not required
+    }
+
+    const selectedDate = new Date(control.value);
+    const currentDate = new Date();
+    const minDate = new Date('1900-01-01');
+
+    // Check if date is less than 1900
+    if (selectedDate < minDate) {
+      return { minDate: { value: control.value } };
+    }
+
+    // Check if date is greater than current date
+    if (selectedDate > currentDate) {
+      return { maxDate: { value: control.value } };
+    }
+
+    return null;
+  }
+
+  // Format date to display to user
+  formatDate(date: string | Date | null | undefined): string {
+    if (!date) return '';
+
+    try {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // Handle file selection for profile image
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      // Create a preview URL
+      this.previewImageUrl = URL.createObjectURL(this.selectedFile);
+    }
+  }
+
+  // Upload the selected image to Cloudinary
+  uploadImage(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (!this.selectedFile) {
+        resolve(''); // No image selected, return empty string
+        return;
+      }
+
+      this.uploadingImage = true;
+
+      this.cloudinaryService.uploadImage(this.selectedFile).subscribe({
+        next: (imageUrl: string) => {
+          this.uploadingImage = false;
+          resolve(imageUrl);
+        },
+        error: (err) => {
+          this.uploadingImage = false;
+          this.error =
+            'Failed to upload profile picture. Profile will be updated without a new profile picture.';
+          console.error('Image upload error:', err);
+          resolve(''); // Continue without image
+        },
+      });
+    });
+  }
+
+  // Profile image upload implementation
   uploadProfileImage(): void {
-    // In a real implementation, this would open a file picker
-    // and upload the image to a server/cloud storage
-    console.log('Upload profile image functionality would go here');
-    alert('Image upload feature will be implemented in a future update');
+    // Create a file input element
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    // Add an event listener to handle file selection
+    fileInput.addEventListener('change', (event) => this.onFileSelected(event));
+
+    // Trigger the file input click
+    fileInput.click();
   }
 }
