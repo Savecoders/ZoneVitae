@@ -38,7 +38,7 @@ export abstract class BaseService<T> {
 
   update(id: number | string, item: Partial<T>): Observable<T> {
     const url = `${this.baseUrl}/${id}`;
-    return this.http.put<T>(url, item);
+    return this.http.patch<T>(url, item);
   }
 
   delete(id: number | string): Observable<void> {
