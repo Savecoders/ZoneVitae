@@ -272,7 +272,7 @@ export class ReportsComponent implements OnInit {
     this.reporteEditando = reporte;
     this.mostrarFormulario = true;
     const comunidad = this.comunidades.find(
-      (c) => c.id === reporte.comunidad_id
+      (c) => c.id !== undefined && Number(c.id) === reporte.comunidad_id
     );
 
     this.form.patchValue({

@@ -194,10 +194,10 @@ export class UserProfileComponent implements OnInit {
 
           // Format communities for community-posts component
           this.communityPosts = this.communities.map((community) => ({
-            id: community.id as number,
+            id: Number(community.id),
             title: community.nombre,
             community: {
-              id: community.id as number,
+              id: Number(community.id),
               name: community.nombre,
               slug:
                 community.nombre?.toLowerCase().replace(/\s+/g, '-') ||

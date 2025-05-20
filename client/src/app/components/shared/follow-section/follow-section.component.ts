@@ -89,7 +89,7 @@ export class FollowSectionComponent implements OnInit {
             const followersCount = Math.floor(Math.random() * 500) + 50;
 
             return {
-              id: community.id as number,
+              id: community.id ? Number(community.id) : 0,
               name: community.nombre,
               followers: followersCount,
             };

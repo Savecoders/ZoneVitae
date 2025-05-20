@@ -72,7 +72,7 @@ export class HomeComponent implements OnInit {
     private comentarioService: ComentarioService,
     private tagService: TagService,
     private http: HttpClient,
-private router: Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -142,7 +142,7 @@ private router: Router
               // Transform reports into PostData format
               return reports.map((report) => {
                 const community = report.comunidad_id
-                  ? communityMap.get(report.comunidad_id)
+                  ? communityMap.get(report.comunidad_id.toString())
                   : null;
                 const author = report.autor_id
                   ? authorMap.get(report.autor_id)
@@ -175,7 +175,7 @@ private router: Router
                   },
                   community: community
                     ? {
-                        id: community.id as number,
+                        id: community.id ? Number(community.id) : 0,
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()
@@ -355,7 +355,7 @@ private router: Router
               // Transform reports into PostData format
               return reports.map((report) => {
                 const community = report.comunidad_id
-                  ? communityMap.get(report.comunidad_id)
+                  ? communityMap.get(report.comunidad_id.toString())
                   : null;
                 const author = report.autor_id
                   ? authorMap.get(report.autor_id)
@@ -384,7 +384,7 @@ private router: Router
                   },
                   community: community
                     ? {
-                        id: community.id as number,
+                        id: community.id ? Number(community.id) : 0,
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()
