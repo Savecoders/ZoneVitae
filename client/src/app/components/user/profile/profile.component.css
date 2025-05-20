@@ -7,7 +7,6 @@
 .profile-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-content3);
 }
 
 .profile-content {
@@ -18,9 +17,8 @@
 
 .profile-sidebar {
   flex: 0 0 300px;
-  background-color: var(--color-content1);
+  background-color: var(--color-default-100);
   padding: 1.5rem;
-  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -92,7 +90,6 @@
 
 .profile-form-container {
   flex: 1;
-  background-color: var(--color-content1);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -126,6 +123,75 @@
   background-color: var(--color-danger-100);
   color: var(--color-danger-700);
   border: 1px solid var(--color-danger-300);
+}
+
+/* Preview badge for new profile images */
+.preview-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--color-primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  transform: translate(30%, -30%);
+}
+
+/* Loading indicator */
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--color-primary-500);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--color-default-50);
+  border-radius: 0.5rem;
+}
+
+.loading-indicator .spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--color-primary-500);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-right: 0.75rem;
+}
+
+/* Date input styling */
+input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-default-300);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  color: var(--color-default-900);
+  background-color: var(--color-default-50);
+  outline: none;
+}
+
+input[type="date"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
 
 /* Responsive layout */
