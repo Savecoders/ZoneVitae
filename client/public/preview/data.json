@@ -153,22 +153,32 @@
       "contenido": "La farola ubicada en la esquina de la calle principal está dañada y no funciona desde hace una semana.",
       "anonimo": 0,
       "estado": "Pendiente de Revision",
-      "estado_seguimiento": "Revisado",
+      "estado_seguimiento": "Pendiente de Revision",
       "create_at": "2023-03-10T16:20:00",
-      "update_at": "2025-05-21T00:17:59.617Z",
+      "update_at": "2025-05-21T01:58:14.835Z",
       "nombreComunidad": "Comunidad Vecinal Las Flores"
     },
     {
       "id": "2",
-      "comunidad_id": 2,
-      "autor_id": 1,
       "titulo": "Basura acumulada en el parque",
       "contenido": "Se ha acumulado mucha basura alrededor de los bancos del sector norte del parque.",
       "anonimo": 1,
-      "estado": "Aprobado",
-      "estado_seguimiento": "Resuelto",
       "create_at": "2023-03-15T10:10:00",
-      "update_at": "2025-05-19T23:52:26.105Z"
+      "comunidad_id": "2",
+      "fotos": [
+        {
+          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747792527/logo-cashmoney_nboixj.png",
+          "reports_id": null
+        }
+      ],
+      "tags": [
+        {
+          "id": "7cd9",
+          "nombre": "tags"
+        }
+      ],
+      "estado": "Pendiente de Revision",
+      "estado_seguimiento": "Pendiente de Revision"
     }
   ],
   "comentarios": [
@@ -254,6 +264,14 @@
     {
       "id": "3ae8",
       "nombre": "Alumbrado público"
+    },
+    {
+      "id": "378f",
+      "nombre": "recoleccion de basura"
+    },
+    {
+      "id": "7cd9",
+      "nombre": "tags"
     }
   ],
   "comunidad_tags": [
@@ -353,42 +371,28 @@
       "reporte_id": "1",
       "usuario_id": 1,
       "estado_anterior": "Aprobado",
-      "estado_nuevo": "Revisado",
+      "estado_nuevo": null,
       "comentario": "",
-      "accion_realizada": "asdadasda",
+      "accion_realizada": null,
       "accion_recomendada": "",
       "documentos_adjuntos": false,
-      "prioridad": "Alta",
+      "prioridad": null,
       "create_at": "2025-05-20T00:23:22.816Z",
-      "update_at": "2025-05-21T00:17:59.616Z",
-      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747786679/cashmoney_bvcvls.png"
+      "update_at": "2025-05-21T01:58:01.932Z",
+      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747792681/logo_ax4hv4.png"
     }
   ],
   "tags": [
     {
-      "id": 1,
+      "id": "1",
       "nombre": "Medio Ambiente"
     },
     {
-      "id": 2,
+      "id": "2",
       "nombre": "Seguridad"
     },
     {
-      "id": 3,
-      "nombre": "Infraestructura"
-    }
-  ],
-  "tags": [
-    {
-      "id": 1,
-      "nombre": "Medio Ambiente"
-    },
-    {
-      "id": 2,
-      "nombre": "Seguridad"
-    },
-    {
-      "id": 3,
+      "id": "3",
       "nombre": "Infraestructura"
     }
   ]
