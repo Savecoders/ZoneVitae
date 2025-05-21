@@ -184,3 +184,12 @@
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+
+/* .mat-mdc-option
+  .mdc-list-item
+  .mat-mdc-option-multiple
+  .mdc-list-item--selected
+  .mat-mdc-option-active {
+  background-color: var(--color-primary) !important;
+  color: var(--color-default-foreground) !important;
+} */
