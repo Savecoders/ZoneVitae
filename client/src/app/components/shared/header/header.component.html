@@ -79,7 +79,14 @@
         </div>
         }
       </div>
-      }
+      } @else {
+      <a
+        routerLink="/auth/login"
+        class="px-4 py-2 text-md font-medium bg-primary-400 text-default-900 rounded-lg hover:bg-primary-200"
+      >
+        <i-lucide [img]="userIcon" class="my-icon inline-block"></i-lucide>
+        Login </a
+      >}
     </div>
   </nav>
 </header>

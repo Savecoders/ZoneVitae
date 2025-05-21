@@ -13,6 +13,7 @@ import { ThemeToggleComponent } from '../primitives/theme-toggle/theme-toggle.co
 import { AuthResponse } from 'app/models';
 import { DropdownMenuComponent } from '../primitives';
 import { AuthService } from '../../../services/auth.service';
+import { LucideAngularModule, UserIcon, UsersIcon } from 'lucide-angular';
 
 @Component({
   selector: 'app-header',
@@ -23,6 +24,7 @@ import { AuthService } from '../../../services/auth.service';
     InputComponent,
     AvatarComponent,
     ThemeToggleComponent,
+    LucideAngularModule,
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
@@ -31,6 +33,7 @@ export class HeaderComponent implements OnInit {
   isScrolled = false;
   user: any = null; // Changed from AuthResponse to any to handle different data structures
   private isBrowser: boolean;
+  userIcon = UserIcon;
   showUserMenu = false;
 
   constructor(
