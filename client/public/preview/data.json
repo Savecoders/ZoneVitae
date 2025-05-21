@@ -36,6 +36,19 @@
       "estado_cuenta": "Activo",
       "create_at": "2025-05-19T23:27:27.919Z",
       "update_at": "2025-05-19T23:27:27.919Z"
+    },
+    {
+      "id": "2cd4",
+      "nombre_usuario": "Savecoders",
+      "email": "SALVADOR2003@GMAIL.COM",
+      "password": "SALVADOR2003!",
+      "genero": "M",
+      "fecha_nacimiento": "2012-05-05T00:00:00.000Z",
+      "rol_id": 2,
+      "foto_perfil": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747786517/logo_ukcg3g.png",
+      "estado_cuenta": "Activo",
+      "create_at": "2025-05-21T00:15:17.913Z",
+      "update_at": "2025-05-21T00:15:17.913Z"
     }
   ],
   "roles": [
@@ -72,6 +85,11 @@
       "id": "d776",
       "id_usuario": "f738",
       "id_rol": 2
+    },
+    {
+      "id": "15c7",
+      "id_usuario": "2cd4",
+      "id_rol": 2
     }
   ],
   "roles_comunidades": [
@@ -98,7 +116,21 @@
       "creador_id": 1,
       "ubicacion": "Barrio Las Flores, Ciudad Ejemplo",
       "create_at": "2023-02-01T09:00:00",
-      "update_at": "2023-02-01T09:00:00"
+      "update_at": "2023-02-01T09:00:00",
+      "tags": [
+        {
+          "id": 1,
+          "nombre": "Medio Ambiente"
+        },
+        {
+          "id": 2,
+          "nombre": "Seguridad"
+        },
+        {
+          "id": 3,
+          "nombre": "Infraestructura"
+        }
+      ]
     },
     {
       "id": "2",
@@ -123,7 +155,7 @@
       "estado": "Pendiente de Revision",
       "estado_seguimiento": "Revisado",
       "create_at": "2023-03-10T16:20:00",
-      "update_at": "2025-05-20T00:27:12.783Z",
+      "update_at": "2025-05-21T00:17:59.617Z",
       "nombreComunidad": "Comunidad Vecinal Las Flores"
     },
     {
@@ -137,30 +169,6 @@
       "estado_seguimiento": "Resuelto",
       "create_at": "2023-03-15T10:10:00",
       "update_at": "2025-05-19T23:52:26.105Z"
-    },
-    {
-      "id": "f234",
-      "titulo": "hdshdshfd",
-      "contenido": "fdsgdagdsgdfgfds",
-      "anonimo": true,
-      "create_at": "2025-05-19T21:59:31.761Z",
-      "comunidad_id": "2",
-      "fotos": [
-        {
-          "image": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747691974/WhatsApp_Image_2025-04-28_at_5.24.26_PM_xtpgck.jpg",
-          "reports_id": null
-        }
-      ],
-      "tags": [
-        {
-          "id": "3ae8",
-          "nombre": "fgd"
-        }
-      ],
-      "autor_id": null,
-      "estado": "Aprobado",
-      "estado_seguimiento": "Pendiente de Revision",
-      "nombreComunidad": "Amigos del Parque Central"
     }
   ],
   "comentarios": [
@@ -224,16 +232,28 @@
     {
       "reports_id": 1,
       "tag_id": 3,
-      "id": "dab0"
+      "id": "dab0",
+      "nombre": "Baches"
+    },
+    {
+      "reports_id": 1,
+      "tag_id": 2,
+      "id": "dab0",
+      "nombre": "Carreteras"
     },
     {
       "reports_id": 2,
       "tag_id": 1,
-      "id": "f91d"
+      "id": "f91d",
+      "nombre": "Problemas de seguridad"
     },
     {
       "id": "3ae8",
-      "nombre": "fgd"
+      "nombre": "Vandalismo"
+    },
+    {
+      "id": "3ae8",
+      "nombre": "Alumbrado público"
     }
   ],
   "comunidad_tags": [
@@ -335,13 +355,27 @@
       "estado_anterior": "Aprobado",
       "estado_nuevo": "Revisado",
       "comentario": "",
-      "accion_realizada": "AFDSADFFSAFSAFDAS",
+      "accion_realizada": "asdadasda",
       "accion_recomendada": "",
       "documentos_adjuntos": false,
       "prioridad": "Alta",
       "create_at": "2025-05-20T00:23:22.816Z",
-      "update_at": "2025-05-20T00:27:12.778Z",
-      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747700839/WhatsApp_Image_2025-04-28_at_5.24.26_PM_txsmdk.jpg"
+      "update_at": "2025-05-21T00:17:59.616Z",
+      "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747786679/cashmoney_bvcvls.png"
+    }
+  ],
+  "tags": [
+    {
+      "id": 1,
+      "nombre": "Medio Ambiente"
+    },
+    {
+      "id": 2,
+      "nombre": "Seguridad"
+    },
+    {
+      "id": 3,
+      "nombre": "Infraestructura"
     }
   ],
   "tags": [
