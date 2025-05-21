@@ -17,6 +17,7 @@ export const routes: Routes = [
 
   {
     path: 'comunities',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/comunities/comunities.component').then(
         (m) => m.ComunitiesComponent
@@ -38,6 +39,7 @@ export const routes: Routes = [
   },
   {
     path: 'form-communities/:id',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/form-community/form-community.component').then(
         (m) => m.FormCommunityComponent
@@ -45,6 +47,7 @@ export const routes: Routes = [
   },
   {
     path: 'reports',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/reports/reports.component').then(
         (m) => m.ReportsComponent
@@ -53,6 +56,7 @@ export const routes: Routes = [
 
   {
     path: 'activities',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/activities/activities.component').then(
         (m) => m.ActivitiesComponent
@@ -76,6 +80,7 @@ export const routes: Routes = [
 
   {
     path: 'profile',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/user/profile/profile.component').then(
         (m) => m.ProfileComponent
