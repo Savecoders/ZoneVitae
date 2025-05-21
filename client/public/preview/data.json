@@ -343,5 +343,19 @@
       "update_at": "2025-05-20T00:27:12.778Z",
       "imagen": "https://res.cloudinary.com/dtfdnwkao/image/upload/v1747700839/WhatsApp_Image_2025-04-28_at_5.24.26_PM_txsmdk.jpg"
     }
+  ],
+  "tags": [
+    {
+      "id": 1,
+      "nombre": "Medio Ambiente"
+    },
+    {
+      "id": 2,
+      "nombre": "Seguridad"
+    },
+    {
+      "id": 3,
+      "nombre": "Infraestructura"
+    }
   ]
 }
