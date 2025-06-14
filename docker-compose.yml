@@ -2,29 +2,17 @@ services:
   # Docker Sql Server
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    container_name: zone_vitae_sqlserver
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong@Passw0rd
     ports:
-      - '1433:1433'
+      - "1433:1433"
     volumes:
+      - ./data/datos.sql:/docker-entrypoint-initdb.d/init.sql
       - sqlserver_data:/var/opt/mssql
     networks:
       - zonevitae_dev_network
-    restart: unless-stopped
-  # Docker .Net Core Web API
-
-  api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORT=8081
-    ports:
-      - '8080:8080'
-      - '8081:8081'
-    build:
-      context: .
 
 networks:
   zonevitae_dev_network:
