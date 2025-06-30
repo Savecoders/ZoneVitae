@@ -1,0 +1,82 @@
+#! Please not changed this file
+#! Not modificable this a functional Docker Container
+#! Please not changed this file
+services:
+  # SQL Server principal
+  db-zone-vitae:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: zone_vitae_sql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./Database:/var/opt/mssql
+      - ./Data/data.sql:/scripts/init.sql:ro
+    networks:
+      - zonevitae_dev_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -C -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 30s
+      retries: 5
+      start_period: 60s
+      timeout: 30s
+
+  # Servicio para ejecutar el script de inicialización
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db-zone-vitae:
+        condition: service_healthy
+    volumes:
+      - ./Data/data.sql:/scripts/init.sql:ro
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+    command: >
+      /bin/bash -c "
+        echo '🚀 Iniciando proceso de inicialización de base de datos...';
+        
+        # Esperar adicional para asegurar que SQL Server esté completamente listo
+        echo '⏳ Esperando 30 segundos adicionales...';
+        sleep 30;
+        
+        # Verificar conexión
+        echo '🔍 Verificando conexión a SQL Server...';
+        until /opt/mssql-tools18/bin/sqlcmd -S db-zone-vitae -U sa -P ${DB_PASSWORD} -C -Q 'SELECT 1' > /dev/null 2>&1; do
+            echo '⏳ SQL Server no está listo. Esperando 10 segundos más...';
+            sleep 10;
+        done;
+        
+        echo '✅ SQL Server está listo. Ejecutando script de inicialización...';
+        
+        # Ejecutar el script con manejo de errores
+        if /opt/mssql-tools18/bin/sqlcmd -S db-zone-vitae -U sa -P ${DB_PASSWORD} -C -d master -i /scripts/init.sql; then
+            echo '✅ Script de inicialización ejecutado correctamente';
+            
+            # Verificar que la base de datos se creó
+            echo '🔍 Verificando creación de la base de datos...';
+            /opt/mssql-tools18/bin/sqlcmd -S db-zone-vitae -U sa -P ${DB_PASSWORD} -C -Q \"SELECT name FROM sys.databases WHERE name = 'zone_vitae_sql'\";
+            
+            echo '🎉 Inicialización completada exitosamente';
+        else
+            echo '❌ Error al ejecutar el script de inicialización';
+            exit 1;
+        fi;
+      "
+    networks:
+      - zonevitae_dev_network
+    restart: "no"
+
+volumes:
+  sql-server-data:
+    driver: local
+
+networks:
+  zonevitae_dev_network:
+    driver: bridge
