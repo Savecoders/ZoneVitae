@@ -81,19 +81,19 @@ ZoneVitae utiliza Docker para facilitar la implementación y el desarrollo. Aseg
    - `ng generate environments`
    - Se creara el directorio de environments y Ahora copia la siguiente estructura
 
-```json
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:5000/api',
-  jsonServerUrl: 'http://localhost:5000/api/',
-  cloudinary: {
-    // CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@dtfdnwkao
-    cloud_name: '',
-    api_key: '',
-    upload_preset: '',
-  },
-};
-```
+  ```ts
+    export const environment = {
+      production: false,
+      apiUrl: 'http://localhost:5000/api',
+      jsonServerUrl: 'http://localhost:5000/api/',
+      cloudinary: {
+        // CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@dtfdnwkao
+        cloud_name: '',
+        api_key: '',
+        upload_preset: '',
+      },
+    };
+  ```
 
 > [!WARNING]  
 > ⚠ Esa misma estructura para todos los archivos
