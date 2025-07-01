@@ -6,19 +6,17 @@ ZoneVitae es una plataforma diseñada para la gestión de comunidades locales y 
 
 El proyecto ZoneVitae está organizado en las siguientes carpetas principales:
 
-- `api/`: Backend del proyecto (si utiliza una API REST)
-- `client/`: Cliente Angular
+- `api/`: Backend del proyecto (utiliza una Asp .Net Core 9 -> Web Api)
+- `client/`: Cliente Angular 19
 - `docs/`: Documentación del proyecto
-  - `database/`: Esquemas y documentación de la base de datos
-  - `firebase/`: Implementación con Firebase
-  - `test/`: Casos de prueba
+  - `database/`: Esquemas y documentación de la base de datos (por documentar)
 
 ## Tecnologías Utilizadas
 
 - **Frontend**: Angular Tailwind
-- **Backend**: DotNet Core 8
-- **Autenticación**: Firebase Authentication | JWT
-- **Almacenamiento**: Firebase Storage
+- **Backend**: DotNet Core 9
+- **Autenticación**: JWT | Clerk
+- **Almacenamiento**: Clodinary
 
 ## Características Principales
 
@@ -34,28 +32,22 @@ ZoneVitae utiliza Docker para facilitar la implementación y el desarrollo. Aseg
 
 ### Comandos Docker
 
-- **Construir la imagen**:
-
-  ```bash
-  docker build -t zonevitae .
-  ```
-
 - **Ejecutar el contenedor**:
 
   ```bash
-  docker run -d -p 8080:80 zonevitae
+  docker-compose up
   ```
 
 - **Detener el contenedor**:
 
   ```bash
-  docker stop <container_id>
+  docker-compose stop
   ```
 
 - **Eliminar el contenedor**:
 
   ```bash
-  docker rm <container_id>
+  docker-compose down -v
   ```
 
 ## Configuración del Proyecto
@@ -66,7 +58,7 @@ ZoneVitae utiliza Docker para facilitar la implementación y el desarrollo. Aseg
 - npm o bun
 - Angular CLI
 
-### Instalación
+### Repositorio
 
 1. Clonar el repositorio:
 
@@ -75,22 +67,102 @@ ZoneVitae utiliza Docker para facilitar la implementación y el desarrollo. Aseg
    cd ZoneVitae
    ```
 
-2. Instalar dependencias del cliente:
+### Ejecutar Cliente
+
+1. Instalar dependencias del cliente:
 
    ```bash
    cd client
    bun install
    ```
 
-3. Configurar Firebase (opcional):
+2. Configurar Envirioments Dir:
+   - Seguir las instrucciones en `https://angular.dev/tools/cli/environments`
+   - `ng generate environments`
+   - Se creara el directorio de environments y Ahora copia la siguiente estructura
 
-   - Seguir las instrucciones en `docs/firebase/firebase-setup-guide.md`
+```json
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:5000/api',
+  jsonServerUrl: 'http://localhost:5000/api/',
+  cloudinary: {
+    // CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@dtfdnwkao
+    cloud_name: '',
+    api_key: '',
+    upload_preset: '',
+  },
+};
+```
 
-4. Ejecutar el cliente:
+> [!WARNING]  
+> ⚠ Esa misma estructura para todos los archivos
+
+3. Ejecutar el cliente:
+
    ```bash
    cd client
    bun run start
    ```
+
+### Ejecutar Api
+
+1. Instalacion de las dependencias
+
+```bash
+  cd api
+  dotnet restore
+```
+
+2. Crear el archivo .env del proyecto
+
+```bash
+  touch .env
+```
+
+y seguir la siguiente estructura del .env de la api
+
+```bash
+  DB_PASSWORD=
+  CLOUDINARY_URL=
+  CLOUDINARY_CLOUD_NAME=
+  CLOUDINARY_API_KEY=
+  CLOUDINARY_API_SECRET=
+```
+
+Y la siguiente estructura del appsettings.json appsettings.Development.json
+
+```bash
+  {
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "default": ""
+  },
+  "Jwt": {
+    "Key": "",
+    "Issuer": "",
+    "Audience": ""
+  }
+}
+```
+
+3. Ejecutar la api
+
+```bash
+  dotnet run
+```
+
+o tambien usar el modo watch(mas recomendado)
+
+```bash
+  dotnet watch -lp http
+```
 
 ## Documentación Adicional
 
