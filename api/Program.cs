@@ -1,56 +1,66 @@
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+using api.Services.Auth;
+using api.Services.Cloudinary;
+using api.Services.Usuario;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.IO;
-
-// Load environment variables from .env file
-try
-{
-    string envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
-    if (File.Exists(envPath))
-    {
-        Console.WriteLine($"Loading environment variables from: {envPath}");
-        DotNetEnv.Env.Load(envPath);
-
-        // Log loaded Cloudinary config for debugging
-        var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
-        Console.WriteLine($"Loaded CLOUDINARY_CLOUD_NAME: {cloudName ?? "null"}");
-    }
-    else
-    {
-        Console.WriteLine($".env file not found at: {envPath}");
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error loading .env file: {ex.Message}");
-}
+using DotNetEnv;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add environment variables to configuration
-builder.Configuration.AddEnvironmentVariables();
+// Load environment variables from the .env file
+Env.Load();
 
-string connectionString = builder.Configuration.GetConnectionString("default") ?? "";
+var connectionString = builder.Configuration.GetConnectionString("default") ?? "";
 
+// Check if the connection string is empty
 builder.Services.AddDbContext<ZoneVitaeSqlContext>(o => o.UseSqlServer(connectionString));
 
-// Add services to the container.
+// Dependency Injection for Repositories and Services
+builder.Services.AddScoped<api.Repositories.IRepository<Usuario>, api.Repositories.UsuarioRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<UsuariosRole>, api.Repositories.UsuariosRoleRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Role>, api.Repositories.RoleRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Comunidade>, api.Repositories.ComunidadeRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Tag>, api.Repositories.TagRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Comentario>, api.Repositories.ComentarioRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Foto>, api.Repositories.FotoRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.Repositories.GaleriaComunidadRepository>();
+// builder.Services.AddScoped<api.Repositories.IRepository<api.Models.SeguimientoReporte>, api.Repositories.ReportRepository>();
 
+
+// Dependency Injection for AuthService
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CloudinaryService>();
+builder.Services.AddScoped<UsuarioService>();
+
+
+// Add controllers with JSON options
+// This is necessary to ensure that the API uses System.Text.Json for serialization
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        corsPolicyBuilder => corsPolicyBuilder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
+    
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "ZoneVitae API",
         Version = "v1",
-        Description = "API for the ZoneVitae community platform"
+        Description = "API for the ZoneVitae community Iesses platform"
     });
-
-
 
     // Add JWT Authentication support to Swagger UI
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -78,36 +88,61 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Dependency Injection for Repositories and Services
-builder.Services.AddScoped<api.Repositories.IRepository<api.Models.Usuario>, api.Repositories.UsuarioRepository>();
-builder.Services.AddScoped<api.Repositories.IRepository<api.Models.Role>, api.Repositories.RoleRepository>();
-builder.Services.AddScoped<api.Repositories.IRepository<api.Models.UsuariosRole>, api.Repositories.UsuariosRoleRepository>();
-builder.Services.AddScoped<api.Services.Usuario.UsuarioService>();
 
+
+// Authentication and Authorization Configuration
 // JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
-    };
-});
+// Docs https://learn.microsoft.com/en-us/aspnet/core/security/authentication/configure-jwt-bearer-authentication?view=aspnetcore-9.0
+// please guys not changes this file
 
-// Dependency Injection for AuthService
-builder.Services.AddScoped<api.Services.Auth.AuthService>();
-builder.Services.AddScoped<api.Services.Cloudinary.CloudinaryService>();
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+var jwtKey = jwtSettings["Key"];
+var jwtIssuer = jwtSettings["Issuer"];
+var jwtAudience = jwtSettings["Audience"];
+
+
+if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
+{
+    throw new InvalidOperationException("JWT configuration is missing. Please.json or environment variables.");
+}
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            RequireExpirationTime = true,
+            ValidateTokenReplay = false
+        };
+        options.MapInboundClaims = false; // Do not map claims from the token to the user principal
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+   // Defailt policy for authenticated users
+   options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        .Build();
+   
+   // Add policies for specific roles if needed
+   // Roles => "Administrador", "Moderador", "Usuario"
+});
 
 var app = builder.Build();
 
@@ -125,7 +160,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAllOrigins");
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
