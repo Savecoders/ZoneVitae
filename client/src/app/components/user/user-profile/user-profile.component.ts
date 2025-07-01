@@ -1,20 +1,20 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
-import { LayoutComponent } from '../../shared/layout/layout.component';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AvatarComponent } from '../../shared/primitives/avatar/avatar.component';
-import { UsuarioService } from '../../../services/usuario.service';
-import { ComunidadService } from '../../../services/comunidad.service';
-import { ReporteService } from '../../../services/reporte.service';
-import { BadgeComponent } from '../../shared/primitives/badge/badge.component';
-import { UIModule } from '../../shared/ui.module';
+import { Component, OnInit, Inject, PLATFORM_ID } from "@angular/core";
+import { LayoutComponent } from "../../shared/layout/layout.component";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { AvatarComponent } from "../../shared/primitives/avatar/avatar.component";
+import { UsuarioService } from "../../../services/usuario.service";
+import { ComunidadService } from "../../../services/comunidad.service";
+import { ReporteService } from "../../../services/reporte.service";
+import { BadgeComponent } from "../../shared/primitives/badge/badge.component";
+import { UIModule } from "../../shared/ui.module";
 import {
   Usuario,
   UsuarioGenero,
   Comunidad,
   Reporte,
   Actividad,
-} from 'app/models';
+} from "app/models";
 import {
   LucideAngularModule,
   UserIcon,
@@ -23,21 +23,21 @@ import {
   UsersRoundIcon,
   ClipboardIcon,
   InboxIcon,
-} from 'lucide-angular';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
+} from "lucide-angular";
+import { catchError, forkJoin, map, of, switchMap } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "../../../../environments/environment";
 import {
   PostCardComponent,
   PostData,
-} from '../../shared/post-card/post-card.component';
+} from "../../shared/post-card/post-card.component";
 import {
   CommunityPostsComponent,
   CommunityPost,
-} from '../../shared/community-posts/community-posts.component';
+} from "../../shared/community-posts/community-posts.component";
 
 @Component({
-  selector: 'app-user-profile',
+  selector: "app-user-profile",
   standalone: true,
   imports: [
     LayoutComponent,
@@ -50,14 +50,14 @@ import {
     PostCardComponent,
     CommunityPostsComponent,
   ],
-  templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css',
+  templateUrl: "./user-profile.component.html",
+  styleUrl: "./user-profile.component.css",
 })
 export class UserProfileComponent implements OnInit {
   userProfile: Usuario | null = null;
   loading = false;
-  error = '';
-  username: string = '';
+  error = "";
+  username: string = "";
 
   // Stats for the user
   stats = {
@@ -88,22 +88,22 @@ export class UserProfileComponent implements OnInit {
     private comunidadService: ComunidadService,
     private reporteService: ReporteService,
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
-      this.username = params['username'];
+      this.username = params["username"];
       if (this.username) {
         this.loadUserProfile();
       } else {
-        this.router.navigate(['/not-found']);
+        this.router.navigate(["/not-found"]);
       }
     });
   }
   loadUserProfile(): void {
     this.loading = true;
-    this.error = '';
+    this.error = "";
 
     // Find user by exact username match
     this.usuarioService
@@ -112,7 +112,7 @@ export class UserProfileComponent implements OnInit {
         switchMap((user) => {
           if (!user) {
             this.loading = false;
-            this.router.navigate(['/not-found']);
+            this.router.navigate(["/not-found"]);
             return of(null);
           }
 
@@ -124,12 +124,12 @@ export class UserProfileComponent implements OnInit {
           // Get user's activities, communities, and reports in parallel
           return forkJoin({
             activities: this.http.get<Actividad[]>(
-              `${environment.jsonServerUrl}/actividades?creador_id=${user.id}`
+              `${environment.jsonServerUrl}/actividades?creador_id=${user.id}`,
             ),
             communities: this.http
-              .get<{ comunidad_id: number }[]>(
-                `${environment.jsonServerUrl}/usuarios_comunidades_roles?usuario_id=${user.id}`
-              )
+              .get<
+                { comunidad_id: number }[]
+              >(`${environment.jsonServerUrl}/usuarios_comunidades_roles?usuario_id=${user.id}`)
               .pipe(
                 switchMap((userCommunities) => {
                   if (userCommunities.length === 0) {
@@ -137,24 +137,24 @@ export class UserProfileComponent implements OnInit {
                   }
 
                   const communityIds = userCommunities.map(
-                    (uc) => uc.comunidad_id
+                    (uc) => uc.comunidad_id,
                   );
                   return forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number)
-                    )
+                      this.comunidadService.getById(id as number),
+                    ),
                   );
-                })
+                }),
               ),
-            reports: this.reporteService.getReportesByAutor(user.id as number),
+            reports: this.reporteService.getReportesByAutor(Number(user.id)),
           });
         }),
         catchError((err) => {
-          console.error('Error loading user profile:', err);
-          this.error = 'Failed to load user profile';
+          console.error("Error loading user profile:", err);
+          this.error = "Failed to load user profile";
           this.loading = false;
           return of({ activities: [], communities: [], reports: [] });
-        })
+        }),
       )
       .subscribe((result) => {
         if (result) {
@@ -170,19 +170,19 @@ export class UserProfileComponent implements OnInit {
             imageUrl:
               report.id && report.estado
                 ? `https://source.unsplash.com/random/800x500?report,${
-                    report.estado?.toLowerCase() || 'general'
+                    report.estado?.toLowerCase() || "general"
                   }`
                 : `https://source.unsplash.com/random/800x500?report,general`,
             author: {
-              id: (this.userProfile?.id as number) || 0,
-              name: this.userProfile?.nombre_usuario || 'Anonymous',
-              avatarUrl: this.userProfile?.foto_perfil || undefined,
+              id: Number(this.userProfile?.id) || 0,
+              name: this.userProfile?.nombreUsuario || "Anonymous",
+              avatarUrl: this.userProfile?.fotoPerfil || undefined,
             },
             community: report.comunidad_id
               ? {
                   id: report.comunidad_id as number,
-                  name: 'Community', // We would need to fetch the community name
-                  slug: 'community',
+                  name: "Community", // We would need to fetch the community name
+                  slug: "community",
                 }
               : undefined,
             likes: 0, // You might want to fetch this data
@@ -200,11 +200,11 @@ export class UserProfileComponent implements OnInit {
               id: Number(community.id),
               name: community.nombre,
               slug:
-                community.nombre?.toLowerCase().replace(/\s+/g, '-') ||
-                'community',
+                community.nombre?.toLowerCase().replace(/\s+/g, "-") ||
+                "community",
             },
             imageUrl: `https://source.unsplash.com/random/800x500?community,${
-              community.nombre?.toLowerCase() || 'general'
+              community.nombre?.toLowerCase() || "general"
             }`,
           }));
 

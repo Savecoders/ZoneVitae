@@ -3,7 +3,7 @@
     <div class="profile-header p-5 rounded-lg bg-default-100 shadow-sm">
       <h1 class="text-3xl font-bold text-default-800">User Profile</h1>
       <p class="text-default-600 text-xl mt-2">
-        Viewing {{ userProfile ? userProfile.nombre_usuario : "" }}'s profile
+        Viewing {{ userProfile ? userProfile.nombreUsuario : "" }}'s profile
       </p>
     </div>
   </div>
@@ -30,15 +30,15 @@
       <div class="flex flex-col items-center mb-6">
         <app-avatar
           [size]="'xl'"
-          [name]="userProfile.nombre_usuario || ''"
-          [src]="userProfile.foto_perfil || ''"
+          [name]="userProfile.nombreUsuario || ''"
+          [src]="userProfile.fotoPerfil || ''"
           [alt]="'Profile Picture'"
           [bordered]="true"
           [className]="'w-24 h-24 mb-4'"
         ></app-avatar>
         <div class="text-center">
           <h2 class="text-2xl font-semibold">
-            {{ userProfile.nombre_usuario }}
+            {{ userProfile.nombreUsuario }}
           </h2>
           <span class="text-default-600 text-lg">{{ userProfile.email }}</span>
         </div>
@@ -53,7 +53,7 @@
             ></i-lucide>
             Birth Date:
             <span class="font-medium">{{
-              userProfile.fecha_nacimiento | date : "longDate"
+              userProfile.fechaNacimiento | date : "longDate"
             }}</span>
           </p>
         </div>
@@ -87,7 +87,7 @@
             ></i-lucide>
             Joined on:
             <app-badge [color]="'secondary'" [size]="'md'" [className]="'ml-2'">
-              {{ userProfile.create_at | date : "longDate" }}
+              {{ userProfile.createAt | date : "longDate" }}
             </app-badge>
           </p>
         </div>

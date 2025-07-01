@@ -85,11 +85,11 @@ export class ProfileComponent implements OnInit {
 
     // Initialize profile form with fields that match the Usuario model
     this.profileForm = this.formBuilder.group({
-      nombre_usuario: ['', Validators.required],
+      nombreUsuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       genero: [''],
-      fecha_nacimiento: [null, ProfileComponent.dateValidator],
-      foto_perfil: [''],
+      fechaNacimiento: [null, ProfileComponent.dateValidator],
+      fotoPerfil: [''],
     });
 
     // Initialize password form
@@ -107,17 +107,17 @@ export class ProfileComponent implements OnInit {
         this.router.navigate(['/auth/login']);
         return;
       }
-
-      // Save basic user info from auth
-      // Handle both possible structures: userData.user or userData directly containing user data
-      const userInfo = userData.user || userData;
+      const userInfo = userData.usuario || userData;
       this.user = {
         ...userInfo,
         genero: userInfo.genero as UsuarioGenero,
+        id: userInfo.id as string,
+        nombreUsuario: userInfo.nombreUsuario ?? '',
+        estadoCuenta: userInfo.estadoCuenta ?? '',
       };
 
       // Fetch complete user data from the backend using the ID
-      if (this.user.id) {
+      if (this.user && this.user.id) {
         this.loading = true;
         this.usuarioService.getById(this.user.id).subscribe({
           next: (fullUserData) => {
@@ -127,13 +127,17 @@ export class ProfileComponent implements OnInit {
               ...this.user,
               ...fullUserData,
               genero: fullUserData.genero as UsuarioGenero,
+              nombreUsuario:
+                fullUserData.nombreUsuario ?? this.user?.nombreUsuario ?? '',
+              estadoCuenta:
+                fullUserData.estadoCuenta ?? this.user?.estadoCuenta ?? '',
             };
 
             // Format date if it exists
             let formattedDate = null;
-            if (this.user?.fecha_nacimiento) {
+            if (this.user?.fechaNacimiento) {
               // Convert to YYYY-MM-DD format for the date input
-              const date = new Date(this.user.fecha_nacimiento);
+              const date = new Date(this.user.fechaNacimiento);
               if (!isNaN(date.getTime())) {
                 formattedDate = date.toISOString().split('T')[0];
               }
@@ -141,11 +145,11 @@ export class ProfileComponent implements OnInit {
 
             // Patch form with complete user data
             this.profileForm.patchValue({
-              nombre_usuario: this.user?.nombre_usuario,
+              nombreUsuario: this.user?.nombreUsuario,
               email: this.user?.email,
               genero: this.user?.genero || '',
-              fecha_nacimiento: formattedDate,
-              foto_perfil: this.user?.foto_perfil || '',
+              fechaNacimiento: formattedDate,
+              fotoPerfil: this.user?.fotoPerfil || '',
             });
           },
           error: (err) => {
@@ -159,9 +163,9 @@ export class ProfileComponent implements OnInit {
         // If no user ID, just use the auth data
         // Format date if it exists
         let formattedDate = null;
-        if (this.user?.fecha_nacimiento) {
+        if (this.user?.fechaNacimiento) {
           // Convert to YYYY-MM-DD format for the date input
-          const date = new Date(this.user.fecha_nacimiento);
+          const date = new Date(this.user.fechaNacimiento);
           if (!isNaN(date.getTime())) {
             formattedDate = date.toISOString().split('T')[0];
           }
@@ -169,11 +173,11 @@ export class ProfileComponent implements OnInit {
 
         // Patch form with current user data
         this.profileForm.patchValue({
-          nombre_usuario: this.user?.nombre_usuario,
+          nombreUsuario: this.user?.nombreUsuario,
           email: this.user?.email,
           genero: this.user?.genero || '',
-          fecha_nacimiento: formattedDate,
-          foto_perfil: this.user?.foto_perfil || '',
+          fechaNacimiento: formattedDate,
+          fotoPerfil: this.user?.fotoPerfil || '',
         });
       }
     });
@@ -196,7 +200,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    if (!this.user?.id) {
+    if (!this.user || !this.user.id) {
       this.error = 'User information not available. Please log in again.';
       return;
     }
@@ -215,17 +219,33 @@ export class ProfileComponent implements OnInit {
         }
       }
 
-      // Only include the properties that are in the Usuario model
-      const updateData = {
-        id: this.user!.id,
-        nombre_usuario: this.f['nombre_usuario'].value,
-        email: this.f['email'].value,
-        genero: this.f['genero'].value || null,
-        fecha_nacimiento: fechaNacimiento || null,
-        foto_perfil: imageUrl || this.user?.foto_perfil || null,
-      };
+      // Verify user is still defined (for TypeScript)
+      if (!this.user || !this.user.id) {
+        this.error = 'User information not available. Please try again.';
+        this.loading = false;
+        return;
+      }
 
-      this.usuarioService.update(this.user!.id!, updateData).subscribe({
+      // Create FormData for file upload if needed
+      const formData = new FormData();
+      formData.append('id', this.user.id.toString());
+      formData.append('nombreUsuario', this.f['nombreUsuario'].value);
+      formData.append('email', this.f['email'].value);
+      formData.append('genero', this.f['genero'].value || '');
+
+      if (fechaNacimiento) {
+        formData.append('fechaNacimiento', fechaNacimiento);
+      }
+
+      if (imageUrl) {
+        // If we have a new image URL from Cloudinary
+        formData.append('fotoPerfilUrl', imageUrl);
+      } else if (this.selectedFile) {
+        // If we have a file but no URL (direct upload to API)
+        formData.append('fotoPerfil', this.selectedFile);
+      }
+
+      this.usuarioService.updateProfile(formData).subscribe({
         next: (response) => {
           this.loading = false;
           this.success = true;
@@ -234,10 +254,12 @@ export class ProfileComponent implements OnInit {
           this.authService.updateUserData(response);
 
           // Update our local user object
-          this.user = {
-            ...this.user,
-            ...updateData,
-          };
+          if (this.user) {
+            this.user = {
+              ...this.user,
+              ...response,
+            };
+          }
         },
         error: (err) => {
           this.loading = false;
@@ -265,7 +287,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    if (!this.user?.id) {
+    if (!this.user || !this.user.id) {
       this.passwordError =
         'User information not available. Please log in again.';
       return;
@@ -273,29 +295,29 @@ export class ProfileComponent implements OnInit {
 
     this.passwordLoading = true;
 
-    // In a real app, we would send the current password for verification
-    // Only include id and password properties from the Usuario model
-    const passwordData = {
-      id: this.user.id,
-      password: this.p['newPassword'].value,
-    };
+    // Store the ID in a variable to satisfy TypeScript
+    const userId = this.user.id;
 
-    this.usuarioService.update(this.user.id!, passwordData).subscribe({
-      next: (response) => {
-        this.passwordLoading = false;
-        this.passwordSuccess = true;
-        this.passwordForm.reset();
-        this.passwordSubmitted = false;
-
-        // Don't update the local user data with the password response
-        // as it only contains id and password, which would wipe other user data
-      },
-      error: (err) => {
-        this.passwordLoading = false;
-        this.passwordError =
-          err.message || 'Failed to update password. Please try again.';
-      },
-    });
+    // Use the dedicated password change endpoint
+    this.usuarioService
+      .changePassword(
+        userId,
+        this.p['currentPassword'].value,
+        this.p['newPassword'].value
+      )
+      .subscribe({
+        next: () => {
+          this.passwordLoading = false;
+          this.passwordSuccess = true;
+          this.passwordForm.reset();
+          this.passwordSubmitted = false;
+        },
+        error: (err) => {
+          this.passwordLoading = false;
+          this.passwordError =
+            err.message || 'Failed to update password. Please try again.';
+        },
+      });
   }
 
   // Custom static validator for birth date
@@ -348,16 +370,22 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // Upload the selected image to Cloudinary
+  // If using Cloudinary for image hosting, we would upload the image first
+  // Otherwise, we can let the API handle the image upload directly
   uploadImage(): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (!this.selectedFile) {
         resolve(''); // No image selected, return empty string
         return;
       }
 
-      this.uploadingImage = true;
+      // Option 1: Let the API handle the image upload (via FormData)
+      // Just return empty string as we'll append the file to FormData later
+      resolve('');
 
+      // Option 2: Use Cloudinary for image hosting (uncomment if needed)
+      /*
+      this.uploadingImage = true;
       this.cloudinaryService.uploadImage(this.selectedFile).subscribe({
         next: (imageUrl: string) => {
           this.uploadingImage = false;
@@ -371,6 +399,7 @@ export class ProfileComponent implements OnInit {
           resolve(''); // Continue without image
         },
       });
+      */
     });
   }
 

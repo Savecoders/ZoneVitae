@@ -15,18 +15,18 @@
     >
       <app-avatar
         [size]="'xl'"
-        [name]="user?.nombre_usuario || ''"
-        [src]="user?.foto_perfil || ''"
+        [name]="user?.nombreUsuario || ''"
+        [src]="user?.fotoPerfil || ''"
         [alt]="'Profile Picture'"
         [bordered]="true"
         [className]="'w-24 h-24'"
       ></app-avatar>
       <div class="username-display">
-        <h2 class="text-2xl font-semibold">{{ user?.nombre_usuario }}</h2>
+        <h2 class="text-2xl font-semibold">{{ user?.nombreUsuario }}</h2>
         <span class="text-default-600 text-xl">{{ user?.email }}</span>
         <p class="text-default-700 text-lg mt-2">
           Data Birth:
-          {{ user?.fecha_nacimiento | date : "longDate" }}
+          {{ user?.fechaNacimiento | date : "longDate" }}
         </p>
         <p class="text-default-700 text-lg mt-2">
           Gender:
@@ -35,7 +35,7 @@
         <p class="text-default-700 text-lg mt-2">
           Joined on:
           <app-badge [color]="'secondary'" [size]="'md'" [className]="'ml-2'">
-            {{ user?.create_at | date : "longDate" }}
+            {{ user?.createAt | date : "longDate" }}
           </app-badge>
         </p>
       </div>
@@ -73,7 +73,7 @@
           <div class="relative">
             <app-avatar
               [size]="'xl'"
-              [name]="user?.nombre_usuario || ''"
+              [name]="user?.nombreUsuario || ''"
               [src]="previewImageUrl"
               [alt]="'Profile Picture Preview'"
               [bordered]="true"
@@ -84,8 +84,8 @@
           } @else {
           <app-avatar
             [size]="'xl'"
-            [name]="user?.nombre_usuario || ''"
-            [src]="user?.foto_perfil || ''"
+            [name]="user?.nombreUsuario || ''"
+            [src]="user?.fotoPerfil || ''"
             [alt]="'Profile Picture'"
             [bordered]="true"
             [className]="'w-24 h-24'"
@@ -204,12 +204,12 @@
             [max]="currentDateISO"
           />
 
-          @if (user?.fecha_nacimiento) {
+          @if (user?.fechaNacimiento) {
           <div class="flex items-center mt-2 text-default-600 text-sm">
             <span class="bg-default-50 px-3 py-1 rounded-md">
               Currently saved:
               <span class="font-medium">{{
-                formatDate(user?.fecha_nacimiento)
+                formatDate(user?.fechaNacimiento)
               }}</span>
             </span>
           </div>
