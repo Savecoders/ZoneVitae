@@ -74,18 +74,18 @@
         class="flex flex-col gap-4 w-full max-w-[395px] max-h-40 overflow-y-auto"
       >
         <app-input
-          [id]="'nombre_usuario'"
+          [id]="'nombreUsuario'"
           [label]="'Username'"
-          formControlName="nombre_usuario"
+          formControlName="nombreUsuario"
           placeholder="Choose your username"
           [required]="true"
           [fullWidth]="true"
           [validation]="{
             state:
-            submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
+            submitted && f['nombreUsuario'].errors ? 'invalid' : 'undefined',
             message:
-            (submitted && f['nombre_usuario'].errors?.['required']) ? 'Username is required' :
-            (submitted && f['nombre_usuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
+            (submitted && f['nombreUsuario'].errors?.['required']) ? 'Username is required' :
+            (submitted && f['nombreUsuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
           }"
         >
         </app-input>
@@ -140,35 +140,35 @@
         <!-- Birth Date input -->
         <div class="mb-4">
           <label
-            for="fecha_nacimiento"
+            for="fechaNacimiento"
             class="block text-default-700 font-medium mb-1"
             >Birth Date <span class="text-danger-500">*</span></label
           >
           <input
             type="date"
-            id="fecha_nacimiento"
-            formControlName="fecha_nacimiento"
+            id="fechaNacimiento"
+            formControlName="fechaNacimiento"
             class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             [class.border-danger-500]="
-              submitted && f['fecha_nacimiento'].errors
+              submitted && f['fechaNacimiento'].errors
             "
-            aria-describedby="fecha_nacimiento-help"
+            aria-describedby="fechaNacimiento-help"
             max="{{ currentDateISO }}"
             min="1900-01-01"
           />
           <p
             class="text-xs"
-            [class.text-danger-500]="submitted && f['fecha_nacimiento'].errors"
+            [class.text-danger-500]="submitted && f['fechaNacimiento'].errors"
             [class.text-default-500]="
-              !(submitted && f['fecha_nacimiento'].errors)
+              !(submitted && f['fechaNacimiento'].errors)
             "
           >
-            @if (submitted && f['fecha_nacimiento'].errors?.['required']) {
+            @if (submitted && f['fechaNacimiento'].errors?.['required']) {
             <span>Birth date is required</span>
-            } @else if (submitted && f['fecha_nacimiento'].errors?.['minDate'])
+            } @else if (submitted && f['fechaNacimiento'].errors?.['minDate'])
             {
             <span>Birth date must be after January 1, 1900</span>
-            } @else if (submitted && f['fecha_nacimiento'].errors?.['maxDate'])
+            } @else if (submitted && f['fechaNacimiento'].errors?.['maxDate'])
             {
             <span>Birth date cannot be in the future</span>
             } @else {
@@ -216,12 +216,12 @@
 
       <button
         type="submit"
-        [disabled]="loading || uploadingImage"
+        [disabled]="loading"
         class="w-full bg-primary-400 mt-2 text-white font-semibold rounded-lg p-2 hover:bg-primary-300 transition-colors duration-200 max-w-[395px] cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <i-lucide [img]="iconSignUp" class="my-icon text-white"></i-lucide>
-        @if (loading || uploadingImage) {
-        {{ uploadingImage ? "Uploading image..." : "Creating account..." }}
+        @if (loading) {
+        Creating account...
         } @else { Sign Up }
       </button>
 

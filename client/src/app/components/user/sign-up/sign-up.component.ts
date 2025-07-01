@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { UIModule } from '../../shared/ui.module';
-import { InputComponent } from '../../shared/primitives/input/input.component';
-import { LucideAngularModule, UserPlusIcon } from 'lucide-angular';
+import { Component, OnInit } from "@angular/core";
+import { UIModule } from "../../shared/ui.module";
+import { InputComponent } from "../../shared/primitives/input/input.component";
+import { LucideAngularModule, UserPlusIcon } from "lucide-angular";
 import {
   FormBuilder,
   FormGroup,
@@ -9,14 +9,13 @@ import {
   ReactiveFormsModule,
   AbstractControl,
   ValidationErrors,
-} from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { CloudinaryService } from '../../../services/cloudinary.service';
+} from "@angular/forms";
+import { AuthService } from "../../../services/auth.service";
+import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { CommonModule } from "@angular/common";
 
 @Component({
-  selector: 'app-sign-up',
+  selector: "app-sign-up",
   standalone: true,
   imports: [
     UIModule,
@@ -26,45 +25,43 @@ import { CloudinaryService } from '../../../services/cloudinary.service';
     CommonModule,
     RouterLink,
   ],
-  templateUrl: './sign-up.component.html',
-  styleUrl: './sign-up.component.css',
+  templateUrl: "./sign-up.component.html",
+  styleUrl: "./sign-up.component.css",
 })
 export class SignUpComponent implements OnInit {
   iconSignUp = UserPlusIcon;
   signUpForm: FormGroup;
   loading = false;
   submitted = false;
-  error: string = '';
+  error: string = "";
   selectedFile: File | null = null;
   previewImageUrl: string | null = null;
-  uploadingImage = false;
-  currentDateISO: string = new Date().toISOString().split('T')[0]; // Today's date in ISO format for the date input max attribute
-  defaultAvatarUrl: string = 'assets/images/default-avatar.png'; // Default avatar image
+  currentDateISO: string = new Date().toISOString().split("T")[0]; // Today's date in ISO format for the date input max attribute
+  defaultAvatarUrl: string = "assets/images/default-avatar.png"; // Default avatar image
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService,
-    private cloudinaryService: CloudinaryService
   ) {
     // Initialize form with validation
     this.signUpForm = this.formBuilder.group(
       {
-        nombre_usuario: ['', [Validators.required, Validators.minLength(4)]],
-        email: ['', [Validators.required, Validators.email]],
-        genero: ['', Validators.required],
-        fecha_nacimiento: [null, [Validators.required, this.dateValidator]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required],
+        nombreUsuario: ["", [Validators.required, Validators.minLength(4)]],
+        email: ["", [Validators.required, Validators.email]],
+        genero: ["", Validators.required],
+        fechaNacimiento: [null, [Validators.required, this.dateValidator]],
+        password: ["", [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ["", Validators.required],
       },
       {
         validators: this.passwordMatchValidator,
-      }
+      },
     );
 
     // Redirect to home if already logged in
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/']);
+      this.router.navigate(["/"]);
     }
   }
 
@@ -72,8 +69,8 @@ export class SignUpComponent implements OnInit {
 
   // Custom validator to check if password and confirmPassword match
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password');
-    const confirmPassword = control.get('confirmPassword');
+    const password = control.get("password");
+    const confirmPassword = control.get("confirmPassword");
 
     if (
       password &&
@@ -101,57 +98,30 @@ export class SignUpComponent implements OnInit {
 
     this.loading = true;
 
-    // First upload image if selected
-    this.uploadImage().then((imageUrl) => {
-      // Make sure fecha_nacimiento is in proper format if it exists
-      let fechaNacimiento = this.f['fecha_nacimiento'].value;
-      if (fechaNacimiento) {
-        // Ensure it's a string in ISO format for the API
-        const date = new Date(fechaNacimiento);
-        if (!isNaN(date.getTime())) {
-          fechaNacimiento = date.toISOString();
-        }
-      }
+    // Only allow 'M', 'F', or 'O' for genero
+    let generoValue = this.f["genero"].value;
+    if (!["M", "F", "O"].includes(generoValue)) {
+      generoValue = "O"; // Default to 'O' (Other) if not selected
+    }
+    const userData = {
+      nombreUsuario: this.f["nombreUsuario"].value,
+      email: this.f["email"].value,
+      password: this.f["password"].value,
+      genero: generoValue,
+      fechaNacimiento: this.f["fechaNacimiento"].value,
+      fotoPerfil: this.selectedFile === null ? undefined : this.selectedFile,
+    };
 
-      const userData = {
-        nombre_usuario: this.f['nombre_usuario'].value,
-        email: this.f['email'].value,
-        password: this.f['password'].value,
-        genero: this.f['genero'].value || null,
-        fecha_nacimiento: fechaNacimiento || null,
-        rol_id: 2, // Default role for regular users
-        foto_perfil: imageUrl || '', // Use uploaded image URL or empty string
-        estado_cuenta: 'Activo',
-      };
+    console.log("Registering user with data:", userData);
 
-      console.log('Registering user with data:', userData);
-
-      this.authService.register(userData).subscribe({
-        next: () => {
-          // After successful registration, log in the user
-          this.authService
-            .login({
-              email: this.f['email'].value,
-              password: this.f['password'].value,
-            })
-            .subscribe({
-              next: () => {
-                this.router.navigate(['/']);
-              },
-              error: (error) => {
-                this.error =
-                  'Registration successful, but failed to log in automatically. Please log in manually.';
-                this.router.navigate(['/auth/login']);
-                this.loading = false;
-              },
-            });
-        },
-        error: (error) => {
-          this.error =
-            error.message || 'Registration failed. Please try again.';
-          this.loading = false;
-        },
-      });
+    this.authService.register(userData).subscribe({
+      next: () => {
+        this.router.navigate(["/"]);
+      },
+      error: (error) => {
+        this.error = error.message || "Registration failed. Please try again.";
+        this.loading = false;
+      },
     });
   }
 
@@ -166,32 +136,6 @@ export class SignUpComponent implements OnInit {
     }
   }
 
-  // Upload the selected image to Cloudinary
-  uploadImage(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (!this.selectedFile) {
-        resolve(''); // No image selected, return empty string
-        return;
-      }
-
-      this.uploadingImage = true;
-
-      this.cloudinaryService.uploadImage(this.selectedFile).subscribe({
-        next: (imageUrl: string) => {
-          this.uploadingImage = false;
-          resolve(imageUrl);
-        },
-        error: (err) => {
-          this.uploadingImage = false;
-          this.error =
-            'Failed to upload profile picture. Registration will continue without a profile picture.';
-          console.error('Image upload error:', err);
-          resolve(''); // Continue without image
-        },
-      });
-    });
-  }
-
   // Custom validator for birth date
   dateValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
@@ -200,7 +144,7 @@ export class SignUpComponent implements OnInit {
 
     const selectedDate = new Date(control.value);
     const currentDate = new Date();
-    const minDate = new Date('1900-01-01');
+    const minDate = new Date("1900-01-01");
 
     // Check if date is less than 1900
     if (selectedDate < minDate) {

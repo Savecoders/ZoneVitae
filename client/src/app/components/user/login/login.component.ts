@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     // Initialize form with validation
     this.loginForm = this.formBuilder.group({
