@@ -1,30 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { HeaderComponent } from '../shared/header/header.component';
-import { SidebarComponent } from '../shared/sidebar/sidebar.component';
-import { FooterComponent } from '../shared/footer/footer.component';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { HttpClient } from "@angular/common/http";
+import { HeaderComponent } from "../shared/header/header.component";
+import { SidebarComponent } from "../shared/sidebar/sidebar.component";
+import { FooterComponent } from "../shared/footer/footer.component";
 import {
   PostCardComponent,
   PostData,
-} from '../shared/post-card/post-card.component';
-import { Router } from '@angular/router';
-import { CommunityPostsComponent } from '../shared/community-posts/community-posts.component';
-import { FollowSectionComponent } from '../shared/follow-section/follow-section.component';
-import { ReporteService } from '../../services/reporte.service';
-import { ComunidadService } from '../../services/comunidad.service';
-import { UsuarioService } from '../../services/usuario.service';
-import { ComentarioService } from '../../services/comentario.service';
-import { TagService } from '../../services/tag.service';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { Comunidad } from '../../models/comunidad.model';
-import { Tag } from '../../models/tag.model';
-import { Actividad } from '../../models/actividad.model';
-import { LayoutComponent } from '../shared/layout/layout.component';
+} from "../shared/post-card/post-card.component";
+import { Router } from "@angular/router";
+import { CommunityPostsComponent } from "../shared/community-posts/community-posts.component";
+import { FollowSectionComponent } from "../shared/follow-section/follow-section.component";
+import { ReporteService } from "../../services/reporte.service";
+import { ComunidadService } from "../../services/comunidad.service";
+import { UsuarioService } from "../../services/usuario.service";
+import { ComentarioService } from "../../services/comentario.service";
+import { TagService } from "../../services/tag.service";
+import { catchError, forkJoin, map, of, switchMap } from "rxjs";
+import { environment } from "../../../environments/environment";
+import { Comunidad } from "../../models/comunidad.model";
+import { Tag } from "../../models/tag.model";
+import { Actividad } from "../../models/actividad.model";
+import { LayoutComponent } from "../shared/layout/layout.component";
 
 @Component({
-  selector: 'app-home',
+  selector: "app-home",
   standalone: true,
   imports: [
     CommonModule,
@@ -35,8 +35,8 @@ import { LayoutComponent } from '../shared/layout/layout.component';
     FollowSectionComponent,
     LayoutComponent,
   ],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  templateUrl: "./home.component.html",
+  styleUrl: "./home.component.css",
 })
 export class HomeComponent implements OnInit {
   // Reports/Posts data
@@ -72,7 +72,7 @@ export class HomeComponent implements OnInit {
     private comentarioService: ComentarioService,
     private tagService: TagService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -100,14 +100,14 @@ export class HomeComponent implements OnInit {
             ...new Set(
               reports
                 .map((report) => report.comunidad_id)
-                .filter((id) => id !== null)
+                .filter((id) => id !== null),
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
                 .map((report) => report.autor_id)
-                .filter((id) => id !== null && id !== undefined)
+                .filter((id) => id !== null && id !== undefined),
             ),
           ];
 
@@ -117,8 +117,8 @@ export class HomeComponent implements OnInit {
               communityIds.length > 0
                 ? forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number)
-                    )
+                      this.comunidadService.getById(id as number),
+                    ),
                   )
                 : of([]),
             authors:
@@ -126,11 +126,11 @@ export class HomeComponent implements OnInit {
                 ? forkJoin(
                     authorIds
                       .filter((id) => id !== undefined)
-                      .map((id) => this.usuarioService.getById(id as number))
+                      .map((id) => this.usuarioService.getById(String(id))),
                   )
                 : of([]),
             likes: this.http.get<any[]>(
-              `${environment.jsonServerUrl}/me_encanta`
+              `${environment.jsonServerUrl}/me_encanta`,
             ),
             reportComments: this.comentarioService.getAll(),
           }).pipe(
@@ -145,16 +145,16 @@ export class HomeComponent implements OnInit {
                   ? communityMap.get(report.comunidad_id.toString())
                   : null;
                 const author = report.autor_id
-                  ? authorMap.get(report.autor_id)
+                  ? authorMap.get(String(report.autor_id))
                   : null;
                 const postLikes = likes.filter(
-                  (like: any) => like.reports_id === report.id
+                  (like: any) => like.reports_id === report.id,
                 ).length;
                 const postComments = reportComments.filter(
                   (comment) =>
                     // This is a simplification since comments in your data are linked to activities, not reports
                     // You'll need to adjust this based on your actual data structure
-                    comment.actividades_Id === report.id
+                    comment.actividades_Id === report.id,
                 ).length;
 
                 return {
@@ -165,13 +165,13 @@ export class HomeComponent implements OnInit {
                   imageUrl:
                     report.id && report.estado
                       ? `https://source.unsplash.com/random/800x500?report,${
-                          report.estado?.toLowerCase() || 'general'
+                          report.estado?.toLowerCase() || "general"
                         }`
                       : `https://source.unsplash.com/random/800x500?report,general`,
                   author: {
-                    id: (author?.id as number) || 0,
-                    name: author?.nombre_usuario || 'Anonymous',
-                    avatarUrl: author?.foto_perfil || undefined,
+                    id: Number(author?.id) || 0,
+                    name: author?.nombreUsuario || "Anonymous",
+                    avatarUrl: author?.fotoPerfil || undefined,
                   },
                   community: community
                     ? {
@@ -179,7 +179,7 @@ export class HomeComponent implements OnInit {
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()
-                          .replace(/\s+/g, '-'),
+                          .replace(/\s+/g, "-"),
                       }
                     : undefined,
                   likes: postLikes,
@@ -189,14 +189,14 @@ export class HomeComponent implements OnInit {
                     : new Date(),
                 };
               });
-            })
+            }),
           );
         }),
         catchError((error) => {
-          console.error('Error loading reports:', error);
+          console.error("Error loading reports:", error);
           this.loadError = true;
           return of([]);
-        })
+        }),
       )
       .subscribe((postsData) => {
         this.posts = postsData;
@@ -212,10 +212,10 @@ export class HomeComponent implements OnInit {
       .getAll()
       .pipe(
         catchError((error) => {
-          console.error('Error loading communities:', error);
+          console.error("Error loading communities:", error);
           this.communityError = true;
           return of([]);
-        })
+        }),
       )
       .subscribe((communities) => {
         this.communities = communities;
@@ -231,10 +231,10 @@ export class HomeComponent implements OnInit {
       .get<Actividad[]>(`${environment.jsonServerUrl}/actividades`)
       .pipe(
         catchError((error) => {
-          console.error('Error loading activities:', error);
+          console.error("Error loading activities:", error);
           this.activitiesError = true;
           return of([]);
-        })
+        }),
       )
       .subscribe((activities) => {
         this.activities = activities;
@@ -250,10 +250,10 @@ export class HomeComponent implements OnInit {
       .getAll()
       .pipe(
         catchError((error) => {
-          console.error('Error loading tags:', error);
+          console.error("Error loading tags:", error);
           this.tagsError = true;
           return of([]);
-        })
+        }),
       )
       .subscribe((tags) => {
         this.tags = tags;
@@ -269,9 +269,9 @@ export class HomeComponent implements OnInit {
       .pipe(
         map((users) => users.length),
         catchError((error) => {
-          console.error('Error loading user count:', error);
+          console.error("Error loading user count:", error);
           return of(0);
-        })
+        }),
       )
       .subscribe((count) => {
         this.userCount = count;
@@ -300,7 +300,7 @@ export class HomeComponent implements OnInit {
 
           const reportIds = relations.map((rel) => rel.reports_id);
           return forkJoin(
-            reportIds.map((id) => this.reporteService.getById(id))
+            reportIds.map((id) => this.reporteService.getById(id)),
           );
         }),
         switchMap((reports) => {
@@ -313,14 +313,14 @@ export class HomeComponent implements OnInit {
             ...new Set(
               reports
                 .map((report) => report.comunidad_id)
-                .filter((id) => id !== null)
+                .filter((id) => id !== null),
             ),
           ];
           const authorIds = [
             ...new Set(
               reports
                 .map((report) => report.autor_id)
-                .filter((id) => id !== null && id !== undefined)
+                .filter((id) => id !== null && id !== undefined),
             ),
           ];
 
@@ -330,8 +330,8 @@ export class HomeComponent implements OnInit {
               communityIds.length > 0
                 ? forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number)
-                    )
+                      this.comunidadService.getById(id as number),
+                    ),
                   )
                 : of([]),
             authors:
@@ -339,11 +339,11 @@ export class HomeComponent implements OnInit {
                 ? forkJoin(
                     authorIds
                       .filter((id) => id !== undefined)
-                      .map((id) => this.usuarioService.getById(id as number))
+                      .map((id) => this.usuarioService.getById(String(id))),
                   )
                 : of([]),
             likes: this.http.get<any[]>(
-              `${environment.jsonServerUrl}/me_encanta`
+              `${environment.jsonServerUrl}/me_encanta`,
             ),
             reportComments: this.comentarioService.getAll(),
           }).pipe(
@@ -358,13 +358,13 @@ export class HomeComponent implements OnInit {
                   ? communityMap.get(report.comunidad_id.toString())
                   : null;
                 const author = report.autor_id
-                  ? authorMap.get(report.autor_id)
+                  ? authorMap.get(String(report.autor_id))
                   : null;
                 const postLikes = likes.filter(
-                  (like: any) => like.reports_id === report.id
+                  (like: any) => like.reports_id === report.id,
                 ).length;
                 const postComments = reportComments.filter(
-                  (comment) => comment.actividades_Id === report.id
+                  (comment) => comment.actividades_Id === report.id,
                 ).length;
 
                 return {
@@ -374,13 +374,13 @@ export class HomeComponent implements OnInit {
                   imageUrl:
                     report.id && report.estado
                       ? `https://source.unsplash.com/random/800x500?report,${
-                          report.estado?.toLowerCase() || 'general'
+                          report.estado?.toLowerCase() || "general"
                         }`
                       : `https://source.unsplash.com/random/800x500?report,general`,
                   author: {
-                    id: (author?.id as number) || 0,
-                    name: author?.nombre_usuario || 'Anonymous',
-                    avatarUrl: author?.foto_perfil || undefined,
+                    id: Number(author?.id) || 0,
+                    name: author?.nombreUsuario || "Anonymous",
+                    avatarUrl: author?.fotoPerfil || undefined,
                   },
                   community: community
                     ? {
@@ -388,7 +388,7 @@ export class HomeComponent implements OnInit {
                         name: community.nombre,
                         slug: community.nombre
                           .toLowerCase()
-                          .replace(/\s+/g, '-'),
+                          .replace(/\s+/g, "-"),
                       }
                     : undefined,
                   likes: postLikes,
@@ -398,14 +398,14 @@ export class HomeComponent implements OnInit {
                     : new Date(),
                 };
               });
-            })
+            }),
           );
         }),
         catchError((error) => {
-          console.error('Error filtering by tag:', error);
+          console.error("Error filtering by tag:", error);
           this.loadError = true;
           return of([]);
-        })
+        }),
       )
       .subscribe((postsData) => {
         this.posts = postsData;
