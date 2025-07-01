@@ -1,4 +1,8 @@
 export interface Tag {
-  id?: number;
+  id?: string; // Guid in C#
   nombre: string;
+
+  // Relationships (optional in the interface)
+  comunidads?: any[];
+  reports?: any[];
 }

@@ -1,14 +1,14 @@
 export enum EstadoReporte {
-  PENDIENTE_REVISION = 'Pendiente de Revision',
-  APROBADO = 'Aprobado',
-  DENEGADO = 'Denegado',
+  PENDIENTE_REVISION = "Pendiente de Revision",
+  APROBADO = "Aprobado",
+  DENEGADO = "Denegado",
 }
 
 export enum SeguimientoReporteEnum {
-  DENEGADO = 'Denegado',
-  PENDIENTE_REVISION = 'Pendiente de Revision',
-  REVISADO = 'Revisado',
-  RESUELTO = 'Resuelto',
+  DENEGADO = "Denegado",
+  PENDIENTE_REVISION = "Pendiente de Revision",
+  REVISADO = "Revisado",
+  RESUELTO = "Resuelto",
 }
 
 export interface Reporte {
