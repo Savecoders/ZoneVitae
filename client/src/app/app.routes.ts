@@ -1,72 +1,72 @@
-import { Routes } from '@angular/router';
-import { AuthGuard } from './guard/auth.guard';
+import { Routes } from "@angular/router";
+import { AuthGuard } from "./guard/auth.guard";
 
 export const routes: Routes = [
   {
-    path: 'home',
+    path: "home",
     loadComponent: () =>
-      import('./components/home/home.component').then((m) => m.HomeComponent),
+      import("./components/home/home.component").then((m) => m.HomeComponent),
   },
 
   // redirect to Home
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
+    path: "",
+    redirectTo: "home",
+    pathMatch: "full",
   },
 
   {
-    path: 'comunities',
+    path: "comunities",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/comunities/comunities.component').then(
-        (m) => m.ComunitiesComponent
+      import("./components/comunities/comunities.component").then(
+        (m) => m.ComunitiesComponent,
       ),
   },
   {
-    path: 'crud-communities',
+    path: "crud-communities",
     loadComponent: () =>
-      import('./components/crud-communities/crud-communities.component').then(
-        (m) => m.CrudComunitiesComponent
+      import("./components/crud-communities/crud-communities.component").then(
+        (m) => m.CrudComunitiesComponent,
       ),
   },
   {
-    path: 'form-communities',
+    path: "form-communities",
     loadComponent: () =>
-      import('./components/form-community/form-community.component').then(
-        (m) => m.FormCommunityComponent
+      import("./components/form-community/form-community.component").then(
+        (m) => m.FormCommunityComponent,
       ),
   },
   {
-    path: 'form-communities/:id',
+    path: "form-communities/:id",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/form-community/form-community.component').then(
-        (m) => m.FormCommunityComponent
+      import("./components/form-community/form-community.component").then(
+        (m) => m.FormCommunityComponent,
       ),
   },
   {
-    path: 'reports',
+    path: "reports",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/reports/reports.component').then(
-        (m) => m.ReportsComponent
+      import("./components/reports/reports.component").then(
+        (m) => m.ReportsComponent,
       ),
   },
 
   {
-    path: 'activities',
+    path: "activities",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/activities/activities.component').then(
-        (m) => m.ActivitiesComponent
+      import("./components/activities/activities.component").then(
+        (m) => m.ActivitiesComponent,
       ),
   },
   {
-    path: 'auditoria',
+    path: "auditoria",
     loadComponent: () =>
-      import('./components/auditoria/auditoria.component').then(
-        (m) => m.AuditoriaComponent
+      import("./components/auditoria/auditoria.component").then(
+        (m) => m.AuditoriaComponent,
       ),
   },
   // {path: 'detalle-reporte',
@@ -79,45 +79,45 @@ export const routes: Routes = [
   // users paths
 
   {
-    path: 'profile',
+    path: "profile",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/user/profile/profile.component').then(
-        (m) => m.ProfileComponent
+      import("./components/user/profile/profile.component").then(
+        (m) => m.ProfileComponent,
       ),
   },
 
   {
-    path: 'user/:username',
+    path: "user/:username",
     loadComponent: () =>
-      import('./components/user/user-profile/user-profile.component').then(
-        (m) => m.UserProfileComponent
+      import("./components/user/user-profile/user-profile.component").then(
+        (m) => m.UserProfileComponent,
       ),
   },
 
   // auth paths
 
   {
-    path: 'auth',
+    path: "auth",
     children: [
       {
-        path: '',
-        redirectTo: 'login',
-        pathMatch: 'full',
+        path: "",
+        redirectTo: "login",
+        pathMatch: "full",
       },
       {
-        path: 'login',
+        path: "login",
         loadComponent: () =>
-          import('./components/user/login/login.component').then(
-            (m) => m.LoginComponent
+          import("./components/user/login/login.component").then(
+            (m) => m.LoginComponent,
           ),
       },
 
       {
-        path: 'sign-up',
+        path: "sign-up",
         loadComponent: () =>
-          import('./components/user/sign-up/sign-up.component').then(
-            (m) => m.SignUpComponent
+          import("./components/user/sign-up/sign-up.component").then(
+            (m) => m.SignUpComponent,
           ),
       },
     ],
@@ -125,21 +125,21 @@ export const routes: Routes = [
 
   // admin paths
   {
-    path: 'admin',
+    path: "admin",
     canActivate: [AuthGuard],
     children: [
       {
-        path: '',
+        path: "",
         loadComponent: () =>
-          import('./components/admin/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent
+          import("./components/admin/dashboard/dashboard.component").then(
+            (m) => m.DashboardComponent,
           ),
       },
       {
-        path: 'activities',
+        path: "activities",
         loadComponent: () =>
           import(
-            './components/admin/crud-activities/crud-activities.component'
+            "./components/admin/crud-activities/crud-activities.component"
           ).then((m) => m.CrudActivitiesComponent),
       },
     ],
@@ -147,45 +147,45 @@ export const routes: Routes = [
 
   // protected autoridy paths
   {
-    path: 'auditoria',
+    path: "auditoria",
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./components/auditoria/auditoria.component').then(
-        (m) => m.AuditoriaComponent
+      import("./components/auditoria/auditoria.component").then(
+        (m) => m.AuditoriaComponent,
       ),
   },
 
   // zone vitae paths
 
   {
-    path: 'about',
+    path: "about",
     loadComponent: () =>
-      import('./components/about/about.component').then(
-        (m) => m.AboutComponent
+      import("./components/about/about.component").then(
+        (m) => m.AboutComponent,
       ),
   },
 
   {
-    path: 'helps',
+    path: "helps",
     loadComponent: () =>
-      import('./components/helps/helps.component').then(
-        (m) => m.HelpsComponent
+      import("./components/helps/helps.component").then(
+        (m) => m.HelpsComponent,
       ),
   },
 
   {
-    path: 'unauthorized',
+    path: "unauthorized",
     loadComponent: () =>
-      import('./components/unauthorized/unauthorized.component').then(
-        (m) => m.UnauthorizedComponent
+      import("./components/unauthorized/unauthorized.component").then(
+        (m) => m.UnauthorizedComponent,
       ),
   },
 
   {
-    path: '**',
+    path: "**",
     loadComponent: () =>
-      import('./components/not-found/not-found.component').then(
-        (m) => m.NotFoundComponent
+      import("./components/not-found/not-found.component").then(
+        (m) => m.NotFoundComponent,
       ),
   },
 ];

@@ -25,6 +25,7 @@
     "@tailwindcss/postcss": "^4.1.7",
     "express": "^5.1.0",
     "json-server": "^1.0.0-beta.3",
+    "jwt-decode": "^4.0.0",
     "lucide-angular": "^0.511.0",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
