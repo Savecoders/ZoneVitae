@@ -4,32 +4,27 @@ export interface AuthRequest {
 }
 
 export interface RegisterRequest {
-  nombre_usuario: string;
+  nombreUsuario: string;
   email: string;
   password: string;
   confirmPassword?: string;
-  fecha_nacimiento?: Date | string;
   genero?: string;
+  fechaNacimiento?: Date | string;
+  fotoPerfil?: File;
 }
 
 export interface AuthResponse {
   token: string;
-  expires: Date | string;
-  user: {
-    id: number;
-    nombre_usuario: string;
+  usuario: {
+    id: string;
+    nombreUsuario: string;
     email: string;
     genero?: string | null;
-    fecha_nacimiento?: Date | string | null;
-    foto_perfil?: string | null;
-    roles: string[];
+    fechaNacimiento?: Date | string | null;
+    fotoPerfil?: string | null;
+    estadoCuenta: string;
+    roles: string[] | null;
   };
-}
-
-// Mock token info for json-server
-export interface MockTokenInfo {
-  userId: number;
-  expiresAt: string;
 }
 
 export interface PasswordResetRequest {
