@@ -24,29 +24,29 @@ interface SuggestedCommunity {
       <h2 class="text-xl font-medium mb-4">Follow</h2>
       <div class="flex flex-col gap-4">
         @for (community of suggestedCommunities; track community.id) {
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <app-avatar
-              [name]="community.name"
-              [size]="'sm'"
-              [showBadge]="false"
-            >
-            </app-avatar>
-            <div>
-              <p class="font-medium text-sm">{{ community.name }}</p>
-              <p class="text-xs text-foreground-muted">
-                {{ community.followers }} followers
-              </p>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <app-avatar
+                [name]="community.name"
+                [size]="'sm'"
+                [showBadge]="false"
+              >
+              </app-avatar>
+              <div>
+                <p class="font-medium text-sm">{{ community.name }}</p>
+                <p class="text-xs text-foreground-muted">
+                  {{ community.followers }} followers
+                </p>
+              </div>
             </div>
+            <app-button
+              size="sm"
+              color="primary"
+              intensity="soft"
+              (buttonClick)="followCommunity(community.id)"
+              >Follow</app-button
+            >
           </div>
-          <app-button
-            size="sm"
-            color="primary"
-            intensity="soft"
-            (buttonClick)="followCommunity(community.id)"
-            >Follow</app-button
-          >
-        </div>
         }
         <a href="/discover" class="text-primary text-sm hover:underline mt-2"
           >Discover more</a
@@ -67,7 +67,7 @@ export class FollowSectionComponent implements OnInit {
 
   constructor(
     private usuarioService: UsuarioService,
-    private comunidadService: ComunidadService
+    private comunidadService: ComunidadService,
   ) {}
 
   ngOnInit(): void {
@@ -102,7 +102,7 @@ export class FollowSectionComponent implements OnInit {
             { id: 2, name: 'Community Two', followers: 189 },
             { id: 3, name: 'Community Three', followers: 327 },
           ]);
-        })
+        }),
       )
       .subscribe((communities) => {
         this.suggestedCommunities = communities;

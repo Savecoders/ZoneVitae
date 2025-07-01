@@ -39,7 +39,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
@@ -49,7 +49,7 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     if (!this.isBrowser) {
       console.warn(
-        'This code is running on the server side, user data will not be available.'
+        'This code is running on the server side, user data will not be available.',
       );
       return;
     }

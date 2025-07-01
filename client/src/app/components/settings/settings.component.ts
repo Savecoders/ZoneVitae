@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { LayoutComponent } from "../shared/layout/layout.component";
+import { LayoutComponent } from '../shared/layout/layout.component';
 
 @Component({
   selector: 'app-settings',
   imports: [LayoutComponent],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.css'
+  styleUrl: './settings.component.css',
 })
-export class SettingsComponent {
-
-}
+export class SettingsComponent {}
