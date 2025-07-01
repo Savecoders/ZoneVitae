@@ -2,7 +2,7 @@ import { Directive, ElementRef, OnInit } from '@angular/core';
 
 @Directive({
   selector: '[appThemeTransition]',
-  standalone: true
+  standalone: true,
 })
 export class ThemeTransitionDirective implements OnInit {
   constructor(private el: ElementRef<HTMLElement>) {}

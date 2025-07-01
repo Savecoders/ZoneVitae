@@ -1,16 +1,16 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from "@angular/core";
 import {
   ActivatedRouteSnapshot,
   Router,
   RouterStateSnapshot,
   UrlTree,
-} from '@angular/router';
-import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
-import { isPlatformBrowser } from '@angular/common';
+} from "@angular/router";
+import { Observable } from "rxjs";
+import { AuthService } from "../services/auth.service";
+import { isPlatformBrowser } from "@angular/common";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthGuard {
   private isBrowser: boolean;
@@ -18,14 +18,14 @@ export class AuthGuard {
   constructor(
     private authService: AuthService,
     private router: Router,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ):
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree>
@@ -38,11 +38,11 @@ export class AuthGuard {
     // Check if the user is logged in
     if (this.authService.isLoggedIn() && !this.authService.isTokenExpired()) {
       // If a specific role is required for the route
-      const requiredRole = route.data['role'] as string;
+      const requiredRole = route.data["role"] as string;
 
       if (requiredRole && !this.authService.hasRole(requiredRole)) {
         // Redirect to unauthorized page or home if user doesn't have the required role
-        return this.router.createUrlTree(['/unauthorized']);
+        return this.router.createUrlTree(["/unauthorized"]);
       }
 
       // User is authenticated and has the required role (if any)
@@ -50,7 +50,7 @@ export class AuthGuard {
     }
 
     // User is not logged in, redirect to login page with return URL
-    return this.router.createUrlTree(['auth/login'], {
+    return this.router.createUrlTree(["auth/login"], {
       queryParams: { returnUrl: state.url },
     });
   }

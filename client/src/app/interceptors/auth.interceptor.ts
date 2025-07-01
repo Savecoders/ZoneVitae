@@ -2,19 +2,19 @@ import {
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
-} from '@angular/common/http';
-import { inject } from '@angular/core';
-import { PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
-import { HttpErrorResponse } from '@angular/common/http';
+} from "@angular/common/http";
+import { inject } from "@angular/core";
+import { PLATFORM_ID } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
+import { Router } from "@angular/router";
+import { catchError } from "rxjs/operators";
+import { throwError } from "rxjs";
+import { AuthService } from "../services/auth.service";
+import { HttpErrorResponse } from "@angular/common/http";
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
-  next: HttpHandlerFn
+  next: HttpHandlerFn,
 ) => {
   const platformId = inject(PLATFORM_ID);
   const authService = inject(AuthService);
@@ -32,7 +32,7 @@ export const authInterceptor: HttpInterceptorFn = (
   }
 
   // Add authorization header with jwt token if available
-  const token = authService.getToken();
+  const token = authService.getToken() || "";
   if (token) {
     req = addTokenToRequest(req, token);
   }
@@ -42,16 +42,16 @@ export const authInterceptor: HttpInterceptorFn = (
       if (error instanceof HttpErrorResponse && error.status === 401) {
         // Token is expired or invalid - logout and redirect to login
         authService.logout();
-        router.navigate(['/auth/login']);
+        router.navigate(["/auth/login"]);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
 
 function addTokenToRequest(
   request: HttpRequest<unknown>,
-  token: string
+  token: string,
 ): HttpRequest<unknown> {
   return request.clone({
     setHeaders: {
@@ -62,14 +62,19 @@ function addTokenToRequest(
 
 function isPublicRequest(url: string): boolean {
   const publicUrls = [
-    '/usuarios?email=', // Login query
-    '/usuarios/register',
-    '/reset-password',
-    '/update-password',
+    "/api/Auth/login",
+    "/api/Auth/register",
+    "/api/Auth/forgot-password",
+    "/api/Auth/reset-password",
   ];
 
   // Also allow access to public endpoints
-  const publicEndpoints = ['/roles', '/actividades', '/comunidades', 'reports'];
+  const publicEndpoints = [
+    "/api/Roles",
+    "/api/Actividades",
+    "/api/Comunidades",
+    "/api/Reports",
+  ];
 
   // Check if it's a public URL specific endpoint
   if (publicUrls.some((publicUrl) => url.includes(publicUrl))) {
@@ -79,9 +84,9 @@ function isPublicRequest(url: string): boolean {
   // Check if it's a GET request to a public endpoint
   if (
     publicEndpoints.some((endpoint) => url.includes(endpoint)) &&
-    !url.includes('POST') &&
-    !url.includes('PUT') &&
-    !url.includes('DELETE')
+    !url.includes("POST") &&
+    !url.includes("PUT") &&
+    !url.includes("DELETE")
   ) {
     return true;
   }
