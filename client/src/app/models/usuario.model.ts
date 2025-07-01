@@ -11,14 +11,15 @@ export enum EstadoCuentaUsuario {
 }
 
 export interface Usuario {
-  id?: number;
-  nombre_usuario: string;
+  id?: string; // Guid in C#
+  nombreUsuario: string;
   email: string;
   password?: string;
-  foto_perfil?: string | null;
-  fecha_nacimiento?: Date | string | null;
-  genero?: UsuarioGenero | null;
-  estado_cuenta?: EstadoCuentaUsuario;
-  create_at?: Date | string;
-  update_at?: Date | string;
+  fotoPerfil?: string | null;
+  fechaNacimiento?: Date | string | null;
+  genero: string;
+  estadoCuenta: string;
+  deletedAt?: Date | string | null;
+  createAt?: Date | string;
+  updateAt?: Date | string;
 }

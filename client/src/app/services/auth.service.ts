@@ -1,24 +1,23 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError, forkJoin } from 'rxjs';
-import { catchError, map, tap, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import {
   AuthRequest,
   AuthResponse,
   RegisterRequest,
   PasswordResetRequest,
   PasswordUpdateRequest,
-  MockTokenInfo,
 } from '../models/auth.model';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
-import { Rol } from '../models/rol.model';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = `${environment.jsonServerUrl}`;
+  private apiUrl = `${environment.apiUrl}`;
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -35,6 +34,7 @@ export class AuthService {
       this.loadStoredAuth();
     }
   }
+
   private loadStoredAuth(): void {
     if (!this.isBrowser) return;
 
@@ -46,8 +46,7 @@ export class AuthService {
         const userData = JSON.parse(storedUser);
         this.currentUserSubject.next({
           token: storedToken,
-          expires: userData.expires,
-          user: userData.user,
+          usuario: userData.usuario,
         });
       } catch (error) {
         console.error('Failed to parse stored user data', error);
@@ -56,7 +55,6 @@ export class AuthService {
     }
   }
 
-  // Store authentication data in localStorage
   private storeAuthData(authData: AuthResponse): void {
     if (!this.isBrowser) return;
 
@@ -64,165 +62,78 @@ export class AuthService {
     localStorage.setItem(
       this.userKey,
       JSON.stringify({
-        expires: authData.expires,
-        user: authData.user,
+        user: authData.usuario,
       })
     );
   }
 
-  // Generate a mock token for json-server (since it doesn't use JWT)
-  private generateMockToken(userId: number): string {
-    const tokenInfo: MockTokenInfo = {
-      userId: userId,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
-    };
-    return btoa(JSON.stringify(tokenInfo)); // Base64 encode the token info
+  private getTokenExpirationDate(token: string): Date | null {
+    try {
+      const decoded: any = jwtDecode(token);
+      if (decoded.exp === undefined) return null;
+
+      const date = new Date(0);
+      date.setUTCSeconds(decoded.exp);
+      return date;
+    } catch (error) {
+      console.error('Error decoding token', error);
+      return null;
+    }
   }
 
-  // Get user roles from the roles endpoint
-  private getUserRoles(userId: number): Observable<string[]> {
-    return this.http
-      .get<any[]>(`${this.apiUrl}/usuario_roles?id_usuario=${userId}`)
-      .pipe(
-        switchMap((userRoles) => {
-          if (userRoles.length === 0) {
-            return of([]);
-          }
-
-          // Get role details for each role ID
-          const roleIds = userRoles.map((ur) => ur.id_rol);
-          const roleRequests = roleIds.map((roleId) =>
-            this.http.get<Rol>(`${this.apiUrl}/roles/${roleId}`)
-          );
-
-          return forkJoin(roleRequests).pipe(
-            map((roles) => roles.map((role) => role.nombre))
-          );
-        }),
-        catchError((error) => {
-          console.error('Error fetching user roles:', error);
-          return of([]);
-        })
-      );
+  private extractRolesFromToken(token: string): string[] {
+    try {
+      const decoded: any = jwtDecode(token);
+      // Check if there's a role claim in the token
+      if (decoded.role) {
+        // Handle both single role (string) and multiple roles (array)
+        return Array.isArray(decoded.role) ? decoded.role : [decoded.role];
+      }
+      return [];
+    } catch (error) {
+      console.error('Error extracting roles from token', error);
+      return [];
+    }
   }
 
-  // Login user
+  private getUserIdFromToken(token: string): string | null {
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.nameid || decoded.sub || null;
+    } catch {
+      return null;
+    }
+  }
+
   login(credentials: AuthRequest): Observable<AuthResponse> {
-    // First, check if the user exists with the provided email
     return this.http
-      .get<any[]>(`${this.apiUrl}/usuarios?email=${credentials.email}`)
+      .post<any>(`${this.apiUrl}/Auth/login`, {
+        email: credentials.email,
+        password: credentials.password,
+      })
       .pipe(
-        switchMap((users) => {
-          if (users.length === 0) {
-            return throwError(
-              () => new Error('User not found with this email')
-            );
-          }
+        map((response) => {
+          // Map the API response to our AuthResponse format
+          const expirationDate = this.getTokenExpirationDate(response.token);
+          const roles = this.extractRolesFromToken(response.token);
+          const userId = this.getUserIdFromToken(response.token);
 
-          const user = users[0];
-
-          // Validate password (in a real app, this would be done on the server with hashed passwords)
-          if (user.password !== credentials.password) {
-            return throwError(() => new Error('Invalid password'));
-          }
-
-          // Get user roles
-          return this.getUserRoles(user.id).pipe(
-            map((roles) => {
-              // Generate mock token
-              const token = this.generateMockToken(user.id);
-              const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-
-              // Create auth response
-              const authResponse: AuthResponse = {
-                token: token,
-                expires: expiresAt.toISOString(),
-                user: {
-                  id: user.id,
-                  nombre_usuario: user.nombre_usuario,
-                  email: user.email,
-                  foto_perfil: user.foto_perfil,
-                  roles: roles,
-                },
-              };
-
-              return authResponse;
-            })
-          );
-        }),
-        tap((response) => {
-          this.storeAuthData(response);
-          this.currentUserSubject.next(response);
-        }),
-        catchError((error) => {
-          return throwError(() => new Error(error.message || 'Login failed'));
-        })
-      );
-  }
-
-  // Register new user
-  register(userData: RegisterRequest): Observable<AuthResponse> {
-    // First, check if the email already exists
-    return this.http
-      .get<any[]>(`${this.apiUrl}/usuarios?email=${userData.email}`)
-      .pipe(
-        switchMap((users) => {
-          if (users.length > 0) {
-            return throwError(() => new Error('Email already in use'));
-          }
-
-          // Create new user without confirmPassword
-          const { confirmPassword, ...newUser } = userData;
-
-          // Add creation timestamp
-          const userToCreate = {
-            ...newUser,
-            estado_cuenta: 'Activo',
-            create_at: new Date().toISOString(),
-            update_at: new Date().toISOString(),
+          const authResponse: AuthResponse = {
+            token: response.token,
+            usuario: {
+              id: userId || '0',
+              nombreUsuario: response.nombreUsuario ?? response.nombre_usuario,
+              email: response.email,
+              genero: response.genero,
+              fechaNacimiento:
+                response.fechaNacimiento ?? response.fecha_nacimiento,
+              fotoPerfil: response.fotoPerfil ?? response.foto_perfil ?? null,
+              estadoCuenta: response.estadoCuenta ?? 'Activo',
+              roles: roles,
+            },
           };
 
-          // Create user
-          return this.http
-            .post<any>(`${this.apiUrl}/usuarios`, userToCreate)
-            .pipe(
-              switchMap((createdUser) => {
-                // Assign default user role (assuming role ID 2 is "user")
-                return this.http
-                  .post(`${this.apiUrl}/usuario_roles`, {
-                    id_usuario: createdUser.id,
-                    id_rol: 2, // Assuming 2 is the regular user role ID
-                  })
-                  .pipe(map(() => createdUser));
-              }),
-              switchMap((createdUser) => {
-                // Get user roles
-                return this.getUserRoles(createdUser.id).pipe(
-                  map((roles) => {
-                    // Generate mock token
-                    const token = this.generateMockToken(createdUser.id);
-                    const expiresAt = new Date(
-                      Date.now() + 24 * 60 * 60 * 1000
-                    ); // 24 hours from now
-
-                    // Create auth response
-                    const authResponse: AuthResponse = {
-                      token: token,
-                      expires: expiresAt.toISOString(),
-                      user: {
-                        id: createdUser.id,
-                        nombre_usuario: createdUser.nombre_usuario,
-                        email: createdUser.email,
-                        foto_perfil: createdUser.foto_perfil,
-                        roles: roles,
-                      },
-                    };
-
-                    return authResponse;
-                  })
-                );
-              })
-            );
+          return authResponse;
         }),
         tap((response) => {
           this.storeAuthData(response);
@@ -230,13 +141,68 @@ export class AuthService {
         }),
         catchError((error) => {
           return throwError(
-            () => new Error(error.message || 'Registration failed')
+            () => new Error(error.error?.message || 'Login failed')
           );
         })
       );
   }
 
-  // Logout user
+  register(userData: RegisterRequest): Observable<AuthResponse> {
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('nombreUsuario', userData.nombreUsuario);
+    formData.append('email', userData.email);
+    formData.append('password', userData.password);
+    formData.append('genero', userData.genero || 'No especificado');
+
+    // Format the date as required by the API (YYYY-MM-DD)
+    if (userData.fechaNacimiento) {
+      const date = new Date(userData.fechaNacimiento);
+      const formattedDate = date.toISOString().split('T')[0];
+      formData.append('fechaNacimiento', formattedDate);
+    }
+
+    // Add the image if it exists
+    if (userData.fotoPerfil) {
+      formData.append('fotoPerfil', userData.fotoPerfil);
+    }
+
+    return this.http.post<any>(`${this.apiUrl}/Auth/signup`, formData).pipe(
+      map((response) => {
+        // Map the API response to our AuthResponse format
+        const expirationDate = this.getTokenExpirationDate(response.token);
+        const roles = this.extractRolesFromToken(response.token);
+        const userId = this.getUserIdFromToken(response.token);
+
+        const authResponse: AuthResponse = {
+          token: response.token,
+          usuario: {
+            id: userId || '0',
+            nombreUsuario: response.nombreUsuario ?? response.nombre_usuario,
+            email: response.email,
+            genero: response.genero ?? '',
+            fechaNacimiento:
+              response.fechaNacimiento ?? response.fecha_nacimiento,
+            fotoPerfil: response.fotoPerfil ?? response.foto_perfil ?? null,
+            estadoCuenta: response.estadoCuenta ?? 'Activo',
+            roles: roles,
+          },
+        };
+
+        return authResponse;
+      }),
+      tap((response) => {
+        this.storeAuthData(response);
+        this.currentUserSubject.next(response);
+      }),
+      catchError((error) => {
+        return throwError(
+          () => new Error(error.error?.message || 'Registration failed')
+        );
+      })
+    );
+  }
+
   logout(): void {
     if (this.isBrowser) {
       localStorage.removeItem(this.tokenKey);
@@ -245,12 +211,15 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  // Check if user is logged in
+  getToken(): string | null {
+    if (!this.isBrowser) return null;
+    return localStorage.getItem(this.tokenKey);
+  }
+
   isLoggedIn(): boolean {
     return !!this.currentUserSubject.value?.token;
   }
 
-  // Update user data after profile changes
   updateUserData(userData: any): void {
     if (!this.currentUserSubject.value) {
       return;
@@ -260,7 +229,7 @@ export class AuthService {
     const updatedAuth = {
       ...currentAuth,
       user: {
-        ...currentAuth.user,
+        ...currentAuth.usuario,
         ...userData,
       },
     };
@@ -270,120 +239,66 @@ export class AuthService {
 
     // Update in local storage if in browser environment
     if (this.isBrowser) {
-      // Store both the expires and user fields in the same structure as storeAuthData uses
       localStorage.setItem(
         this.userKey,
         JSON.stringify({
-          expires: currentAuth.expires,
-          user: updatedAuth.user,
+          user: updatedAuth.usuario,
         })
       );
     }
   }
 
-  // Get current user
   getCurrentUser(): AuthResponse | null {
     return this.currentUserSubject.value;
   }
 
-  // Get auth token
-  getToken(): string | null {
-    return this.currentUserSubject.value?.token || null;
-  }
-
-  // Check if token is expired
   isTokenExpired(): boolean {
-    // Get token
     const token = this.getToken();
     if (!token) return true;
 
-    try {
-      // Decode the token (base64)
-      const tokenInfo: MockTokenInfo = JSON.parse(atob(token));
-      const expirationDate = new Date(tokenInfo.expiresAt);
-      return expirationDate < new Date();
-    } catch (error) {
-      console.error('Error parsing token', error);
-      return true;
-    }
+    const expirationDate = this.getTokenExpirationDate(token);
+    if (!expirationDate) return true;
+
+    return expirationDate < new Date();
   }
 
-  // Get user ID from token
-  getUserIdFromToken(): number | null {
+  getUserIdFromCurrentToken(): string | null {
     const token = this.getToken();
     if (!token) return null;
-
-    try {
-      const tokenInfo: MockTokenInfo = JSON.parse(atob(token));
-      return tokenInfo.userId;
-    } catch {
-      return null;
-    }
+    return this.getUserIdFromToken(token);
   }
 
-  // Request password reset
   requestPasswordReset(email: PasswordResetRequest): Observable<any> {
-    // With json-server, we'll simulate this by checking if the user exists
     return this.http
-      .get<any[]>(`${this.apiUrl}/usuarios?email=${email.email}`)
+      .post<any>(`${this.apiUrl}/Auth/forgot-password`, { email: email.email })
       .pipe(
-        map((users) => {
-          if (users.length === 0) {
-            throw new Error('No user found with this email');
-          }
-
-          // In a real app, this would send an email with a reset link
-          // For now, we'll just return a success message
-          return { message: 'Password reset instructions sent to your email' };
-        }),
         catchError((error) => {
           return throwError(
-            () => new Error(error.message || 'Password reset request failed')
+            () =>
+              new Error(error.error?.message || 'Password reset request failed')
           );
         })
       );
   }
 
-  // Update password with reset token
   updatePassword(data: PasswordUpdateRequest): Observable<any> {
-    // In a real app, this would verify the token and update the password
-    // For json-server, we'll simulate this by finding the user in "users" from the token
-
-    try {
-      // Decode the token to get the user ID
-      const tokenInfo: MockTokenInfo = JSON.parse(atob(data.token));
-      const userId = tokenInfo.userId;
-
-      // Verify the token is not expired
-      const expirationDate = new Date(tokenInfo.expiresAt);
-      if (expirationDate < new Date()) {
-        return throwError(() => new Error('Password reset token has expired'));
-      }
-
-      // Check that passwords match
-      if (data.password !== data.confirmPassword) {
-        return throwError(() => new Error('Passwords do not match'));
-      }
-
-      // Update the user's password
-      return this.http
-        .patch<any>(`${this.apiUrl}/usuarios/${userId}`, {
-          password: data.password,
-          update_at: new Date().toISOString(),
+    return this.http
+      .post<any>(`${this.apiUrl}/Auth/reset-password`, {
+        token: data.token,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      })
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || 'Password update failed')
+          );
         })
-        .pipe(
-          map(() => {
-            return { message: 'Password updated successfully' };
-          })
-        );
-    } catch (error) {
-      return throwError(() => new Error('Invalid password reset token'));
-    }
+      );
   }
 
-  // Check if user has specific role
   hasRole(role: string): boolean {
-    const userRoles = this.currentUserSubject.value?.user.roles || [];
+    const userRoles = this.currentUserSubject.value?.usuario.roles || [];
     return userRoles.includes(role);
   }
 }

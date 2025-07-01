@@ -1,15 +1,40 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, switchMap } from 'rxjs';
-import { Usuario } from '../models/usuario.model';
-import { BaseService } from './base.service';
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, map, of, switchMap, catchError } from "rxjs";
+import { Usuario } from "../models/usuario.model";
+import { environment } from "../../environments/environment";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
-export class UsuarioService extends BaseService<Usuario> {
-  constructor(http: HttpClient) {
-    super(http, 'usuarios');
+export class UsuarioService {
+  private apiUrl = `${environment.apiUrl}api/Usuario`;
+
+  constructor(private http: HttpClient) {}
+
+  // Get all users
+  getAll(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}`);
+  }
+
+  // Get user by ID
+  getById(id: string): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
+  }
+
+  // Create user
+  create(usuario: Usuario): Observable<Usuario> {
+    return this.http.post<Usuario>(`${this.apiUrl}`, usuario);
+  }
+
+  // Update user
+  update(id: string, usuario: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, usuario);
+  }
+
+  // Delete user
+  delete(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
   // Get user by exact username match
@@ -18,65 +43,76 @@ export class UsuarioService extends BaseService<Usuario> {
       map((usuarios) => {
         const user = usuarios.find(
           (usuario) =>
-            usuario.nombre_usuario.toLowerCase() === username.toLowerCase()
+            usuario.nombreUsuario.toLowerCase() === username.toLowerCase(),
         );
         return user || null;
-      })
+      }),
+      catchError((error) => {
+        console.error("Error fetching user by username:", error);
+        return of(null);
+      }),
     );
   }
 
-  // Get all users with filtering
+  // Get all users with filtering - can be improved with server-side filtering
   getUsuarios(
     nombreUsuario?: string,
     email?: string,
-    genero?: string
+    genero?: string,
   ): Observable<Usuario[]> {
+    // In a real API, you would add query parameters for filtering
+    // For now, we'll handle filtering on the client side
     return this.getAll().pipe(
       map((usuarios) =>
         usuarios.filter(
           (usuario) =>
             (nombreUsuario
-              ? usuario.nombre_usuario
+              ? usuario.nombreUsuario
                   .toLowerCase()
                   .includes(nombreUsuario.toLowerCase())
               : true) &&
             (email
               ? usuario.email.toLowerCase().includes(email.toLowerCase())
               : true) &&
-            (genero ? usuario.genero === genero : true)
-        )
-      )
+            (genero ? usuario.genero === genero : true),
+        ),
+      ),
+      catchError((error) => {
+        console.error("Error fetching filtered users:", error);
+        return of([]);
+      }),
     );
   }
 
-  // For mock profile data since JSON Server doesn't support custom endpoints
-  getProfile(): Observable<Usuario | null> {
-    // Get first user as mock profile
-    return this.getAll().pipe(
-      map((usuarios) => (usuarios.length > 0 ? usuarios[0] : null))
-    );
+  // Update user profile with file upload
+  updateProfile(userData: FormData): Observable<Usuario> {
+    const userId = userData.get("id") as string;
+    if (!userId) {
+      throw new Error("User ID is required for profile update");
+    }
+
+    return this.http.put<Usuario>(`${this.apiUrl}/${userId}`, userData);
   }
 
-  // Update user profile
-  updateProfile(userData: Partial<Usuario>): Observable<Usuario> {
-    // Assuming the first user is the logged-in user for mocking purposes
-    return this.getProfile().pipe(
-      switchMap((profile) => {
-        if (profile) {
-          return this.update(profile.id!, userData);
-        }
-        throw new Error('No profile found');
-      })
-    );
+  // Change password
+  changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${userId}/change-password`, {
+      currentPassword,
+      newPassword,
+    });
   }
 
-  // Get user communities using the relationship data
-  getUserCommunities(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(
-      `${this.baseUrl.replace(
-        '/usuarios',
-        ''
-      )}/usuarios_comunidades_roles?usuario_id=${userId}`
-    );
+  // Get user roles
+  getUserRoles(userId: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/${userId}/roles`);
+  }
+
+  // Get user communities
+  getUserCommunities(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${userId}/communities`);
   }
 }
