@@ -117,7 +117,7 @@ namespace api.Controllers
             if (currentUserId != null && currentUserId == id)
             {
                 // Generate a new token with updated user information
-                string newToken = _authService.GenerateTokenForUser(existingUsuario);
+                string newToken = _authService.GenerateJwtToken(existingUsuario);
 
                 // Return the updated token along with basic user info
                 return Ok(new
