@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -18,9 +19,26 @@ namespace api.Repositories
             return await _dbSet.ToListAsync();
         }
 
+        // Find by UUID or primary key
         public async Task<T?> GetByIdAsync(object id)
         {
             return await _dbSet.FindAsync(id);
+        }
+
+        // Find by a specific condition in callback
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
+        public Task<IEnumerable<T>> FindWithIncludesAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T?> GetByIdWithIncludesAsync(object id, params Expression<Func<T, object>>[] includes)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task AddAsync(T entity)

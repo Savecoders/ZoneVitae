@@ -7,4 +7,3 @@ namespace api.DTOs.Auth
         public UsuarioDto Usuario { get; set; } = null!;
     }
 }
-
