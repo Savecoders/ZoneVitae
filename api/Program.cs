@@ -1,4 +1,5 @@
 using System.Text;
+using api.Config;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
 using api.Services.Auth;
@@ -95,14 +96,30 @@ builder.Services.AddSwaggerGen(options =>
 // Docs https://learn.microsoft.com/en-us/aspnet/core/security/authentication/configure-jwt-bearer-authentication?view=aspnetcore-9.0
 // please guys not changes this file
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
+// App.Settings configuration or environment variables
+builder.Services.Configure<JwtSesttings>(
+    builder.Configuration.GetSection("Jwt")
+);
 
-var jwtKey = jwtSettings["Key"];
-var jwtIssuer = jwtSettings["Issuer"];
-var jwtAudience = jwtSettings["Audience"];
+// Development environment variables
+
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSesttings>();
+
+var jwtKey = Encoding.UTF8.GetBytes(jwtSettings?.Key ?? "");
+
+// Deployment environment variables
+// Using DontEnv to load environment variables from a .env file
+
+// jwtSettings = new JwtSesttings()
+// {
+//     Key = Env.GetString("JWT_SECRET_KEY"),
+//     Issuer = Env.GetString("JWT_ISSUER"),
+//     Audience = Env.GetString("JWT_AUDIENCE"),
+//     ExpirationInMinutes = Env.GetInt("JWT_EXPIRATION_IN_MINUTES", 4320) // Default to 4320 minutes if not set
+// };
 
 
-if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
+if (string.IsNullOrEmpty(jwtSettings?.Audience) || string.IsNullOrEmpty(jwtSettings.Issuer))
 {
     throw new InvalidOperationException("JWT configuration is missing. Please.json or environment variables.");
 }
@@ -123,9 +140,9 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
             RequireExpirationTime = true,
             ValidateTokenReplay = false
         };
