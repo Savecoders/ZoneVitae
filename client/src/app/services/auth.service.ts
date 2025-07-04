@@ -1,33 +1,35 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Injectable, PLATFORM_ID, Inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { BehaviorSubject, Observable, of, throwError } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
 import {
   AuthRequest,
   AuthResponse,
   RegisterRequest,
   PasswordResetRequest,
   PasswordUpdateRequest,
-} from '../models/auth.model';
-import { environment } from '../../environments/environment';
-import { isPlatformBrowser } from '@angular/common';
-import { jwtDecode } from 'jwt-decode';
+  AuthResponseDto,
+} from "../models/auth.model";
+import { ApiResponse } from "../models/api-response.model";
+import { environment } from "../../environments/environment";
+import { isPlatformBrowser } from "@angular/common";
+import { jwtDecode } from "jwt-decode";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}`;
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  private tokenKey = 'auth_token';
-  private userKey = 'user_data';
+  private tokenKey = "auth_token";
+  private userKey = "user_data";
   private isBrowser: boolean;
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     if (this.isBrowser) {
@@ -49,7 +51,6 @@ export class AuthService {
           usuario: userData.usuario,
         });
       } catch (error) {
-        console.error('Failed to parse stored user data', error);
         this.logout();
       }
     }
@@ -62,8 +63,8 @@ export class AuthService {
     localStorage.setItem(
       this.userKey,
       JSON.stringify({
-        user: authData.usuario,
-      })
+        usuario: authData.usuario,
+      }),
     );
   }
 
@@ -76,7 +77,7 @@ export class AuthService {
       date.setUTCSeconds(decoded.exp);
       return date;
     } catch (error) {
-      console.error('Error decoding token', error);
+      console.error("Error decoding token", error);
       return null;
     }
   }
@@ -86,12 +87,18 @@ export class AuthService {
       const decoded: any = jwtDecode(token);
       // Check if there's a role claim in the token
       if (decoded.role) {
-        // Handle both single role (string) and multiple roles (array)
+        // Handle comma-separated roles as returned by the API
+        if (typeof decoded.role === "string") {
+          return decoded.role
+            .split(",")
+            .map((role: string) => role.trim())
+            .filter((role: string) => role);
+        }
+        // Handle array of roles
         return Array.isArray(decoded.role) ? decoded.role : [decoded.role];
       }
       return [];
     } catch (error) {
-      console.error('Error extracting roles from token', error);
       return [];
     }
   }
@@ -107,28 +114,35 @@ export class AuthService {
 
   login(credentials: AuthRequest): Observable<AuthResponse> {
     return this.http
-      .post<any>(`${this.apiUrl}/Auth/login`, {
+      .post<ApiResponse<AuthResponseDto>>(`${this.apiUrl}/Auth/login`, {
         email: credentials.email,
         password: credentials.password,
       })
       .pipe(
         map((response) => {
-          // Map the API response to our AuthResponse format
-          const expirationDate = this.getTokenExpirationDate(response.token);
-          const roles = this.extractRolesFromToken(response.token);
-          const userId = this.getUserIdFromToken(response.token);
+          // Handle ApiResponse wrapper format
+          if (!response.success) {
+            throw new Error(response.message || "Login failed");
+          }
+
+          if (!response.data) {
+            throw new Error("No data received from server");
+          }
+
+          const authData = response.data;
+          const roles = this.extractRolesFromToken(authData.token);
+          const userId = this.getUserIdFromToken(authData.token);
 
           const authResponse: AuthResponse = {
-            token: response.token,
+            token: authData.token,
             usuario: {
-              id: userId || '0',
-              nombreUsuario: response.nombreUsuario ?? response.nombre_usuario,
-              email: response.email,
-              genero: response.genero,
-              fechaNacimiento:
-                response.fechaNacimiento ?? response.fecha_nacimiento,
-              fotoPerfil: response.fotoPerfil ?? response.foto_perfil ?? null,
-              estadoCuenta: response.estadoCuenta ?? 'Activo',
+              id: userId || authData.usuario.id,
+              nombreUsuario: authData.usuario.nombreUsuario,
+              email: authData.usuario.email,
+              genero: authData.usuario.genero,
+              fechaNacimiento: authData.usuario.fechaNacimiento,
+              fotoPerfil: authData.usuario.fotoPerfil,
+              estadoCuenta: authData.usuario.estadoCuenta,
               roles: roles,
             },
           };
@@ -141,66 +155,83 @@ export class AuthService {
         }),
         catchError((error) => {
           return throwError(
-            () => new Error(error.error?.message || 'Login failed')
+            () => new Error(error.error?.message || "Login failed"),
           );
-        })
+        }),
       );
   }
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
     // Create FormData for file upload
     const formData = new FormData();
-    formData.append('nombreUsuario', userData.nombreUsuario);
-    formData.append('email', userData.email);
-    formData.append('password', userData.password);
-    formData.append('genero', userData.genero || 'No especificado');
+    formData.append("nombreUsuario", userData.nombreUsuario);
+    formData.append("email", userData.email);
+    formData.append("password", userData.password);
+    formData.append("genero", userData.genero || "No especificado");
 
     // Format the date as required by the API (YYYY-MM-DD)
     if (userData.fechaNacimiento) {
       const date = new Date(userData.fechaNacimiento);
-      const formattedDate = date.toISOString().split('T')[0];
-      formData.append('fechaNacimiento', formattedDate);
+      const formattedDate = date.toISOString().split("T")[0];
+      formData.append("fechaNacimiento", formattedDate);
     }
 
     // Add the image if it exists
     if (userData.fotoPerfil) {
-      formData.append('fotoPerfil', userData.fotoPerfil);
+      formData.append("fotoPerfil", userData.fotoPerfil);
     }
 
-    return this.http.post<any>(`${this.apiUrl}/Auth/signup`, formData).pipe(
-      map((response) => {
-        // Map the API response to our AuthResponse format
-        const expirationDate = this.getTokenExpirationDate(response.token);
-        const roles = this.extractRolesFromToken(response.token);
-        const userId = this.getUserIdFromToken(response.token);
+    // Debug: Log FormData contents
+    console.log("FormData being sent:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
 
-        const authResponse: AuthResponse = {
-          token: response.token,
-          usuario: {
-            id: userId || '0',
-            nombreUsuario: response.nombreUsuario ?? response.nombre_usuario,
-            email: response.email,
-            genero: response.genero ?? '',
-            fechaNacimiento:
-              response.fechaNacimiento ?? response.fecha_nacimiento,
-            fotoPerfil: response.fotoPerfil ?? response.foto_perfil ?? null,
-            estadoCuenta: response.estadoCuenta ?? 'Activo',
-            roles: roles,
-          },
-        };
+    return this.http
+      .post<
+        ApiResponse<AuthResponseDto>
+      >(`${this.apiUrl}/Auth/signup`, formData)
+      .pipe(
+        map((response) => {
+          // Handle ApiResponse wrapper format
+          if (!response.success) {
+            throw new Error(response.message || "Registration failed");
+          }
 
-        return authResponse;
-      }),
-      tap((response) => {
-        this.storeAuthData(response);
-        this.currentUserSubject.next(response);
-      }),
-      catchError((error) => {
-        return throwError(
-          () => new Error(error.error?.message || 'Registration failed')
-        );
-      })
-    );
+          if (!response.data) {
+            throw new Error("No data received from server");
+          }
+
+          const authData = response.data;
+          const roles = this.extractRolesFromToken(authData.token);
+          const userId = this.getUserIdFromToken(authData.token);
+
+          const authResponse: AuthResponse = {
+            token: authData.token,
+            usuario: {
+              id: userId || authData.usuario.id,
+              nombreUsuario: authData.usuario.nombreUsuario,
+              email: authData.usuario.email,
+              genero: authData.usuario.genero,
+              fechaNacimiento: authData.usuario.fechaNacimiento,
+              fotoPerfil: authData.usuario.fotoPerfil,
+              estadoCuenta: authData.usuario.estadoCuenta,
+              roles: roles,
+            },
+          };
+
+          return authResponse;
+        }),
+        tap((response) => {
+          this.storeAuthData(response);
+          this.currentUserSubject.next(response);
+        }),
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || "Registration failed"),
+          );
+        }),
+      );
   }
 
   logout(): void {
@@ -220,30 +251,25 @@ export class AuthService {
     return !!this.currentUserSubject.value?.token;
   }
 
-  updateUserData(userData: any): void {
+  updateUserData(data: { token: string; usuario: any }): void {
     if (!this.currentUserSubject.value) {
       return;
     }
 
-    const currentAuth = this.currentUserSubject.value;
-    const updatedAuth = {
-      ...currentAuth,
-      user: {
-        ...currentAuth.usuario,
-        ...userData,
-      },
+    const updatedAuth: AuthResponse = {
+      token: data.token,
+      usuario: data.usuario,
     };
 
-    // Update in memory
+    // Actualiza el observable
     this.currentUserSubject.next(updatedAuth);
 
-    // Update in local storage if in browser environment
+    // Actualiza en localStorage
     if (this.isBrowser) {
+      localStorage.setItem(this.tokenKey, data.token);
       localStorage.setItem(
         this.userKey,
-        JSON.stringify({
-          user: updatedAuth.usuario,
-        })
+        JSON.stringify({ usuario: data.usuario }),
       );
     }
   }
@@ -267,19 +293,21 @@ export class AuthService {
     if (!token) return null;
     return this.getUserIdFromToken(token);
   }
-
-  requestPasswordReset(email: PasswordResetRequest): Observable<any> {
-    return this.http
-      .post<any>(`${this.apiUrl}/Auth/forgot-password`, { email: email.email })
-      .pipe(
-        catchError((error) => {
-          return throwError(
-            () =>
-              new Error(error.error?.message || 'Password reset request failed')
-          );
-        })
-      );
-  }
+  // this funcion is no abiab
+  // requestPasswordReset(email: PasswordResetRequest): Observable<any> {
+  //   return this.http
+  //     .post<any>(`${this.apiUrl}/Auth/forgot-password`, { email: email.email })
+  //     .pipe(
+  //       catchError((error) => {
+  //         return throwError(
+  //           () =>
+  //             new Error(
+  //               error.error?.message || "Password reset request failed",
+  //             ),
+  //         );
+  //       }),
+  //     );
+  // }
 
   updatePassword(data: PasswordUpdateRequest): Observable<any> {
     return this.http
@@ -291,9 +319,9 @@ export class AuthService {
       .pipe(
         catchError((error) => {
           return throwError(
-            () => new Error(error.error?.message || 'Password update failed')
+            () => new Error(error.error?.message || "Password update failed"),
           );
-        })
+        }),
       );
   }
 

@@ -13,6 +13,19 @@ export interface RegisterRequest {
   fotoPerfil?: File;
 }
 
+export interface AuthResponseDto {
+  token: string;
+  usuario: {
+    id: string;
+    nombreUsuario: string;
+    email: string;
+    genero?: string | null;
+    fechaNacimiento?: Date | string | null;
+    fotoPerfil?: string | null;
+    estadoCuenta: string;
+  };
+}
+
 export interface AuthResponse {
   token: string;
   usuario: {
