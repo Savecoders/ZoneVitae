@@ -1,13 +1,13 @@
 export enum UsuarioGenero {
-  MASCULINO = 'M',
-  FEMENINO = 'F',
-  OTRO = 'O',
+  MASCULINO = "M",
+  FEMENINO = "F",
+  OTRO = "O",
 }
 
 export enum EstadoCuentaUsuario {
-  ACTIVO = 'Activo',
-  SUSPENDIDO = 'Suspendido',
-  INACTIVO = 'Inactivo',
+  ACTIVO = "Activo",
+  SUSPENDIDO = "Suspendido",
+  INACTIVO = "Inactivo",
 }
 
 export interface Usuario {

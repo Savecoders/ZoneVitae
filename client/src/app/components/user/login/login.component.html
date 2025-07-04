@@ -10,23 +10,26 @@
     />
   </div>
   <section class="container w-full h-full">
+    <div class="flex flex-col gap-4 h-full justify-center items-center p-4 md:bg-default-100 rounded-3xl shadow-lg">
+
     <form
       [formGroup]="loginForm"
       (ngSubmit)="onSubmit()"
-      class="flex flex-col gap-6 h-full justify-center items-center p-4 md:bg-default-100 rounded-3xl shadow-lg"
+      class="w-full max-w-[395px] flex flex-col gap-4"
     >
-      <h1 class="text-4xl font-bold text-default-800">ZoneVitae</h1>
-      <p class="text-default-700">
+      <h1 class="text-4xl font-bold text-default-800 text-center">ZoneVitae</h1>
+      <p class="text-default-700 text-center">
         Please enter your credentials to access your account.
       </p>
 
       <!-- Show error message if login fails -->
-      <div
-        *ngIf="error"
-        class="w-full max-w-[395px] bg-danger-100 text-danger-600 p-3 rounded-lg"
-      >
-        {{ error }}
-      </div>
+
+      @if (error) {
+        <div class="w-full bg-danger-100 text-danger-600 p-3 rounded-lg">
+          {{ error }}
+        </div>
+      }
+
 
       <app-input
         [id]="'email'"
@@ -72,10 +75,11 @@
         {{ loading ? "Logging in..." : "Login" }}
       </button>
 
-      <p class="text-default-800 text-lg">
+      <p class="text-default-800 text-lg text-center">
         Don't have an account?
-        <a [routerLink]="['/auth/', 'sign-up']" class="text-primary">Sign Up</a>
+        <a [routerLink]="['/auth/', 'sign-up']" class="text-primary text-center">Sign Up</a>
       </p>
     </form>
+    </div>
   </section>
 </main>

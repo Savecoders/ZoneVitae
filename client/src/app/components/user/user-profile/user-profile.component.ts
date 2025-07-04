@@ -105,7 +105,7 @@ export class UserProfileComponent implements OnInit {
     this.loading = true;
     this.error = "";
 
-    // Find user by exact username match
+    // Find user by exact username match using the updated service
     this.usuarioService
       .getUserByUsername(this.username)
       .pipe(
@@ -123,9 +123,16 @@ export class UserProfileComponent implements OnInit {
 
           // Get user's activities, communities, and reports in parallel
           return forkJoin({
-            activities: this.http.get<Actividad[]>(
-              `${environment.jsonServerUrl}/actividades?creador_id=${user.id}`,
-            ),
+            activities: this.http
+              .get<
+                Actividad[]
+              >(`${environment.jsonServerUrl}/actividades?creador_id=${user.id}`)
+              .pipe(
+                catchError((err) => {
+                  console.error("Error loading activities:", err);
+                  return of([]);
+                }),
+              ),
             communities: this.http
               .get<
                 { comunidad_id: number }[]
@@ -141,19 +148,34 @@ export class UserProfileComponent implements OnInit {
                   );
                   return forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number),
+                      this.comunidadService
+                        .getById(id as number)
+                        .pipe(catchError(() => of(null))),
                     ),
+                  ).pipe(
+                    map((communities) => communities.filter((c) => c !== null)),
                   );
                 }),
+                catchError((err) => {
+                  console.error("Error loading communities:", err);
+                  return of([]);
+                }),
               ),
-            reports: this.reporteService.getReportesByAutor(Number(user.id)),
+            reports: this.reporteService
+              .getReportesByAutor(Number(user.id))
+              .pipe(
+                catchError((err) => {
+                  console.error("Error loading reports:", err);
+                  return of([]);
+                }),
+              ),
           });
         }),
         catchError((err) => {
           console.error("Error loading user profile:", err);
-          this.error = "Failed to load user profile";
+          this.error = err.message || "Error al cargar el perfil de usuario";
           this.loading = false;
-          return of({ activities: [], communities: [], reports: [] });
+          return of(null);
         }),
       )
       .subscribe((result) => {
@@ -175,13 +197,13 @@ export class UserProfileComponent implements OnInit {
                 : `https://source.unsplash.com/random/800x500?report,general`,
             author: {
               id: Number(this.userProfile?.id) || 0,
-              name: this.userProfile?.nombreUsuario || "Anonymous",
+              name: this.userProfile?.nombreUsuario || "Anónimo",
               avatarUrl: this.userProfile?.fotoPerfil || undefined,
             },
             community: report.comunidad_id
               ? {
                   id: report.comunidad_id as number,
-                  name: "Community", // We would need to fetch the community name
+                  name: "Comunidad", // We would need to fetch the community name
                   slug: "community",
                 }
               : undefined,
