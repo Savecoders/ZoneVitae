@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  zonevitae-app:
+    image: zonevitae-service:latest
+    container_name: zonevitae-service
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DATA_PROTECTION_KEYS_PATH=/app/keys
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - zonevitae-keys:/app/keys
+    networks:
+      - zonevitae_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  zonevitae-keys:
+    driver: local
+
+networks:
+  zonevitae_network:
+    driver: bridge
