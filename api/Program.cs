@@ -37,7 +37,6 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
 
-
 // Add controllers with JSON options
 // This is necessary to ensure that the API uses System.Text.Json for serialization
 builder.Services.AddControllers();
@@ -54,7 +53,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
-    
+
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
@@ -151,14 +150,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-   // Defailt policy for authenticated users
-   options.DefaultPolicy = new AuthorizationPolicyBuilder()
-        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-        .RequireAuthenticatedUser()
-        .Build();
-   
-   // Add policies for specific roles if needed
-   // Roles => "Administrador", "Moderador", "Usuario"
+    // Defailt policy for authenticated users
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+         .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+         .RequireAuthenticatedUser()
+         .Build();
+
+    // Add policies for specific roles if needed
+    // Roles => "Administrador", "Moderador", "Usuario"
 });
 
 var app = builder.Build();
