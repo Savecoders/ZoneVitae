@@ -19,6 +19,9 @@ namespace api.DTOs
         [Required(ErrorMessage = "El estado del reporte es requerido")]
         [RegularExpression(@"^(Pendiente|En Revision|Resuelto|Rechazado)$", ErrorMessage = "El estado debe ser Pendiente, En Revision, Resuelto o Rechazado")]
         public string Estado { get; set; } = null!;
+        
+        [StringLength(500, ErrorMessage = "La dirección no puede exceder los 500 caracteres")]
+        public string? Direccion { get; set; }
 
         public DateTime CreateAt { get; set; }
         public DateTime UpdateAt { get; set; }

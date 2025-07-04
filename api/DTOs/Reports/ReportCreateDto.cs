@@ -16,6 +16,9 @@ namespace api.DTOs.Reports
 
         [Required(ErrorMessage = "El tipo de reporte es requerido")]
         public string TipoReporte { get; set; } = null!;
+        
+        [StringLength(500, ErrorMessage = "La dirección no puede exceder los 500 caracteres")]
+        public string? Direccion { get; set; }
 
         public Guid? UsuarioReportadoId { get; set; }
 
