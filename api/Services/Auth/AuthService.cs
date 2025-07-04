@@ -202,7 +202,7 @@ public class AuthService(
                 new(JwtRegisteredClaimNames.Email, usuario.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("nombreUsuario", usuario.NombreUsuario),
-                new("role", string.Join(",", roles))
+                new(ClaimTypes.Role, string.Join(",", roles))
             };
 
             var token = new JwtSecurityToken(

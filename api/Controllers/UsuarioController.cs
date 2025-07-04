@@ -17,7 +17,7 @@ namespace api.Controllers;
 public class UsuarioController(UsuarioService usuarioService, AuthService authService) : ControllerBase
 {
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<IEnumerable<UsuarioResponseDto>>>> GetAll()
     {
         var usuarios = await usuarioService.GetAllAsync();
