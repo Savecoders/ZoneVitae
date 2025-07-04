@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Models;
 
 #nullable disable
-
+using api.Contexts;
 namespace api.Migrations
 {
     [DbContext(typeof(ZoneVitaeSqlContext))]
