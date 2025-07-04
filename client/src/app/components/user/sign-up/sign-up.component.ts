@@ -1,7 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 import { UIModule } from "../../shared/ui.module";
 import { InputComponent } from "../../shared/primitives/input/input.component";
-import { LucideAngularModule, UserPlusIcon } from "lucide-angular";
+import {
+  LucideAngularModule,
+  UserPlusIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+} from "lucide-angular";
 import {
   FormBuilder,
   FormGroup,
@@ -11,6 +16,7 @@ import {
   ValidationErrors,
 } from "@angular/forms";
 import { AuthService } from "../../../services/auth.service";
+import { UsuarioService } from "../../../services/usuario.service";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import { CommonModule } from "@angular/common";
 
@@ -30,27 +36,58 @@ import { CommonModule } from "@angular/common";
 })
 export class SignUpComponent implements OnInit {
   iconSignUp = UserPlusIcon;
-  signUpForm: FormGroup;
-  loading = false;
-  submitted = false;
-  error: string = "";
+  iconNext = ArrowRightIcon;
+  iconBack = ArrowLeftIcon;
+
+  // Forms for each step
+  emailForm: FormGroup;
+  personalInfoForm: FormGroup;
+  passwordForm: FormGroup;
+
+  // Step management
+  currentStep = 1;
+  totalSteps = 3;
+
+  // Loading states for each step
+  emailLoading = false;
+  personalLoading = false;
+  passwordLoading = false;
+
+  // Error states
+  emailError: string = "";
+  personalError: string = "";
+  passwordError: string = "";
+
+  // Submitted states
+  emailSubmitted = false;
+  personalSubmitted = false;
+  passwordSubmitted = false;
+
   selectedFile: File | null = null;
   previewImageUrl: string | null = null;
-  currentDateISO: string = new Date().toISOString().split("T")[0]; // Today's date in ISO format for the date input max attribute
-  defaultAvatarUrl: string = "assets/images/default-avatar.png"; // Default avatar image
+  currentDateISO: string = new Date().toISOString().split("T")[0];
+  defaultAvatarUrl: string =
+    "https://via.placeholder.com/96x96/e5e7eb/9ca3af?text=User";
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private usuarioService: UsuarioService,
   ) {
-    // Initialize form with validation
-    this.signUpForm = this.formBuilder.group(
+    // Initialize forms for each step
+    this.emailForm = this.formBuilder.group({
+      email: ["", [Validators.required, Validators.email]],
+    });
+
+    this.personalInfoForm = this.formBuilder.group({
+      nombreUsuario: ["", [Validators.required, Validators.minLength(4)]],
+      genero: ["", Validators.required],
+      fechaNacimiento: [null, [Validators.required, this.dateValidator]],
+    });
+
+    this.passwordForm = this.formBuilder.group(
       {
-        nombreUsuario: ["", [Validators.required, Validators.minLength(4)]],
-        email: ["", [Validators.required, Validators.email]],
-        genero: ["", Validators.required],
-        fechaNacimiento: [null, [Validators.required, this.dateValidator]],
         password: ["", [Validators.required, Validators.minLength(6)]],
         confirmPassword: ["", Validators.required],
       },
@@ -67,6 +104,115 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  // Easy access to form fields for each step
+  get emailF() {
+    return this.emailForm.controls;
+  }
+
+  get personalF() {
+    return this.personalInfoForm.controls;
+  }
+
+  get passwordF() {
+    return this.passwordForm.controls;
+  }
+
+  // Step navigation methods
+  nextStep(): void {
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  // Step 1: Email validation
+  onEmailSubmit(): void {
+    this.emailSubmitted = true;
+    this.emailError = "";
+
+    if (this.emailForm.invalid) {
+      return;
+    }
+
+    this.emailLoading = true;
+    const email = this.emailF["email"].value;
+
+    this.usuarioService.validateEmail(email).subscribe({
+      next: (isAvailable) => {
+        this.emailLoading = false;
+        if (isAvailable) {
+          this.nextStep();
+        } else {
+          this.emailError =
+            "Este correo electrónico ya está registrado. Por favor, usa otro correo.";
+        }
+      },
+      error: (error) => {
+        this.emailLoading = false;
+        this.emailError =
+          "Error al validar el correo. Por favor, inténtalo de nuevo.";
+      },
+    });
+  }
+
+  // Step 2: Personal information
+  onPersonalInfoSubmit(): void {
+    this.personalSubmitted = true;
+    this.personalError = "";
+
+    if (this.personalInfoForm.invalid) {
+      return;
+    }
+
+    // Move to password step
+    this.nextStep();
+  }
+
+  // Step 3: Password and final registration
+  onPasswordSubmit(): void {
+    this.passwordSubmitted = true;
+    this.passwordError = "";
+
+    if (this.passwordForm.invalid) {
+      return;
+    }
+
+    this.passwordLoading = true;
+
+    // Combine all form data
+    const userData = {
+      email: this.emailF["email"].value,
+      nombreUsuario: this.personalF["nombreUsuario"].value,
+      genero: this.personalF["genero"].value || "O",
+      fechaNacimiento: this.personalF["fechaNacimiento"].value,
+      password: this.passwordF["password"].value,
+      fotoPerfil: this.selectedFile || undefined,
+    };
+
+    console.log("Registration data:", {
+      ...userData,
+      fotoPerfil: userData.fotoPerfil ? "File selected" : "No file",
+      password: "[HIDDEN]",
+    });
+
+    this.authService.register(userData).subscribe({
+      next: () => {
+        this.router.navigate(["/"]);
+      },
+      error: (error) => {
+        this.passwordError =
+          error.message ||
+          "Error en el registro. Por favor, inténtalo de nuevo.";
+        this.passwordLoading = false;
+      },
+    });
+  }
+
   // Custom validator to check if password and confirmPassword match
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get("password");
@@ -81,48 +227,6 @@ export class SignUpComponent implements OnInit {
       return { passwordMismatch: true };
     }
     return null;
-  }
-
-  // Easy access to form fields
-  get f() {
-    return this.signUpForm.controls;
-  }
-
-  onSubmit() {
-    this.submitted = true;
-
-    // stop here if form is invalid
-    if (this.signUpForm.invalid) {
-      return;
-    }
-
-    this.loading = true;
-
-    // Only allow 'M', 'F', or 'O' for genero
-    let generoValue = this.f["genero"].value;
-    if (!["M", "F", "O"].includes(generoValue)) {
-      generoValue = "O"; // Default to 'O' (Other) if not selected
-    }
-    const userData = {
-      nombreUsuario: this.f["nombreUsuario"].value,
-      email: this.f["email"].value,
-      password: this.f["password"].value,
-      genero: generoValue,
-      fechaNacimiento: this.f["fechaNacimiento"].value,
-      fotoPerfil: this.selectedFile === null ? undefined : this.selectedFile,
-    };
-
-    console.log("Registering user with data:", userData);
-
-    this.authService.register(userData).subscribe({
-      next: () => {
-        this.router.navigate(["/"]);
-      },
-      error: (error) => {
-        this.error = error.message || "Registration failed. Please try again.";
-        this.loading = false;
-      },
-    });
   }
 
   // Handle file selection for profile image

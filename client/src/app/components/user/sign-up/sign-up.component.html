@@ -8,227 +8,312 @@
     />
   </div>
   <section class="container w-full h-full">
-    <form
-      [formGroup]="signUpForm"
-      (ngSubmit)="onSubmit()"
-      class="flex flex-col gap-4 h-full justify-center items-center p-4 md:bg-default-100 rounded-3xl shadow-lg"
-    >
-      <h1 class="text-4xl font-bold text-default-800">Create Account</h1>
-      <p class="text-default-700 mb-2">
-        Join ZoneVitae community and connect with others.
-      </p>
+    <div class="flex flex-col gap-4 h-full justify-center items-center p-4 md:bg-default-100 rounded-3xl shadow-lg">
+      <!-- Header with step indicator -->
+      <div class="text-center mb-4">
+        <h1 class="text-4xl font-bold text-default-800">Create Account</h1>
+        <p class="text-default-700 mb-4">
+          Join ZoneVitae community and connect with others.
+        </p>
 
-      <!-- Show error message if registration fails -->
-      @if (error) {
-      <div
-        class="w-full max-w-[395px] bg-danger-100 text-danger-600 p-3 rounded-lg"
-      >
-        {{ error }}
+        <!-- Step indicator -->
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="flex items-center gap-2">
+            <div [class]="currentStep >= 1 ? 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold' : 'w-8 h-8 rounded-full bg-default-300 text-default-600 flex items-center justify-center text-sm'">
+              1
+            </div>
+            <span [class]="currentStep >= 1 ? 'text-primary font-medium' : 'text-default-500'">Email</span>
+          </div>
+          <div class="w-8 h-0.5 bg-default-300 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <div [class]="currentStep >= 2 ? 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold' : 'w-8 h-8 rounded-full bg-default-300 text-default-600 flex items-center justify-center text-sm'">
+              2
+            </div>
+            <span [class]="currentStep >= 2 ? 'text-primary font-medium' : 'text-default-500'">Info</span>
+          </div>
+          <div class="w-8 h-0.5 bg-default-300 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <div [class]="currentStep >= 3 ? 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold' : 'w-8 h-8 rounded-full bg-default-300 text-default-600 flex items-center justify-center text-sm'">
+              3
+            </div>
+            <span [class]="currentStep >= 3 ? 'text-primary font-medium' : 'text-default-500'">Password</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Step 1: Email validation -->
+      @if (currentStep === 1) {
+      <form [formGroup]="emailForm" (ngSubmit)="onEmailSubmit()" class="w-full max-w-[395px]">
+        <div class="flex flex-col gap-4">
+          <!-- Show error message -->
+          @if (emailError) {
+          <div class="w-full bg-danger-100 text-danger-600 p-3 rounded-lg">
+            {{ emailError }}
+          </div>
+          }
+
+          <app-input
+            [id]="'email'"
+            [label]="'Email Address'"
+            formControlName="email"
+            placeholder="Enter your email address"
+            [required]="true"
+            [fullWidth]="true"
+            [validation]="{
+              state: emailSubmitted && emailF['email'].errors ? 'invalid' : 'undefined',
+              message:
+                (emailSubmitted && emailF['email'].errors?.['required']) ? 'Email is required' :
+                (emailSubmitted && emailF['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
+            }"
+          >
+          </app-input>
+
+          <button
+            type="submit"
+            [disabled]="emailLoading"
+            class="w-full bg-primary-400 text-white font-semibold rounded-lg p-3 hover:bg-primary-300 transition-colors duration-200 cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i-lucide [img]="iconNext" class="my-icon text-white"></i-lucide>
+            @if (emailLoading) {
+            Validating email...
+            } @else { Continue }
+          </button>
+        </div>
+      </form>
       }
 
-      <div class="flex flex-col gap-4 w-full max-w-[395px]">
-        <!-- Profile Image Upload -->
-        <div class="mb-4 text-center">
-          <div class="profile-image-upload relative mx-auto w-24 h-24 mb-2">
-            <img
-              [src]="previewImageUrl || defaultAvatarUrl"
-              alt="Profile Preview"
-              class="w-24 h-24 rounded-full object-cover border-2 border-default-300"
-            />
-            <label
-              for="profile-image"
-              class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full cursor-pointer"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-                ></path>
-                <circle cx="12" cy="13" r="4"></circle>
-              </svg>
-            </label>
-            <input
-              type="file"
-              id="profile-image"
-              class="hidden"
-              accept="image/*"
-              (change)="onFileSelected($event)"
-            />
+      <!-- Step 2: Personal information -->
+      @if (currentStep === 2) {
+      <form [formGroup]="personalInfoForm" (ngSubmit)="onPersonalInfoSubmit()" class="w-full max-w-[395px]">
+        <div class="flex flex-col gap-4">
+          <!-- Show error message -->
+          @if (personalError) {
+          <div class="w-full bg-danger-100 text-danger-600 p-3 rounded-lg">
+            {{ personalError }}
           </div>
-          <p class="text-xs text-default-500">
-            Upload a profile picture (optional)
-          </p>
+          }
+
+          <!-- Profile Image Upload -->
+          <div class="mb-4 text-center">
+            <div class="profile-image-upload relative mx-auto w-24 h-24 mb-2">
+              <img
+                [src]="previewImageUrl || defaultAvatarUrl"
+                alt="Profile Preview"
+                class="w-24 h-24 rounded-full object-cover border-2 border-default-300"
+              />
+              <label
+                for="profile-image"
+                class="absolute bottom-0 right-0 bg-primary text-white p-1 rounded-full cursor-pointer"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                  ></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </label>
+              <input
+                type="file"
+                id="profile-image"
+                class="hidden"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+              />
+            </div>
+            <p class="text-xs text-default-500">
+              Upload a profile picture (optional)
+            </p>
+          </div>
+
+          <app-input
+            [id]="'nombreUsuario'"
+            [label]="'Username'"
+            formControlName="nombreUsuario"
+            placeholder="Choose your username"
+            [required]="true"
+            [fullWidth]="true"
+            [validation]="{
+              state: personalSubmitted && personalF['nombreUsuario'].errors ? 'invalid' : 'undefined',
+              message:
+                (personalSubmitted && personalF['nombreUsuario'].errors?.['required']) ? 'Username is required' :
+                (personalSubmitted && personalF['nombreUsuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
+            }"
+          >
+          </app-input>
+
+          <!-- Gender dropdown -->
+          <div class="mb-4">
+            <label for="genero" class="block text-default-700 font-medium mb-1"
+              >Gender <span class="text-danger-500">*</span></label
+            >
+            <select
+              id="genero"
+              formControlName="genero"
+              class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              [class.border-danger-500]="personalSubmitted && personalF['genero'].errors"
+              aria-describedby="genero-help"
+            >
+              <option value="">Select gender</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="O">Other</option>
+            </select>
+            <p
+              class="text-xs"
+              [class.text-danger-500]="personalSubmitted && personalF['genero'].errors"
+              [class.text-default-500]="!(personalSubmitted && personalF['genero'].errors)"
+            >
+              @if (personalSubmitted && personalF['genero'].errors?.['required']) {
+              <span>Gender selection is required</span>
+              } @else {
+              <span>This information helps personalize your experience</span>
+              }
+            </p>
+          </div>
+
+          <!-- Birth Date input -->
+          <div class="mb-4">
+            <label
+              for="fechaNacimiento"
+              class="block text-default-700 font-medium mb-1"
+              >Birth Date <span class="text-danger-500">*</span></label
+            >
+            <input
+              type="date"
+              id="fechaNacimiento"
+              formControlName="fechaNacimiento"
+              class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+              [class.border-danger-500]="personalSubmitted && personalF['fechaNacimiento'].errors"
+              aria-describedby="fechaNacimiento-help"
+              [max]="currentDateISO"
+              min="1900-01-01"
+            />
+            <p
+              class="text-xs"
+              [class.text-danger-500]="personalSubmitted && personalF['fechaNacimiento'].errors"
+              [class.text-default-500]="!(personalSubmitted && personalF['fechaNacimiento'].errors)"
+            >
+              @if (personalSubmitted && personalF['fechaNacimiento'].errors?.['required']) {
+              <span>Birth date is required</span>
+              } @else if (personalSubmitted && personalF['fechaNacimiento'].errors?.['minDate']) {
+              <span>Birth date must be after January 1, 1900</span>
+              } @else if (personalSubmitted && personalF['fechaNacimiento'].errors?.['maxDate']) {
+              <span>Birth date cannot be in the future</span>
+              } @else {
+              <span>Your birth date helps personalize your experience</span>
+              }
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="prevStep()"
+              class="w-1/3 bg-default-200 text-default-700 font-semibold rounded-lg p-3 hover:bg-default-300 transition-colors duration-200 cursor-pointer flex flex-row items-center justify-center gap-2"
+            >
+              <i-lucide [img]="iconBack" class="my-icon"></i-lucide>
+              Back
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="personalLoading"
+              class="w-2/3 bg-primary-400 text-white font-semibold rounded-lg p-3 hover:bg-primary-300 transition-colors duration-200 cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i-lucide [img]="iconNext" class="my-icon text-white"></i-lucide>
+              @if (personalLoading) {
+              Processing...
+              } @else { Continue }
+            </button>
+          </div>
         </div>
-      </div>
-      <section
-        class="flex flex-col gap-4 w-full max-w-[395px] max-h-40 overflow-y-auto"
-      >
-        <app-input
-          [id]="'nombreUsuario'"
-          [label]="'Username'"
-          formControlName="nombreUsuario"
-          placeholder="Choose your username"
-          [required]="true"
-          [fullWidth]="true"
-          [validation]="{
-            state:
-            submitted && f['nombreUsuario'].errors ? 'invalid' : 'undefined',
-            message:
-            (submitted && f['nombreUsuario'].errors?.['required']) ? 'Username is required' :
-            (submitted && f['nombreUsuario'].errors?.['minlength']) ? 'Username must be at least 4 characters' : ''
-          }"
-        >
-        </app-input>
+      </form>
+      }
 
-        <app-input
-          [id]="'email'"
-          [label]="'Email'"
-          formControlName="email"
-          placeholder="Enter your email"
-          [required]="true"
-          [fullWidth]="true"
-          [validation]="{
-        state:
-        submitted && f['email'].errors ? 'invalid' : 'undefined',
-        message:
-        (submitted && f['email'].errors?.['required']) ? 'Email is required' :
-        (submitted && f['email'].errors?.['email']) ? 'Please enter a valid email address' : ''
-      }"
-        >
-        </app-input>
+      <!-- Step 3: Password -->
+      @if (currentStep === 3) {
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="w-full max-w-[395px]">
+        <div class="flex flex-col gap-4">
+          <!-- Show error message -->
+          @if (passwordError) {
+          <div class="w-full bg-danger-100 text-danger-600 p-3 rounded-lg">
+            {{ passwordError }}
+          </div>
+          }
 
-        <!-- Gender dropdown -->
-        <div class="mb-4">
-          <label for="genero" class="block text-default-700 font-medium mb-1"
-            >Gender <span class="text-danger-500">*</span></label
+          <app-input
+            [id]="'password'"
+            [label]="'Password'"
+            formControlName="password"
+            placeholder="Create a password"
+            [required]="true"
+            [fullWidth]="true"
+            [type]="'password'"
+            [validation]="{
+              state: passwordSubmitted && passwordF['password'].errors ? 'invalid' : 'undefined',
+              message:
+                (passwordSubmitted && passwordF['password'].errors?.['required']) ? 'Password is required' :
+                (passwordSubmitted && passwordF['password'].errors?.['minlength']) ? 'Password must be at least 6 characters' : ''
+            }"
           >
-          <select
-            id="genero"
-            formControlName="genero"
-            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            [class.border-danger-500]="submitted && f['genero'].errors"
-            aria-describedby="genero-help"
+          </app-input>
+
+          <app-input
+            [id]="'confirmPassword'"
+            [label]="'Confirm Password'"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [required]="true"
+            [fullWidth]="true"
+            [type]="'password'"
+            [validation]="{
+              state: passwordSubmitted && (passwordF['confirmPassword'].errors || passwordForm.errors?.['passwordMismatch']) ? 'invalid' : 'undefined',
+              message:
+                (passwordSubmitted && passwordF['confirmPassword'].errors?.['required']) ? 'Please confirm your password' :
+                (passwordSubmitted && passwordForm.errors?.['passwordMismatch']) ? 'Passwords do not match' : ''
+            }"
           >
-            <option value="">Select gender</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
-            <option value="O">Other</option>
-          </select>
-          <p
-            class="text-xs"
-            [class.text-danger-500]="submitted && f['genero'].errors"
-            [class.text-default-500]="!(submitted && f['genero'].errors)"
-          >
-            @if (submitted && f['genero'].errors?.['required']) {
-            <span>Gender selection is required</span>
-            } @else {
-            <span>This information helps personalize your experience</span>
-            }
-          </p>
+          </app-input>
+
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="prevStep()"
+              class="w-1/3 bg-default-200 text-default-700 font-semibold rounded-lg p-3 hover:bg-default-300 transition-colors duration-200 cursor-pointer flex flex-row items-center justify-center gap-2"
+            >
+              <i-lucide [img]="iconBack" class="my-icon"></i-lucide>
+              Back
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="passwordLoading"
+              class="w-2/3 bg-primary-400 text-white font-semibold rounded-lg p-3 hover:bg-primary-300 transition-colors duration-200 cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i-lucide [img]="iconSignUp" class="my-icon text-white"></i-lucide>
+              @if (passwordLoading) {
+              Creating account...
+              } @else { Create Account }
+            </button>
+          </div>
         </div>
+      </form>
+      }
 
-        <!-- Birth Date input -->
-        <div class="mb-4">
-          <label
-            for="fechaNacimiento"
-            class="block text-default-700 font-medium mb-1"
-            >Birth Date <span class="text-danger-500">*</span></label
-          >
-          <input
-            type="date"
-            id="fechaNacimiento"
-            formControlName="fechaNacimiento"
-            class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            [class.border-danger-500]="
-              submitted && f['fechaNacimiento'].errors
-            "
-            aria-describedby="fechaNacimiento-help"
-            max="{{ currentDateISO }}"
-            min="1900-01-01"
-          />
-          <p
-            class="text-xs"
-            [class.text-danger-500]="submitted && f['fechaNacimiento'].errors"
-            [class.text-default-500]="
-              !(submitted && f['fechaNacimiento'].errors)
-            "
-          >
-            @if (submitted && f['fechaNacimiento'].errors?.['required']) {
-            <span>Birth date is required</span>
-            } @else if (submitted && f['fechaNacimiento'].errors?.['minDate'])
-            {
-            <span>Birth date must be after January 1, 1900</span>
-            } @else if (submitted && f['fechaNacimiento'].errors?.['maxDate'])
-            {
-            <span>Birth date cannot be in the future</span>
-            } @else {
-            <span>Your birth date helps personalize your experience</span>
-            }
-          </p>
-        </div>
-
-        <app-input
-          [id]="'password'"
-          [label]="'Password'"
-          formControlName="password"
-          placeholder="Create a password"
-          [required]="true"
-          [fullWidth]="true"
-          [type]="'password'"
-          [validation]="{
-          state:
-          submitted && f['password'].errors ? 'invalid' : 'undefined',
-          message:
-          (submitted && f['password'].errors?.['required']) ? 'Password is required' :
-          (submitted && f['password'].errors?.['minlength']) ? 'Password must be at least 6 characters' : ''
-        }"
-        >
-        </app-input>
-
-        <app-input
-          [id]="'confirmPassword'"
-          [label]="'Confirm Password'"
-          formControlName="confirmPassword"
-          placeholder="Confirm your password"
-          [required]="true"
-          [fullWidth]="true"
-          [type]="'password'"
-          [validation]="{
-        state:
-        submitted && (f['confirmPassword'].errors || signUpForm.errors?.['passwordMismatch']) ? 'invalid' : 'undefined',
-        message:
-        (submitted && f['confirmPassword'].errors?.['required']) ? 'Please confirm your password' :
-        (submitted && signUpForm.errors?.['passwordMismatch']) ? 'Passwords do not match' : ''
-      }"
-        >
-        </app-input>
-      </section>
-
-      <button
-        type="submit"
-        [disabled]="loading"
-        class="w-full bg-primary-400 mt-2 text-white font-semibold rounded-lg p-2 hover:bg-primary-300 transition-colors duration-200 max-w-[395px] cursor-pointer flex flex-row items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <i-lucide [img]="iconSignUp" class="my-icon text-white"></i-lucide>
-        @if (loading) {
-        Creating account...
-        } @else { Sign Up }
-      </button>
-
-      <p class="text-default-800 text-lg">
+      <p class="text-default-800 text-lg mt-4">
         Already have an account?
         <a [routerLink]="['/auth/login']" class="text-primary">Login</a>
       </p>
-    </form>
+    </div>
   </section>
 </main>
