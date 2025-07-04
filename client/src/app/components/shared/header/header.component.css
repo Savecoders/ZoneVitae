@@ -2,8 +2,89 @@ header {
   transition: all 0.3s ease;
 }
 
-@media (width <= 768px) {
+/* Navigation styles */
+nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(var(--default-400), 0.3);
+}
+
+/* Logo and brand styles */
+.logo-container {
+  transition: transform 0.2s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.02);
+}
+
+/* User menu styles */
+.user-menu {
+  animation: fadeIn 0.2s ease-in-out;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.user-menu a {
+  transition: all 0.2s ease;
+}
+
+.user-menu a:hover {
+  background-color: rgba(var(--default-100), 0.8);
+}
+
+/* Search input container */
+.search-container {
+  flex: 1;
+  max-width: 500px;
+}
+
+/* Avatar hover effect */
+app-avatar {
+  transition: transform 0.2s ease;
+}
+
+app-avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
   a > span {
     display: none;
   }
+
+  .search-container {
+    display: none;
+  }
+
+  nav {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .logo-text {
+    display: none;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Theme toggle positioning */
+app-theme-toggle {
+  transition: transform 0.2s ease;
+}
+
+app-theme-toggle:hover {
+  transform: scale(1.1);
 }

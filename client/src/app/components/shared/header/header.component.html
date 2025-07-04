@@ -8,34 +8,27 @@
     class="border-b border-default-400 shadow-md flex items-center justify-between py-4 md:px-3 xl:px-4 z-50 transition-all duration-300 md:w-[calc(84%)] xl:w-[calc(92%)] gap-x-2 fixed top-0"
   >
     <div class="flex items-center">
-      <a routerLink="/" class="flex items-center gap-2 mr-2">
+      <a routerLink="/" class="flex items-center gap-2 mr-2 logo-container">
         <div class="w-16 h-16 flex items-center justify-center">
           <img src="logo-light.svg" alt="logo" srcset="logo-light.svg" />
         </div>
-        <span class="font-medium text-xl">ZoneVitae</span>
+        <span class="font-medium text-xl logo-text">ZoneVitae</span>
       </a>
     </div>
 
-    <div class="w-full max-w-2xl">
-      <app-input
-        [fullWidth]="true"
-        [placeholder]="'Search'"
-        [startContent]="searchIcon"
-      ></app-input>
-      <ng-template #searchIcon>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 text-foreground-muted"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
+    <form class="search-container w-full max-w-2xl" (ngSubmit)="onSearchSubmit($event)">
+      <div class="relative">
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Search communities, activities..."
+          class="w-full pl-10 pr-4 py-2 rounded-lg border border-default-300 bg-default-100 text-default-700 placeholder-default-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-200"
         >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </ng-template>
-    </div>
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i-lucide [img]="searchIcon" class="h-4 w-4 text-default-500"></i-lucide>
+        </div>
+      </div>
+    </form>
 
     <div class="flex items-center gap-3">
       <app-theme-toggle></app-theme-toggle>
@@ -43,13 +36,9 @@
       @if(user) {
       <div class="relative">
         <app-avatar
-          [name]="user.user?.nombre_usuario || user.nombre_usuario"
+          [name]="user.usuario?.nombreUsuario || 'User'"
           [size]="'md'"
-          [src]="
-            user.user?.foto_perfil || user.foto_perfil
-              ? user.user?.foto_perfil || user.foto_perfil
-              : null
-          "
+          [src]="user.usuario?.fotoPerfil || null"
           [alt]="'User Profile Picture'"
           [bordered]="true"
           (click)="toggleUserMenu()"
@@ -59,20 +48,28 @@
 
         @if(showUserMenu) {
         <div
-          class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-default-50 ring-1 ring-black ring-opacity-5 divide-y divide-default-100"
+          class="user-menu absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-default-50 ring-1 ring-black ring-opacity-5 divide-y divide-default-100 z-50"
         >
+          <div class="px-4 py-2 text-sm text-default-600 border-b border-default-200">
+            <p class="font-medium">{{ user.usuario?.nombreUsuario }}</p>
+            <p class="text-xs text-default-500">{{ user.usuario?.email }}</p>
+          </div>
           <div class="py-1">
             <a
               routerLink="/profile"
-              class="flex items-center px-4 py-2 text-sm hover:bg-default-100"
+              class="flex items-center px-4 py-2 text-sm hover:bg-default-100 transition-colors"
               (click)="navigateToProfile()"
             >
+              <i-lucide [img]="userIcon" class="my-icon mr-2 h-4 w-4"></i-lucide>
               <span class="flex-1">Profile</span>
             </a>
             <a
-              class="flex items-center px-4 py-2 text-sm hover:bg-default-100 cursor-pointer"
+              class="flex items-center px-4 py-2 text-sm hover:bg-default-100 cursor-pointer transition-colors text-danger-500"
               (click)="logout()"
             >
+              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
               <span class="flex-1">Logout</span>
             </a>
           </div>
@@ -82,11 +79,11 @@
       } @else {
       <a
         routerLink="/auth/login"
-        class="px-4 py-2 text-md font-medium bg-primary-400 text-default-900 rounded-lg hover:bg-primary-200"
+        class="px-4 py-2 text-md font-medium bg-primary-400 text-default-900 rounded-lg hover:bg-primary-300 transition-colors duration-200 flex items-center gap-2"
       >
-        <i-lucide [img]="userIcon" class="my-icon inline-block"></i-lucide>
-        Login </a
-      >}
+        <i-lucide [img]="userIcon" class="my-icon h-4 w-4"></i-lucide>
+        <span class="hidden sm:inline">Login</span>
+      </a>}
     </div>
   </nav>
 </header>
