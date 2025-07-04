@@ -63,9 +63,12 @@
     </div>
   </app-card>
 
-  <app-separator className="mx-4 bg-default-400 h-[1px]" />
 
   <!-- Moderation -->
+
+  <app-separator className="mx-4 bg-default-400 h-[1px]" />
+
+  @if(authService.hasRole('Administrador') || authService.hasRole('Moderador') || authService.hasRole('Autoridad')){
   <app-card class="p-4 bg-default-50">
     <div class="flex flex-col gap-4">
       @for (moderation_link of admin_section; track $index) {
@@ -84,6 +87,8 @@
       }
     </div>
   </app-card>
+
+  }
 
   <app-separator className="mx-4 bg-default-400 h-[1px]" />
 

@@ -119,6 +119,7 @@ export const routes: Routes = [
   {
     path: "admin",
     canActivate: [AuthGuard],
+    data: { role: ["Administrador", "Moderador", "Autoridad"] },
     children: [
       {
         path: "",
