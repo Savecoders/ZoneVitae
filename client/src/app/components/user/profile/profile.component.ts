@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
-import { LayoutComponent } from '../../shared/layout/layout.component';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from "@angular/core";
+import { LayoutComponent } from "../../shared/layout/layout.component";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import {
   FormBuilder,
   FormGroup,
@@ -8,15 +8,15 @@ import {
   ReactiveFormsModule,
   AbstractControl,
   ValidationErrors,
-} from '@angular/forms';
-import { InputComponent } from '../../shared/primitives/input/input.component';
-import { AvatarComponent } from '../../shared/primitives/avatar/avatar.component';
-import { ButtonComponent } from '../../shared/primitives/button/button.component';
-import { AuthService } from '../../../services/auth.service';
-import { UsuarioService } from '../../../services/usuario.service';
-import { CloudinaryService } from '../../../services/cloudinary.service';
-import { Router } from '@angular/router';
-import { AuthResponse } from '../../../models/auth.model';
+} from "@angular/forms";
+import { InputComponent } from "../../shared/primitives/input/input.component";
+import { AvatarComponent } from "../../shared/primitives/avatar/avatar.component";
+import { ButtonComponent } from "../../shared/primitives/button/button.component";
+import { AuthService } from "../../../services/auth.service";
+import { UsuarioService } from "../../../services/usuario.service";
+import { CloudinaryService } from "../../../services/cloudinary.service";
+import { Router } from "@angular/router";
+import { AuthResponse } from "../../../models/auth.model";
 import {
   LucideAngularModule,
   SaveIcon,
@@ -24,13 +24,14 @@ import {
   CameraIcon,
   LockIcon,
   CalendarIcon,
-} from 'lucide-angular';
-import { Usuario, UsuarioGenero } from 'app/models';
-import { UIModule } from '../../shared/ui.module';
-import { BadgeComponent } from '../../shared/primitives/badge/badge.component';
+} from "lucide-angular";
+import { Usuario, UsuarioGenero } from "app/models";
+import { UIModule } from "../../shared/ui.module";
+import { BadgeComponent } from "../../shared/primitives/badge/badge.component";
+import { catchError, of } from "rxjs";
 
 @Component({
-  selector: 'app-profile',
+  selector: "app-profile",
   imports: [
     LayoutComponent,
     CommonModule,
@@ -42,8 +43,8 @@ import { BadgeComponent } from '../../shared/primitives/badge/badge.component';
     BadgeComponent,
     UIModule,
   ],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css',
+  templateUrl: "./profile.component.html",
+  styleUrl: "./profile.component.css",
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
@@ -52,18 +53,18 @@ export class ProfileComponent implements OnInit {
   loading = false;
   submitted = false;
   success = false;
-  error = '';
+  error = "";
   isBrowser: boolean;
   selectedFile: File | null = null;
   previewImageUrl: string | null = null;
   uploadingImage = false;
-  currentDateISO: string = new Date().toISOString().split('T')[0]; // Today's date in ISO format for the date input max attribute
+  currentDateISO: string = new Date().toISOString().split("T")[0]; // Today's date in ISO format for the date input max attribute
 
   // Password form states
   passwordLoading = false;
   passwordSubmitted = false;
   passwordSuccess = false;
-  passwordError = '';
+  passwordError = "";
   passwordsNotMatching = false;
 
   // Icons for buttons
@@ -79,24 +80,24 @@ export class ProfileComponent implements OnInit {
     private usuarioService: UsuarioService,
     private cloudinaryService: CloudinaryService,
     private router: Router,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: Object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
 
     // Initialize profile form with fields that match the Usuario model
     this.profileForm = this.formBuilder.group({
-      nombreUsuario: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      genero: [''],
+      nombreUsuario: ["", Validators.required],
+      email: ["", [Validators.required, Validators.email]],
+      genero: [""],
       fechaNacimiento: [null, ProfileComponent.dateValidator],
-      fotoPerfil: [''],
+      fotoPerfil: [""],
     });
 
     // Initialize password form
     this.passwordForm = this.formBuilder.group({
-      currentPassword: ['', Validators.required],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required],
+      currentPassword: ["", Validators.required],
+      newPassword: ["", [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ["", Validators.required],
     });
   }
 
@@ -104,16 +105,16 @@ export class ProfileComponent implements OnInit {
     // Get current user from auth service
     this.authService.currentUser$.subscribe((userData: AuthResponse | null) => {
       if (!userData) {
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(["/auth/login"]);
         return;
       }
-      const userInfo = userData.usuario || userData;
+      const userInfo = userData.usuario;
       this.user = {
         ...userInfo,
         genero: userInfo.genero as UsuarioGenero,
         id: userInfo.id as string,
-        nombreUsuario: userInfo.nombreUsuario ?? '',
-        estadoCuenta: userInfo.estadoCuenta ?? '',
+        nombreUsuario: userInfo.nombreUsuario ?? "",
+        estadoCuenta: userInfo.estadoCuenta ?? "",
       };
 
       // Fetch complete user data from the backend using the ID
@@ -128,9 +129,9 @@ export class ProfileComponent implements OnInit {
               ...fullUserData,
               genero: fullUserData.genero as UsuarioGenero,
               nombreUsuario:
-                fullUserData.nombreUsuario ?? this.user?.nombreUsuario ?? '',
+                fullUserData.nombreUsuario ?? this.user?.nombreUsuario ?? "",
               estadoCuenta:
-                fullUserData.estadoCuenta ?? this.user?.estadoCuenta ?? '',
+                fullUserData.estadoCuenta ?? this.user?.estadoCuenta ?? "",
             };
 
             // Format date if it exists
@@ -139,7 +140,7 @@ export class ProfileComponent implements OnInit {
               // Convert to YYYY-MM-DD format for the date input
               const date = new Date(this.user.fechaNacimiento);
               if (!isNaN(date.getTime())) {
-                formattedDate = date.toISOString().split('T')[0];
+                formattedDate = date.toISOString().split("T")[0];
               }
             }
 
@@ -147,16 +148,17 @@ export class ProfileComponent implements OnInit {
             this.profileForm.patchValue({
               nombreUsuario: this.user?.nombreUsuario,
               email: this.user?.email,
-              genero: this.user?.genero || '',
+              genero: this.user?.genero || "",
               fechaNacimiento: formattedDate,
-              fotoPerfil: this.user?.fotoPerfil || '',
+              fotoPerfil: this.user?.fotoPerfil || "",
             });
           },
           error: (err) => {
             this.loading = false;
             this.error =
-              'Failed to load user profile. Please refresh the page.';
-            console.error('Error loading user profile:', err);
+              err.message ||
+              "Error al cargar el perfil de usuario. Por favor, recarga la página.";
+            console.error("Error loading user profile:", err);
           },
         });
       } else {
@@ -167,7 +169,7 @@ export class ProfileComponent implements OnInit {
           // Convert to YYYY-MM-DD format for the date input
           const date = new Date(this.user.fechaNacimiento);
           if (!isNaN(date.getTime())) {
-            formattedDate = date.toISOString().split('T')[0];
+            formattedDate = date.toISOString().split("T")[0];
           }
         }
 
@@ -175,9 +177,9 @@ export class ProfileComponent implements OnInit {
         this.profileForm.patchValue({
           nombreUsuario: this.user?.nombreUsuario,
           email: this.user?.email,
-          genero: this.user?.genero || '',
+          genero: this.user?.genero || "",
           fechaNacimiento: formattedDate,
-          fotoPerfil: this.user?.fotoPerfil || '',
+          fotoPerfil: this.user?.fotoPerfil || "",
         });
       }
     });
@@ -194,55 +196,53 @@ export class ProfileComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
     this.success = false;
-    this.error = '';
+    this.error = "";
 
     if (this.profileForm.invalid) {
       return;
     }
 
     if (!this.user || !this.user.id) {
-      this.error = 'User information not available. Please log in again.';
+      this.error = "User information not available. Please log in again.";
       return;
     }
 
     this.loading = true;
 
-    // Upload image first if there's a selected file
     this.uploadImage().then((imageUrl) => {
-      // Make sure fecha_nacimiento is in proper format if it exists
-      let fechaNacimiento = this.f['fecha_nacimiento'].value;
+      let fechaNacimiento = this.f["fechaNacimiento"].value;
       if (fechaNacimiento) {
         // Ensure it's a string in ISO format for the API
         const date = new Date(fechaNacimiento);
         if (!isNaN(date.getTime())) {
-          fechaNacimiento = date.toISOString();
+          fechaNacimiento = date.toISOString().split("T")[0];
         }
       }
 
       // Verify user is still defined (for TypeScript)
       if (!this.user || !this.user.id) {
-        this.error = 'User information not available. Please try again.';
+        this.error =
+          "Información de usuario no disponible. Por favor, inténtalo de nuevo.";
         this.loading = false;
         return;
       }
 
       // Create FormData for file upload if needed
       const formData = new FormData();
-      formData.append('id', this.user.id.toString());
-      formData.append('nombreUsuario', this.f['nombreUsuario'].value);
-      formData.append('email', this.f['email'].value);
-      formData.append('genero', this.f['genero'].value || '');
+      formData.append("nombreUsuario", this.f["nombreUsuario"].value);
+      formData.append("email", this.f["email"].value);
+      formData.append("genero", this.f["genero"].value || "");
 
       if (fechaNacimiento) {
-        formData.append('fechaNacimiento', fechaNacimiento);
+        formData.append("fechaNacimiento", fechaNacimiento);
       }
 
       if (imageUrl) {
         // If we have a new image URL from Cloudinary
-        formData.append('fotoPerfilUrl', imageUrl);
+        formData.append("fotoPerfilUrl", imageUrl);
       } else if (this.selectedFile) {
         // If we have a file but no URL (direct upload to API)
-        formData.append('fotoPerfil', this.selectedFile);
+        formData.append("fotoPerfil", this.selectedFile);
       }
 
       this.usuarioService.updateProfile(formData).subscribe({
@@ -251,20 +251,24 @@ export class ProfileComponent implements OnInit {
           this.success = true;
 
           // Update the local user data
-          this.authService.updateUserData(response);
+          this.authService.updateUserData({
+            token: response.token,
+            usuario: response.usuario,
+          });
 
-          // Update our local user object
-          if (this.user) {
-            this.user = {
-              ...this.user,
-              ...response,
-            };
-          }
+          // Reset form state
+          this.submitted = false;
+          this.selectedFile = null;
+          this.previewImageUrl = null;
         },
         error: (err) => {
           this.loading = false;
+          this.success = false;
           this.error =
-            err.message || 'Failed to update profile. Please try again.';
+            err?.error?.message ||
+            err?.error?.Message ||
+            err?.message ||
+            "Ocurrió un error inesperado al actualizar el perfil.";
         },
       });
     });
@@ -274,11 +278,11 @@ export class ProfileComponent implements OnInit {
   onPasswordSubmit(): void {
     this.passwordSubmitted = true;
     this.passwordSuccess = false;
-    this.passwordError = '';
+    this.passwordError = "";
     this.passwordsNotMatching = false;
 
     // Check if passwords match
-    if (this.p['newPassword'].value !== this.p['confirmPassword'].value) {
+    if (this.p["newPassword"].value !== this.p["confirmPassword"].value) {
       this.passwordsNotMatching = true;
       return;
     }
@@ -289,7 +293,7 @@ export class ProfileComponent implements OnInit {
 
     if (!this.user || !this.user.id) {
       this.passwordError =
-        'User information not available. Please log in again.';
+        "Información de usuario no disponible. Por favor, inicia sesión de nuevo.";
       return;
     }
 
@@ -302,20 +306,27 @@ export class ProfileComponent implements OnInit {
     this.usuarioService
       .changePassword(
         userId,
-        this.p['currentPassword'].value,
-        this.p['newPassword'].value
+        this.p["currentPassword"].value,
+        this.p["newPassword"].value,
       )
-      .subscribe({
-        next: () => {
-          this.passwordLoading = false;
-          this.passwordSuccess = true;
-          this.passwordForm.reset();
-          this.passwordSubmitted = false;
-        },
-        error: (err) => {
+      .pipe(
+        catchError((err) => {
           this.passwordLoading = false;
           this.passwordError =
-            err.message || 'Failed to update password. Please try again.';
+            err.message ||
+            "Error al cambiar la contraseña. Por favor, inténtalo de nuevo.";
+          return of(null);
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          if (response !== null) {
+            this.passwordLoading = false;
+            this.passwordSuccess = true;
+            this.passwordForm.reset();
+            this.passwordSubmitted = false;
+            this.passwordsNotMatching = false;
+          }
         },
       });
   }
@@ -328,7 +339,7 @@ export class ProfileComponent implements OnInit {
 
     const selectedDate = new Date(control.value);
     const currentDate = new Date();
-    const minDate = new Date('1900-01-01');
+    const minDate = new Date("1900-01-01");
 
     // Check if date is less than 1900
     if (selectedDate < minDate) {
@@ -345,17 +356,17 @@ export class ProfileComponent implements OnInit {
 
   // Format date to display to user
   formatDate(date: string | Date | null | undefined): string {
-    if (!date) return '';
+    if (!date) return "";
 
     try {
       const dateObj = new Date(date);
-      return dateObj.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+      return dateObj.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     } catch (e) {
-      return '';
+      return "";
     }
   }
 
@@ -375,13 +386,13 @@ export class ProfileComponent implements OnInit {
   uploadImage(): Promise<string> {
     return new Promise((resolve) => {
       if (!this.selectedFile) {
-        resolve(''); // No image selected, return empty string
+        resolve(""); // No image selected, return empty string
         return;
       }
 
       // Option 1: Let the API handle the image upload (via FormData)
       // Just return empty string as we'll append the file to FormData later
-      resolve('');
+      resolve("");
 
       // Option 2: Use Cloudinary for image hosting (uncomment if needed)
       /*
@@ -393,8 +404,7 @@ export class ProfileComponent implements OnInit {
         },
         error: (err) => {
           this.uploadingImage = false;
-          this.error =
-            'Failed to upload profile picture. Profile will be updated without a new profile picture.';
+          this.error = 'Error al subir la foto de perfil. El perfil se actualizará sin una nueva foto de perfil.';
           console.error('Image upload error:', err);
           resolve(''); // Continue without image
         },
@@ -406,12 +416,12 @@ export class ProfileComponent implements OnInit {
   // Profile image upload implementation
   uploadProfileImage(): void {
     // Create a file input element
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
 
     // Add an event listener to handle file selection
-    fileInput.addEventListener('change', (event) => this.onFileSelected(event));
+    fileInput.addEventListener("change", (event) => this.onFileSelected(event));
 
     // Trigger the file input click
     fileInput.click();

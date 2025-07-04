@@ -132,17 +132,17 @@
         }
 
         <app-input
-          [id]="'nombre_usuario'"
+          [id]="'nombreUsuario'"
           [label]="'Username'"
-          formControlName="nombre_usuario"
+          formControlName="nombreUsuario"
           [required]="true"
           [fullWidth]="true"
           [placeholder]="'Enter your username'"
           [color]="'default'"
           [type]="'text'"
           [validation]="{
-              state: submitted && f['nombre_usuario'].errors ? 'invalid' : 'undefined',
-              message: submitted && f['nombre_usuario'].errors?.['required'] ? 'Username is required' : ''
+              state: submitted && f['nombreUsuario'].errors ? 'invalid' : 'undefined',
+              message: submitted && f['nombreUsuario'].errors?.['required'] ? 'Username is required' : ''
             }"
         ></app-input>
 
@@ -192,14 +192,14 @@
         <!-- Birth Date input -->
         <div class="form-group mb-4">
           <label
-            for="fecha_nacimiento"
+            for="fechaNacimiento"
             class="block text-default-700 font-medium mb-1"
             >Birth Date</label
           >
           <input
-            id="fecha_nacimiento"
+            id="fechaNacimiento"
             type="date"
-            formControlName="fecha_nacimiento"
+            formControlName="fechaNacimiento"
             class="w-full p-2 border border-default-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
             [max]="currentDateISO"
           />
