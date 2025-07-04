@@ -38,9 +38,15 @@ export class AuthGuard {
     // Check if the user is logged in
     if (this.authService.isLoggedIn() && !this.authService.isTokenExpired()) {
       // If a specific role is required for the route
-      const requiredRole = route.data["role"] as string;
+      const requiredRole =
+        (route.data["roles"] as string[]) ||
+        (route.data["role"] ? [route.data["role"]] : []) ||
+        [];
 
-      if (requiredRole && !this.authService.hasRole(requiredRole)) {
+      if (
+        requiredRole.length > 0 &&
+        !requiredRole.some((role) => this.authService.hasRole(role))
+      ) {
         // Redirect to unauthorized page or home if user doesn't have the required role
         return this.router.createUrlTree(["/unauthorized"]);
       }

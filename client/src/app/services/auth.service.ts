@@ -85,17 +85,19 @@ export class AuthService {
   private extractRolesFromToken(token: string): string[] {
     try {
       const decoded: any = jwtDecode(token);
-      // Check if there's a role claim in the token
-      if (decoded.role) {
-        // Handle comma-separated roles as returned by the API
-        if (typeof decoded.role === "string") {
-          return decoded.role
+
+      const roleClaim =
+        decoded.role ||
+        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      if (roleClaim) {
+        if (typeof roleClaim === "string") {
+          return roleClaim
             .split(",")
             .map((role: string) => role.trim())
             .filter((role: string) => role);
         }
-        // Handle array of roles
-        return Array.isArray(decoded.role) ? decoded.role : [decoded.role];
+        return Array.isArray(roleClaim) ? roleClaim : [roleClaim];
       }
       return [];
     } catch (error) {
@@ -326,7 +328,9 @@ export class AuthService {
   }
 
   hasRole(role: string): boolean {
-    const userRoles = this.currentUserSubject.value?.usuario.roles || [];
-    return userRoles.includes(role);
+    const token = this.getToken();
+    if (!token) return false;
+    const roles = this.extractRolesFromToken(token);
+    return roles.includes(role);
   }
 }
