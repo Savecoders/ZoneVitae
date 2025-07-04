@@ -1,5 +1,6 @@
 using System.Text;
 using api.Config;
+using api.Contexts;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
 using api.Services.Auth;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
-
+using api.Contexts;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
