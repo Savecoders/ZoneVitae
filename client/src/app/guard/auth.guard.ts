@@ -50,7 +50,7 @@ export class AuthGuard {
     }
 
     // User is not logged in, redirect to login page with return URL
-    return this.router.createUrlTree(["auth/login"], {
+    return this.router.createUrlTree(["/auth/login"], {
       queryParams: { returnUrl: state.url },
     });
   }

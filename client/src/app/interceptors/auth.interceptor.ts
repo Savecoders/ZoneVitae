@@ -27,7 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (
   }
 
   // Skip authentication for login, register, and other public endpoints
-  if (isPublicRequest(req.url)) {
+  if (isPublicRequest(req.url, req.method)) {
     return next(req);
   }
 
@@ -60,16 +60,17 @@ function addTokenToRequest(
   });
 }
 
-function isPublicRequest(url: string): boolean {
+function isPublicRequest(url: string, method: string = "GET"): boolean {
   const publicUrls = [
     "/api/Auth/login",
-    "/api/Auth/register",
+    "/api/Auth/signup",
     "/api/Auth/forgot-password",
     "/api/Auth/reset-password",
+    "/api/Usuario/validate-email",
   ];
 
-  // Also allow access to public endpoints
-  const publicEndpoints = [
+  // Also allow access to public endpoints for GET requests only
+  const publicGetEndpoints = [
     "/api/Roles",
     "/api/Actividades",
     "/api/Comunidades",
@@ -81,12 +82,9 @@ function isPublicRequest(url: string): boolean {
     return true;
   }
 
-  // Check if it's a GET request to a public endpoint
   if (
-    publicEndpoints.some((endpoint) => url.includes(endpoint)) &&
-    !url.includes("POST") &&
-    !url.includes("PUT") &&
-    !url.includes("DELETE")
+    method === "GET" &&
+    publicGetEndpoints.some((endpoint) => url.includes(endpoint))
   ) {
     return true;
   }
