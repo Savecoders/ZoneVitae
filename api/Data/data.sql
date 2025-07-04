@@ -82,6 +82,7 @@ CREATE TABLE [reports] (
   [contenido] nvarchar(max) NOT NULL,
   [anonimo] bit NOT NULL DEFAULT 0,
   [estado] nvarchar(50) NOT NULL CHECK ([estado] IN ('Pendiente_Moderacion', 'Aprobado', 'En_Seguimiento', 'En_Proceso', 'Rechazado', 'Resuelto')) DEFAULT 'Pendiente_Moderacion',
+  [direccion] nvarchar(500),
   [deleted_at] datetime2,
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -361,15 +362,24 @@ BEGIN
         WHERE ur.[id_usuario] = i.[ID]
     );
 END;
+
 GO
 
 -- Create default user with Administrador role
-INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
-VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
+IF NOT EXISTS (SELECT 1 FROM [usuarios] WHERE [nombre_usuario] = 'admin')
+BEGIN
+    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
+    VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
+END;
+GO
 
 DECLARE @admin_id uniqueidentifier = (SELECT [ID] FROM [usuarios] WHERE [nombre_usuario] = 'admin');
-INSERT INTO [usuarios_roles] ([id_usuario], [id_rol])
-VALUES (@admin_id, (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'));
+IF NOT EXISTS (SELECT 1 FROM [usuarios_roles] WHERE [id_usuario] = @admin_id AND [id_rol] = (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'))
+BEGIN
+    INSERT INTO [usuarios_roles] ([id_usuario], [id_rol])
+    VALUES (@admin_id, (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'));
+END;
+GO
 
 -- Trigger to assign the creator as an admin in the community
 CREATE TRIGGER [tr_asignar_admin_creador]
@@ -395,6 +405,7 @@ BEGIN
         AND ucr.[comunidad_id] = i.[ID]
     );
 END;
+
 GO
 
 -- Add constraints
