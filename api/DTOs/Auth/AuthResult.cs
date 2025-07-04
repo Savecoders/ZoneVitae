@@ -21,11 +21,9 @@ public class AuthResult
 public enum AuthErrorType
 {
     InvalidCredentials,
-    UserAlreadyExists,
     EmailAlreadyExists,
     UsernameAlreadyExists,
     WeakPassword,
     AccountInactive,
-    ValidationError,
     InternalError
 }
