@@ -332,6 +332,7 @@ GO
 INSERT INTO [roles] ([nombre]) VALUES ('Administrador');
 INSERT INTO [roles] ([nombre]) VALUES ('Moderador');
 INSERT INTO [roles] ([nombre]) VALUES ('Usuario');
+INSERT INTO [roles] ([nombre]) VALUES ('Autoridad');
 GO
 
 INSERT INTO [roles_comunidades] ([nombre], [descripcion]) VALUES ('Administrador', 'Administrador de la comunidad con todos los permisos');
@@ -362,6 +363,15 @@ BEGIN
 END;
 GO
 
+-- Create default user with Administrador role
+INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
+VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
+
+DECLARE @admin_id uniqueidentifier = (SELECT [ID] FROM [usuarios] WHERE [nombre_usuario] = 'admin');
+INSERT INTO [usuarios_roles] ([id_usuario], [id_rol])
+VALUES (@admin_id, (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'));
+
+-- Trigger to assign the creator as an admin in the community
 CREATE TRIGGER [tr_asignar_admin_creador]
 ON [comunidades]
 AFTER INSERT
