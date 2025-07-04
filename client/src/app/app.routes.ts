@@ -69,14 +69,6 @@ export const routes: Routes = [
         (m) => m.AuditoriaComponent,
       ),
   },
-  // {path: 'detalle-reporte',
-  //   loadComponent: () =>
-  //     import('./components/detalle-reporte/detalle-reporte.component').then(
-  //       (m) => m.DetalleReporteComponent
-  //     ),
-
-  // },
-  // users paths
 
   {
     path: "profile",
