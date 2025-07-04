@@ -37,14 +37,14 @@ namespace api.Repositories
         public async Task<IEnumerable<Usuario>> FindWithIncludesAsync(Expression<Func<Usuario, bool>> predicate, params Expression<Func<Usuario, object>>[] includes)
         {
             IQueryable<Usuario> query = _context.Usuarios;
-            
+
             try
             {
                 foreach (var include in includes)
                 {
                     query = query.Include(include);
                 }
-                
+
                 return await query.Where(predicate).ToListAsync();
             }
             catch (InvalidOperationException)
@@ -63,14 +63,14 @@ namespace api.Repositories
         public async Task<Usuario?> FindSingleWithIncludesAsync(Expression<Func<Usuario, bool>> predicate, params Expression<Func<Usuario, object>>[] includes)
         {
             IQueryable<Usuario> query = _context.Usuarios;
-            
+
             try
             {
                 foreach (var include in includes)
                 {
                     query = query.Include(include);
                 }
-                
+
                 return await query.FirstOrDefaultAsync(predicate);
             }
             catch (InvalidOperationException)
@@ -87,14 +87,25 @@ namespace api.Repositories
 
         public async Task<Usuario?> GetByIdWithIncludesAsync(object id, params Expression<Func<Usuario, object>>[] includes)
         {
-            IQueryable<Usuario> query = _context.Usuarios;
-            
-            foreach (var include in includes)
+            try
             {
-                query = query.Include(include);
+                IQueryable<Usuario> query = _context.Usuarios;
+
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+
+                return await query.FirstOrDefaultAsync(u => u.Id == (Guid)id);
             }
-            
-            return await query.FirstOrDefaultAsync(u => u.Id == (Guid)id);
+            catch (InvalidOperationException)
+            {
+                // Fallback to basic query with standard includes for Usuario
+                return await _context.Usuarios
+                    .Include(u => u.UsuariosRoles)
+                    .ThenInclude(ur => ur.IdRolNavigation)
+                    .FirstOrDefaultAsync(u => u.Id == (Guid)id);
+            }
         }
 
         public async Task AddAsync(Usuario entity)
