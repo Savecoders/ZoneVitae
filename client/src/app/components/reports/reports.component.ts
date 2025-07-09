@@ -238,44 +238,60 @@ guardarReporte(): void {
 }
 
   //Editar Reporte
-  editarReporte(id: number): void {
-    const reporte = this.reportes.find((r) => r.id === id);
-    if (!reporte) return;
-    
+editarReporte(id: number): void {
+  const reporte = this.reportes.find((r) => r.id === id);
+  if (!reporte) return;
+  
   if (!this.usuarioActual || !reporte.autor || reporte.autor.id !== this.usuarioActual.id) {
     this.toastService.error('No tienes permiso para editar este reporte.');
     return;
   }
-
-    this.isEditMode = true;
-    this.reporteEditando = reporte;
-    this.mostrarFormulario = true;
-    const comunidad = this.comunidades.find(
-      (c) => c.id !== undefined && Number(c.id) === reporte.comunidad_id
-    );
-
-    this.form.patchValue({
-      titulo: reporte.titulo,
-      contenido: reporte.contenido,
-      direccion: reporte.direccion,
-      anonimo: reporte.anonimo,
-      comunidad: comunidad ?? null,
-      create_at: reporte.create_at,
-      estado: reporte.estado 
+  
+  this.isEditMode = true;
+  this.reporteEditando = reporte;
+  this.mostrarFormulario = true;
+  
+  // Carga comunidades primero si no se han cargado
+  if (this.comunidades.length === 0) {
+    this.comunidadService.getComunidadesParaReportes().subscribe((coms: Comunidad[]) => {
+      this.comunidades = coms;
+      this.setFormularioConReporte(reporte);
     });
-
-    this.tags.clear();
-    reporte.tags?.forEach((tag) => {
-      this.tags.push(this.fb.control({ nombre: tag.nombre }));
-    });
-
-    this.fotos.clear();
-    if (reporte.fotos) {
-      reporte.fotos.forEach((foto) => {
-        this.fotos.push(this.fb.control(foto));
-      });
-    }
+  } else {
+    this.setFormularioConReporte(reporte);
   }
+}
+
+private setFormularioConReporte(reporte: ReporteCompleto): void {
+  const comunidadId = reporte.comunidad?.id?.toString() ?? reporte['comunidad_id']?.toString();
+  const comunidad = this.comunidades.find(
+  (c) => c.id?.toString() === comunidadId
+  );
+  
+  
+  this.form.patchValue({
+    titulo: reporte.titulo,
+    contenido: reporte.contenido,
+    direccion: reporte.direccion,
+    anonimo: reporte.anonimo,
+    comunidad: comunidad ?? null,
+    create_at: reporte.create_at,
+    estado: reporte.estado,
+  });
+  
+  this.tags.clear();
+  reporte.tags?.forEach((tag) => {
+    this.tags.push(this.fb.control({ nombre: tag.nombre }));
+  });
+  
+  this.fotos.clear();
+  if (reporte.fotos) {
+    reporte.fotos.forEach((foto) => {
+      this.fotos.push(this.fb.control(foto));
+    });
+  }
+}
+
 
   //Eliminar Reporte
   eliminarReporte(id: number): void {
@@ -430,8 +446,8 @@ filtrarTag(tag: string): void {
       'Se limpió el filtro, mostrando todos los reportes.'
     );
   }
+  compareComunidades(c1: Comunidad | null, c2: Comunidad | null): boolean {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
 
-  compareComunidades(c1: Comunidad, c2: Comunidad): boolean {
-  return c1 && c2 ? c1.id === c2.id : c1 === c2;
-}
 }
