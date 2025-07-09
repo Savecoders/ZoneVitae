@@ -127,24 +127,33 @@ export class AuditoriaComponent {
   }
 
   ngOnInit(): void {
-    const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
-    const roles: string[] = usuario.user.roles || [];
+  const usuarioRaw = localStorage.getItem('user_data');
+  let roles: string[] = [];
 
-    console.log('Roles del usuario:', roles.join(', '));
-
-    if (!roles.includes('admin')) {
-      alert(
-        `No tienes permisos para acceder a esta sección. ${roles.join('')} `
-      );
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.http.get<any>('../preview/data.json').subscribe((data) => {
-      this.comunidadesData = data.comunidades;
-      this.cargarDatos();
-    });
+  try {
+    const usuario = usuarioRaw ? JSON.parse(usuarioRaw) : null;
+    roles = usuario?.user?.roles ?? [];
+  } catch (error) {
+    console.error('Error al parsear user_data:', error);
   }
+
+  console.log('Roles del usuario:', roles.join(', '));
+
+  if (!roles.includes('admin')) {
+    alert(`No tienes permisos para acceder a esta sección. ${roles.join('')} `);
+    this.router.navigate(['/']);
+    return;
+  }
+
+  this.http.get<any>('../preview/data.json').subscribe((data) => {
+    this.comunidadesData = data.comunidades;
+    this.cargarDatos();
+  });
+}
+
+/*
+ngOnInit(): void { const usuario = JSON.parse(localStorage.getItem('user_data') || '{}'); const roles: string[] = usuario.user.roles || []; console.log('Roles del usuario:', roles.join(', ')); if (!roles.includes('admin')) { alert( `No tienes permisos para acceder a esta sección. ${roles.join('')} ` ); this.router.navigate(['/']); return; } this.http.get<any>('../preview/data.json').subscribe((data) => { this.comunidadesData = data.comunidades; this.cargarDatos(); }); }
+*/
   aplicarFiltro() {
     if (!this.filtro) {
       this.cargarDatos();

@@ -14,7 +14,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl: string = `${environment.jsonServerUrl}/reports`;
+  private jsonUrl: string = `${environment.jsonServerUrl}reports`;
 
   constructor(http: HttpClient) {
     super(http, 'reports');
