@@ -30,12 +30,12 @@ namespace api.Repositories
         }
       
 
-      public async Task<IEnumerable<SeguimientoReporte>> GetByReporteIdAsync(long reporteId)
+    /*S  public async Task<IEnumerable<SeguimientoReporte>> GetByReporteIdAsync(long reporteId)
 {
     return await context.SeguimientoReportes
         .Where(s => s.ReporteId == reporteId)
         .ToListAsync();
-}
+}*/
         public async Task AddAsync(SeguimientoReporte entity) => await context.SeguimientoReportes.AddAsync(entity);
 
         public void Update(SeguimientoReporte entity) => context.SeguimientoReportes.Update(entity);

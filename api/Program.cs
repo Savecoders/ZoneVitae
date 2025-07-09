@@ -31,6 +31,7 @@ builder.Services.AddScoped<api.Repositories.IRepository<Tag>, api.Repositories.T
 builder.Services.AddScoped<api.Repositories.IRepository<Comentario>, api.Repositories.ComentarioRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Foto>, api.Repositories.FotoRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.Repositories.GaleriaComunidadRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<SeguimientoReporte>, api.Repositories.SeguimientoRepository>();
 // builder.Services.AddScoped<api.Repositories.IRepository<api.Models.SeguimientoReporte>, api.Repositories.ReportRepository>();
 
 

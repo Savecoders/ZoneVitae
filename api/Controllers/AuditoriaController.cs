@@ -1,23 +1,28 @@
 ﻿using api.Models;
 using api.Services.Seguimiento;
 using api.DTOs.Seguimientos;
-using api.DTOs.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using api.DTOs.Common;
 
 namespace api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
-public class SeguimientoReporteController(SeguimientoReporteService seguimientoService) : ControllerBase
+public class SeguimientoReporteController : ControllerBase
 {
+    private readonly SeguimientoReporteService _seguimientoService;
+
+    public SeguimientoReporteController(SeguimientoReporteService seguimientoService)
+    {
+        _seguimientoService = seguimientoService;
+    }
+
     [HttpGet]
-    [Authorize(Roles = "Administrador, Moderador, Auditor")]
+    [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<IEnumerable<SeguimientoReporteDto>>>> GetAll()
     {
-        var seguimientos = await seguimientoService.GetAllAsync();
+        var seguimientos = await _seguimientoService.GetAllAsync();
         var seguimientosDto = seguimientos.Select(s => new SeguimientoReporteDto
         {
             Id = s.Id,
@@ -38,34 +43,11 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
         });
     }
 
-    [HttpGet("reporte/{reporteId}")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<SeguimientoReporteDto>>>> GetByReporteId(long reporteId)
-    {
-        var seguimientos = await seguimientoService.GetByReporteIdAsync(reporteId);
-        var seguimientosDto = seguimientos.Select(s => new SeguimientoReporteDto
-        {
-            Id = s.Id,
-            EstadoAnterior = s.EstadoAnterior,
-            Estado = s.Estado,
-            Comentario = s.Comentario,
-            AccionRealizada = s.AccionRealizada,
-            Prioridad = s.Prioridad,
-            CreateAt = s.CreateAt,
-            UpdateAt = s.UpdateAt
-        });
-
-        return Ok(new ApiResponse<IEnumerable<SeguimientoReporteDto>>
-        {
-            Success = true,
-            Message = "Seguimientos del reporte obtenidos exitosamente",
-            Data = seguimientosDto
-        });
-    }
-
     [HttpGet("{id}")]
+    [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> GetById(long id)
     {
-        var seguimiento = await seguimientoService.GetByIdAsync(id);
+        var seguimiento = await _seguimientoService.GetByIdAsync(id);
         if (seguimiento == null)
             return NotFound(new ApiResponse<SeguimientoReporteDto>
             {
@@ -95,25 +77,13 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
     }
 
     [HttpPost]
+    [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteDto seguimientoDto)
     {
         try
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
-            {
-                return BadRequest(new ApiResponse<SeguimientoReporteDto>
-                {
-                    Success = false,
-                    Message = "Usuario no válido",
-                    Data = default
-                });
-            }
-
             var seguimiento = new SeguimientoReporte
             {
-                ReporteId = seguimientoDto.ReporteId,
-                UsuarioId = userGuid,
                 EstadoAnterior = seguimientoDto.EstadoAnterior,
                 Estado = seguimientoDto.Estado,
                 Comentario = seguimientoDto.Comentario,
@@ -123,35 +93,26 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
                 UpdateAt = DateTime.UtcNow
             };
 
-            await seguimientoService.AddAsync(seguimiento);
+            await _seguimientoService.AddAsync(seguimiento);
 
             // Actualizar el DTO con el ID generado
             seguimientoDto.Id = seguimiento.Id;
             seguimientoDto.CreateAt = seguimiento.CreateAt;
             seguimientoDto.UpdateAt = seguimiento.UpdateAt;
 
-            return CreatedAtAction(nameof(GetById), new ApiResponse<SeguimientoReporteDto>
+            return CreatedAtAction(nameof(GetById), new { id = seguimiento.Id }, new ApiResponse<SeguimientoReporteDto>
             {
                 Success = true,
                 Message = "Seguimiento creado exitosamente",
                 Data = seguimientoDto
             });
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
-            return Conflict(new ApiResponse<SeguimientoReporteDto>
+            return StatusCode(500, new ApiResponse<SeguimientoReporteDto>
             {
                 Success = false,
-                Message = ex.Message,
-                Data = default
-            });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new ApiResponse<SeguimientoReporteDto>
-            {
-                Success = false,
-                Message = ex.Message,
+                Message = $"Error al crear el seguimiento: {ex.Message}",
                 Data = default
             });
         }
@@ -159,14 +120,12 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Administrador, Moderador")]
-    public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Update(
-        long id,
-        SeguimientoReporteDto seguimientoDto)
+    public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Update(long id, SeguimientoReporteDto seguimientoDto)
     {
         try
         {
-            var currentSeguimiento = await seguimientoService.GetByIdAsync(id);
-            if (currentSeguimiento == null)
+            var seguimientoExistente = await _seguimientoService.GetByIdAsync(id);
+            if (seguimientoExistente == null)
                 return NotFound(new ApiResponse<SeguimientoReporteDto>
                 {
                     Success = false,
@@ -174,33 +133,20 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
                     Data = default
                 });
 
-            // Verificar que el usuario sea el dueño o tenga permisos
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentSeguimiento.UsuarioId.ToString() != userId && 
-                !User.IsInRole("Administrador") && 
-                !User.IsInRole("Moderador"))
-            {
-                return StatusCode(403, new ApiResponse<SeguimientoReporteDto>
-                {
-                    Success = false,
-                    Message = "No tienes permisos para modificar este seguimiento",
-                    Data = default
-                });
-            }
+            // Actualizar propiedades
+            seguimientoExistente.EstadoAnterior = seguimientoDto.EstadoAnterior;
+            seguimientoExistente.Estado = seguimientoDto.Estado;
+            seguimientoExistente.Comentario = seguimientoDto.Comentario;
+            seguimientoExistente.AccionRealizada = seguimientoDto.AccionRealizada;
+            seguimientoExistente.Prioridad = seguimientoDto.Prioridad;
+            seguimientoExistente.UpdateAt = DateTime.UtcNow;
 
-            currentSeguimiento.EstadoAnterior = seguimientoDto.EstadoAnterior;
-            currentSeguimiento.Estado = seguimientoDto.Estado;
-            currentSeguimiento.Comentario = seguimientoDto.Comentario;
-            currentSeguimiento.AccionRealizada = seguimientoDto.AccionRealizada;
-            currentSeguimiento.Prioridad = seguimientoDto.Prioridad;
-            currentSeguimiento.UpdateAt = DateTime.UtcNow;
+            await _seguimientoService.UpdateAsync(seguimientoExistente);
 
-            await seguimientoService.UpdateAsync(currentSeguimiento);
-
-            // Actualizar el DTO con los datos actualizados
-            seguimientoDto.Id = currentSeguimiento.Id;
-            seguimientoDto.CreateAt = currentSeguimiento.CreateAt;
-            seguimientoDto.UpdateAt = currentSeguimiento.UpdateAt;
+            // Actualizar el DTO para la respuesta
+            seguimientoDto.Id = seguimientoExistente.Id;
+            seguimientoDto.CreateAt = seguimientoExistente.CreateAt;
+            seguimientoDto.UpdateAt = seguimientoExistente.UpdateAt;
 
             return Ok(new ApiResponse<SeguimientoReporteDto>
             {
@@ -209,21 +155,12 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
                 Data = seguimientoDto
             });
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
-            return Conflict(new ApiResponse<SeguimientoReporteDto>
+            return StatusCode(500, new ApiResponse<SeguimientoReporteDto>
             {
                 Success = false,
-                Message = ex.Message,
-                Data = default
-            });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new ApiResponse<SeguimientoReporteDto>
-            {
-                Success = false,
-                Message = ex.Message,
+                Message = $"Error al actualizar el seguimiento: {ex.Message}",
                 Data = default
             });
         }
@@ -233,18 +170,19 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
     [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(long id)
     {
-        var seguimiento = await seguimientoService.GetByIdAsync(id);
-        if (seguimiento == null)
-            return NotFound(new ApiResponse<object>
-            {
-                Success = false,
-                Message = "Seguimiento no encontrado",
-                Data = default
-            });
-
         try
         {
-            await seguimientoService.DeleteAsync(seguimiento);
+            var seguimiento = await _seguimientoService.GetByIdAsync(id);
+            if (seguimiento == null)
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Seguimiento no encontrado",
+                    Data = default
+                });
+
+            await _seguimientoService.DeleteAsync(seguimiento);
+
             return Ok(new ApiResponse<object>
             {
                 Success = true,
@@ -252,12 +190,12 @@ public class SeguimientoReporteController(SeguimientoReporteService seguimientoS
                 Data = default
             });
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
-            return Conflict(new ApiResponse<object>
+            return StatusCode(500, new ApiResponse<object>
             {
                 Success = false,
-                Message = ex.Message,
+                Message = $"Error al eliminar el seguimiento: {ex.Message}",
                 Data = default
             });
         }

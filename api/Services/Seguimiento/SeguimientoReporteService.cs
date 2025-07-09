@@ -60,11 +60,11 @@ public class SeguimientoReporteService
         await _seguimientoRepository.SaveChangesAsync();
     }
 
-public async Task<IEnumerable<SeguimientoReporte>> GetByReporteIdAsync(long reporteId)
+/*public async Task<IEnumerable<SeguimientoReporte>> GetByReporteIdAsync(long reporteId)
 {
     if (_seguimientoRepository is SeguimientoRepository repo)
         return await repo.GetByReporteIdAsync(reporteId);
     throw new NotSupportedException("Repositorio no soporta esta operación");
-}
+}*/
 
 }
