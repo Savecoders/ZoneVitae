@@ -44,15 +44,10 @@ editReporte(id: number, dto: any): Observable<ReporteCompleto> {
 
   //BuscarTag
   buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
-    const nombreTagLower = nombreTag.toLowerCase();
-    return this.getReporte().pipe(
-      map((reportes) =>
-        reportes.filter((r) =>
-          r.tags?.some((tag) => tag.nombre.toLowerCase() === nombreTagLower)
-        )
-      )
-    );
+    const url = `${this.jsonUrl}/filtrar-por-tag?tag=${encodeURIComponent(nombreTag)}`;
+    return this.http.get<ReporteCompleto[]>(url);
   }
+
 
 
   // ...existing code...

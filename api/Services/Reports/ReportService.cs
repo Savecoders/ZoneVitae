@@ -153,7 +153,7 @@ public class ReportService
         await _reportRepository.AddAsync(report);
         await _reportRepository.SaveChangesAsync();
 
-        // Crear fotos
+        // Crea fotos
         if (dto.FotosUrls != null && dto.FotosUrls.Any())
         {
             foreach (var url in dto.FotosUrls)
@@ -195,21 +195,6 @@ public class ReportService
 
         return true;
     }
-
-
-
-
-    /*public async Task<IEnumerable<Report>> GetReportsByTagAsync(string tagName)
-    {
-        // Asume que tienes un contexto que relaciona Reports y Tags, por ejemplo una tabla intermedia ReportTags
-        var context = (_reportRepository as ReportRepository)?;
-        if (context == null)
-            throw new InvalidOperationException("No se puede acceder al contexto de la base de datos.");
-
-        return await context.Reports
-            .Where(r => r.ReportTags.Any(rt => rt.Tag.Nombre.ToLower() == tagName.ToLower()))
-            .ToListAsync();
-    }*/
 
     public static ReportResponseDto MapToDto(Report report)
     {
@@ -291,16 +276,16 @@ public class ReportService
         if (report.AutorId != userId && !await UserIsAdminOrJoinAsync(userId))
             throw new UnauthorizedAccessException("No tienes permiso para editar este reporte.");
 
-        // Actualizar propiedades básicas
+        // Actualiza
         report.Titulo = dto.Titulo;
         report.Contenido = dto.Contenido;
         report.Direccion = dto.Direccion;
         report.ComunidadId = dto.ComunidadId;
 
-        // Limpiar tags existentes
+        // Limpia tags
         report.Tags.Clear();
 
-        // Añadir nuevos tags reutilizando los existentes
+        // Añade nuevos tags
         foreach (var tagName in dto.Tags.Distinct())
         {
             var existingTags = await _tagRepository.FindAsync(t => t.Nombre.ToLower() == tagName.ToLower());
@@ -331,6 +316,23 @@ public class ReportService
         var roles = usuario?.UsuariosRoles.Select(ur => ur.IdRolNavigation.Nombre).ToList();
 
         return roles != null && (roles.Contains("Administrador") || roles.Contains("Join"));
+    }
+
+    public async Task<IEnumerable<ReportResponseDto>> GetByTagAsync(string tagNombre)
+    {
+        var repo = _reportRepository as ReportRepository;
+        if (repo == null) return Enumerable.Empty<ReportResponseDto>();
+
+        string tagNombreNormalized = tagNombre.Trim().ToLower();
+
+        // Obtener reportes que tienen un tag con ese nombre
+        var reports = await repo.FindWithIncludesAsync(
+            r => r.Tags.Any(t => t.Nombre.ToLower() == tagNombreNormalized),
+            r => r.Autor,
+            r => r.Fotos,
+            r => r.Tags);
+
+        return reports.Select(MapToDto).ToList();
     }
 
 

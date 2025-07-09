@@ -82,6 +82,17 @@ public class ReportsController : ControllerBase
         }
     }
 
+    [HttpGet("filtrar-por-tag")]
+    [Authorize]
+    public async Task<IActionResult> FiltrarPorTag([FromQuery] string tag)
+    {
+        if (string.IsNullOrEmpty(tag))
+            return BadRequest("El parámetro tag es obligatorio.");
+
+        var reports = await _reportService.GetByTagAsync(tag);
+        return Ok(reports);
+    }
+
 
 
 
@@ -100,16 +111,4 @@ public class ReportsController : ControllerBase
 
         return Ok(resultado);
     }
-
-
-    /*[HttpGet("search/by-tag")]
-    [Authorize]
-    public async Task<IActionResult> SearchByTag([FromQuery] string tagName)
-    {
-    if (string.IsNullOrWhiteSpace(tagName))
-        return BadRequest("El nombre del tag es requerido.");
-
-    var reports = await _reportService.GetReportsByTagAsync(tagName);
-    return Ok(reports);
-    }*/
 }

@@ -84,7 +84,6 @@ export class ReportsComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarUsuarioActual();
-    console.log('Usuario actual:', this.usuarioActual);
     this.cargarComunidades();
     this.cargarReportes();
     this.reportsForm();
@@ -130,16 +129,23 @@ cargarUsuarioActual(): void {
     return this.form.get('fotos') as FormArray;
   }
 
-  nuevoReporte() {
-    this.mostrarFormulario = true;
-    this.isEditMode = false;
-    this.form.reset();
-    this.fotos.clear();
-    this.tags.value.map((t: Tag) => ({ id: t.id, nombre: t.nombre }));
-    this.imagePreview = null;
-    this.menuAbiertoId = null;
-  }
+nuevoReporte() {
+  this.mostrarFormulario = true;
+  this.isEditMode = false;
+  this.menuAbiertoId = null;
+  this.imagePreview = null;
 
+  this.form.reset();
+
+  this.fotos.clear();
+  this.tags.clear();
+
+  this.form.patchValue({
+    estado: 'Pendiente_Moderacion',
+    anonimo: false,
+    create_at: new Date()
+  });
+}
   resetFormulario(): void {
     this.form.reset();
     this.tags.clear();
@@ -153,7 +159,6 @@ cargarUsuarioActual(): void {
   cargarComunidades(): Subscription {
     return this.comunidadService.getComunidadesParaReportes().subscribe((datos: Comunidad[]) => {
       this.comunidades = datos;
-      console.log('Comunidades cargadas:', this.comunidades);
     });
   }
 
@@ -162,7 +167,6 @@ cargarUsuarioActual(): void {
     this.reporteService.getReporte().subscribe((datos: ReporteCompleto[]) => {
       this.reportes = datos;
       this.reportesFiltrados = datos;
-      console.log('Reportes cargados:', datos);
       this.reportes
         .filter((reporte) => reporte.id !== undefined)
         .forEach((reporte) => this.verificarMeEncanta(reporte.id!));
@@ -204,14 +208,14 @@ guardarReporte(): void {
 
   // Construir el DTO compatible con el backend (ReportCreateDto)
   const dto = {
-    titulo: reportForm.titulo,
-    contenido: reportForm.contenido,
-    anonimo: !!reportForm.anonimo,
-    Direccion: reportForm.direccion,
-    ComunidadId: reportForm.comunidad.id,
-    Tags: tagsNom,
-    FotosUrls: fotosUrls,
-  };
+  titulo: reportForm.titulo,
+  contenido: reportForm.contenido,
+  anonimo: !!reportForm.anonimo,
+  Direccion: reportForm.direccion,
+  ComunidadId: reportForm.comunidad?.id,
+  Tags: tagsNom,
+  FotosUrls: fotosUrls,
+};
 
   const accion = this.isEditMode && this.reporteEditando
     ? this.reporteService.editReporte(this.reporteEditando.id!, dto)
@@ -257,6 +261,7 @@ guardarReporte(): void {
       anonimo: reporte.anonimo,
       comunidad: comunidad ?? null,
       create_at: reporte.create_at,
+      estado: reporte.estado 
     });
 
     this.tags.clear();
@@ -425,4 +430,8 @@ filtrarTag(tag: string): void {
       'Se limpió el filtro, mostrando todos los reportes.'
     );
   }
+
+  compareComunidades(c1: Comunidad, c2: Comunidad): boolean {
+  return c1 && c2 ? c1.id === c2.id : c1 === c2;
+}
 }
