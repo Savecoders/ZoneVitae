@@ -91,23 +91,17 @@
                               <label
                                 for="comunidad"
                                 class="block text-sm font-bold text-white"
-                                >Comunidad</label
-                              >
-                              <select
-                                id="comunidad"
-                                formControlName="comunidad"
-                                class="mt-2 block w-full rounded-md bg-gray-900 text-white px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
-                              >
-                                <option [ngValue]="null" disabled>
-                                  Selecciona una comunidad
-                                </option>
-                                <option
-                                  *ngFor="let comunidad of comunidades"
-                                  [ngValue]="comunidad"
+                                >Comunidad</label>
+                                <select
+                                  formControlName="comunidad"
+                                  required
+                                  class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
                                 >
-                                  {{ comunidad.nombre }}
-                                </option>
-                              </select>
+                                  <option [ngValue]="null" disabled selected>Selecciona una comunidad</option>
+                                  <option *ngFor="let c of comunidades" [ngValue]="c">
+                                    {{ c.nombre }}
+                                  </option>
+                                </select>
                               <div
                                 *ngIf="
                                   form.get('comunidad')?.invalid &&
@@ -253,6 +247,22 @@
                                     &times;
                                   </button>
                                 </span>
+                              </div>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="sm:col-span-6 mt-4">
+                              <label for="direccion" class="block text-sm font-bold text-white">Dirección</label>
+                              <input
+                                type="text"
+                                id="direccion"
+                                formControlName="direccion"
+                                maxlength="500"
+                                class="block w-full rounded-md bg-gray-900 px-3 py-2 text-base text-white border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+                                placeholder="Dirección (opcional)"
+                              />
+                              <div *ngIf="form.get('direccion')?.invalid && form.get('direccion')?.touched" class="text-red-500 text-sm mt-1">
+                                La dirección no puede superar los 500 caracteres.
                               </div>
                             </div>
 
@@ -449,15 +459,22 @@
 
                           <!-- Encabezado -->
                           <div class="flex items-center gap-3">
-                            <div
-                              class="bg-muted text-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm"
-                            >
-                              {{
-                                reporte.anonimo
-                                  ? "A"
-                                  : reporte.autor?.nombreUsuario
-                              }}
-                            </div>
+                            <ng-container *ngIf="!reporte.anonimo && reporte.autor?.fotoPerfil; else letraInicial">
+                              <img
+                                [src]="reporte.autor?.fotoPerfil"
+                                alt="Foto de perfil"
+                                class="w-8 h-8 rounded-full object-cover"
+                              />
+                            </ng-container>
+                            
+                            <ng-template #letraInicial>
+                              <div
+                                class="bg-muted text-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm"
+                              >
+                                {{ reporte.anonimo ? 'A' : (reporte.autor?.nombreUsuario?.charAt(0) | uppercase) }}
+                              </div>
+                            </ng-template>
+                            
                             <div>
                               <div class="text-sm font-medium">
                                 {{

@@ -8,6 +8,7 @@ import { Comunidad } from '../models/comunidad.model';
   providedIn: 'root',
 })
 export class ComunidadService extends BaseService<Comunidad> {
+  
   constructor(http: HttpClient) {
     super(http, 'comunidades');
   }
@@ -75,5 +76,10 @@ export class ComunidadService extends BaseService<Comunidad> {
           return this.http.get<Comunidad[]>(`${this.baseUrl}?${queryParams}`);
         })
       );
+  }
+
+  getComunidadesParaReportes(): Observable<Comunidad[]> {
+    const url = `${this.baseUrl.split('/comunidades')[0]}/reports/comunidades`;
+    return this.http.get<Comunidad[]>(url);
   }
 }

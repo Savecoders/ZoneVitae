@@ -33,7 +33,7 @@ import { SidebarComponent } from '../shared/sidebar/sidebar.component';
 import { FollowSectionComponent } from '../shared/follow-section/follow-section.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { map, switchMap } from 'rxjs/operators';
-import { of, forkJoin } from 'rxjs';
+import { of, forkJoin, Subscription } from 'rxjs';
 import { ToastService } from 'app/services/toast.service';
 
 @Component({
@@ -83,9 +83,9 @@ export class ReportsComponent implements OnInit {
   imagePreview: string | null = null;
 
   ngOnInit(): void {
+    this.cargarComunidades();
     this.cargarReportes();
     this.reportsForm();
-    this.cargarComunidades();
   }
 
   reportsForm(): void {
@@ -94,6 +94,7 @@ export class ReportsComponent implements OnInit {
       contenido: ['', [Validators.required, Validators.maxLength(280)]],
       anonimo: [false],
       create_at: [new Date()],
+      direccion: ['', Validators.maxLength(500)],
       comunidad: [null, Validators.required],
       fotos: this.fb.array([], (control: AbstractControl) => {
         const array = control as FormArray;
@@ -138,9 +139,10 @@ export class ReportsComponent implements OnInit {
   }
 
   //Cargar Comunidades
-  cargarComunidades(): void {
-    this.comunidadService.getComunidades().subscribe((datos: Comunidad[]) => {
+  cargarComunidades(): Subscription {
+    return this.comunidadService.getComunidadesParaReportes().subscribe((datos: Comunidad[]) => {
       this.comunidades = datos;
+      console.log('Comunidades cargadas:', this.comunidades);
     });
   }
 
@@ -166,103 +168,59 @@ export class ReportsComponent implements OnInit {
   }
 
   //Guardar Reporte
-  guardarReporte(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const reportForm = this.form.value;
-    // Validar que todos los tags tengan un nombre definido
-    const tagsNom: string[] = reportForm.tags
-      .filter((t: any) => t && t.nombre) // Asegurar que el tag tenga propiedad nombre
-      .map((t: any) => (t.nombre as string).trim().toLowerCase())
-      .filter((nombre: string) => nombre.length > 0);
-
-    if (tagsNom.length === 0) {
-      this.toastService.error('Debes agregar al menos un tag válido');
-      return;
-    }
-
-    const tagsCreacion$ = tagsNom.map((nombre: string) =>
-      this.tagService.getTags().pipe(
-        map((tags) =>
-          tags.find((tag) => tag?.nombre?.toLowerCase() === nombre)
-        ), // Añadimos validación adicional
-        switchMap((tagExistente) => {
-          if (tagExistente) {
-            return of(tagExistente);
-          } else {
-            return this.tagService.createTag({ nombre });
-          }
-        })
-      )
-    );
-
-    forkJoin(tagsCreacion$).subscribe({
-      next: (tagsCreadoOExistentes: Tag[]) => {
-        const nuevoReporte: ReporteCompleto = {
-          id: this.reporteEditando?.id,
-          titulo: reportForm.titulo,
-          contenido: reportForm.contenido,
-          anonimo: reportForm.anonimo,
-          create_at: reportForm.create_at || new Date(),
-          comunidad_id: reportForm.comunidad.id,
-          fotos: this.fotos.value as Foto[],
-          tags: tagsCreadoOExistentes,
-          autor_id: localStorage.getItem('user_data')
-            ? JSON.parse(localStorage.getItem('user_data')!).id
-            : null,
-          estado: EstadoReporte.PENDIENTE_REVISION,
-          estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION,
-        };
-
-        if (this.isEditMode && this.reporteEditando) {
-          this.reporteService.editReporte(nuevoReporte).subscribe({
-            next: () => {
-              this.toastService.success('¡Reporte guardado exitosamente!');
-
-              // Primero hacer todas las actualizaciones de estado
-              this.resetFormulario();
-              this.mostrarFormulario = false;
-              this.isEditMode = false;
-              this.reporteEditando = null;
-
-              // Luego cargar los reportes para evitar problemas de refresco
-              setTimeout(() => this.cargarReportes(), 100);
-            },
-            error: (err) => {
-              console.error('Error al editar reporte:', err);
-              this.toastService.error('Error al guardar el reporte');
-            },
-          });
-        } else {
-          this.reporteService.createReporte(nuevoReporte).subscribe({
-            next: () => {
-              this.toastService.success('¡Reporte guardado exitosamente!');
-
-              // Primero hacer todas las actualizaciones de estado
-              this.resetFormulario();
-              this.mostrarFormulario = false;
-
-              // Luego cargar los reportes para evitar problemas de refresco
-              setTimeout(() => this.cargarReportes(), 100);
-            },
-            error: (err) => {
-              console.error('Error al crear reporte:', err);
-              this.toastService.error('Error al guardar el reporte');
-            },
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error creando tags:', err);
-        this.toastService.error(
-          'Error al guardar el reporte. Verifica los datos ingresados.'
-        );
-      },
-    });
+guardarReporte(): void {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  const reportForm = this.form.value;
+
+  // Obtener tags como string[]
+  const tagsNom: string[] = this.tags.value
+    .filter((t: any) => t?.nombre)
+    .map((t: any) => t.nombre.trim().toLowerCase())
+    .filter((nombre: string) => nombre.length > 0);
+
+  if (tagsNom.length === 0) {
+    this.toastService.error('Debes agregar al menos un tag válido');
+    return;
+  }
+
+  // Obtener URLs de las fotos subidas
+  const fotosUrls: string[] = this.fotos.value.map((f: any) => f.image);
+
+  // Construir el DTO compatible con el backend (ReportCreateDto)
+  const dto = {
+    titulo: reportForm.titulo,
+    contenido: reportForm.contenido,
+    anonimo: !!reportForm.anonimo,
+    Direccion: reportForm.direccion,
+    ComunidadId: reportForm.comunidad.id,
+    Tags: tagsNom,
+    FotosUrls: fotosUrls,
+  };
+
+  const accion = this.isEditMode && this.reporteEditando
+    ? this.reporteService.editReporte(this.reporteEditando)
+    : this.reporteService.createReporte(dto);
+
+  accion.subscribe({
+    next: () => {
+      this.toastService.success('¡Reporte guardado exitosamente!');
+      this.resetFormulario();
+      this.mostrarFormulario = false;
+      this.isEditMode = false;
+      this.reporteEditando = null;
+      setTimeout(() => this.cargarReportes(), 100);
+    },
+    error: (err) => {
+      console.error('Error al guardar el reporte:', err);
+      this.toastService.error('Error al guardar el reporte');
+    },
+  });
+}
+
   //Editar Reporte
   editarReporte(id: number): void {
     const reporte = this.reportes.find((r) => r.id === id);
@@ -310,6 +268,7 @@ export class ReportsComponent implements OnInit {
           this.toastService.success('Reporte eliminado correctamente');
         },
         error: (err) => {
+          const msg = err.error?.message || 'Error interno al eliminar el reporte';
           this.toastService.error('Error al eliminar el reporte:', err);
         },
       });

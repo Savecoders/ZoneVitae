@@ -16,15 +16,32 @@ namespace api.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Report>> FindWithIncludesAsync(Expression<Func<Report, bool>> predicate, params Expression<Func<Report, object>>[] includes)
+        public async Task<Report?> GetByIdWithIncludesAsync(object id, params Expression<Func<Report, object>>[] includes)
         {
-            throw new NotImplementedException();
+            IQueryable<Report> query = context.Reports;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(r => r.Id == (long)id);
         }
 
-        public Task<Report?> GetByIdWithIncludesAsync(object id, params Expression<Func<Report, object>>[] includes)
+
+        public async Task<IEnumerable<Report>> FindWithIncludesAsync(Expression<Func<Report, bool>> predicate, params Expression<Func<Report, object>>[] includes)
         {
-            throw new NotImplementedException();
+            IQueryable<Report> query = context.Reports.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
+
+
 
         public async Task AddAsync(Report entity) => await context.Reports.AddAsync(entity);
         public void Update(Report entity) => context.Reports.Update(entity);

@@ -6,8 +6,8 @@ import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
 
 import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+import { environment } from 'environments/environment.development';
 
-import { environment } from '../../environments/environment';
 
 
 @Injectable({
@@ -26,9 +26,10 @@ export class ReporteService extends BaseService<ReporteCompleto> {
   }
 
   //Agregar Reporte
-  createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte);
+  createReporte(dto: any): Observable<ReporteCompleto> {
+    return this.http.post<ReporteCompleto>(this.jsonUrl, dto);
   }
+
 
   //Editar Reporte
   editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
