@@ -7,7 +7,8 @@ namespace api.DTOs.Seguimientos
     {
         public long Id { get; set; }
 
-       
+        [Required(ErrorMessage = "El reporte es requerido")]
+        public long ReporteId { get; set; }
 
         [Required(ErrorMessage = "El estado anterior es requerido")]
         [StringLength(50, ErrorMessage = "El estado anterior no puede exceder 50 caracteres")]
