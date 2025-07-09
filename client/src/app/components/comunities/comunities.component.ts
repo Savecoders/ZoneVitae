@@ -30,7 +30,7 @@ export class ComunitiesComponent {
     }
   
     getComunidades():void{
-      this.miServicio.getComunidades().subscribe((data:Comunidad[])=>{
+      this.miServicio.getAll().subscribe((data:Comunidad[])=>{
         this.communities = data;
       });
     }

@@ -91,14 +91,15 @@ export class SeguimientoService extends BaseService<SeguimientoReporte> {
     );
   }
 
-  getSeguimientosByReporte(reporteId: number): Observable<SeguimientoReporte[]> {
-    return this.getAll().pipe(
-      map((seguimientos) => seguimientos.filter(s => Number(s.reporte_id) === Number(reporteId)))
-    );
-  }
-  getSeguimientosByUsuario(usuarioId: number): Observable<SeguimientoReporte[]> {
-    return this.getAll().pipe(
-      map((seguimientos) => seguimientos.filter(s => s.usuario_id === usuarioId))
-    );
-  }
+getSeguimientosByReporte(reporteId: number): Observable<SeguimientoReporte[]> {
+  return this.http.get<ApiResponse<SeguimientoReporte[]>>(this.jsonUrl).pipe(
+    map(response => (response.data ?? []).filter(s => Number(s.reporte_id) === Number(reporteId)))
+  );
+}
+
+getSeguimientosByUsuario(usuarioId: number): Observable<SeguimientoReporte[]> {
+  return this.http.get<ApiResponse<SeguimientoReporte[]>>(this.jsonUrl).pipe(
+    map(response => (response.data ?? []).filter(s => s.usuario_id === usuarioId))
+  );
+}
 }

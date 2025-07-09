@@ -19,7 +19,7 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Administrador, Moderador")]
+   // [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<IEnumerable<SeguimientoReporteDto>>>> GetAll()
     {
         var seguimientos = await _seguimientoService.GetAllAsync();
@@ -44,7 +44,7 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Administrador, Moderador")]
+   // [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> GetById(long id)
     {
         var seguimiento = await _seguimientoService.GetByIdAsync(id);
@@ -77,7 +77,7 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Administrador, Moderador")]
+  //  [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteDto seguimientoDto)
     {
         try
@@ -119,7 +119,7 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Administrador, Moderador")]
+   // [Authorize(Roles = "Administrador, Moderador")]
     public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Update(long id, SeguimientoReporteDto seguimientoDto)
     {
         try
@@ -167,7 +167,7 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrador")]
+   // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(long id)
     {
         try

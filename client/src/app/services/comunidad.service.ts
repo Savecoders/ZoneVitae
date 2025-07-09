@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, switchMap, of } from 'rxjs';
-import { BaseService } from './base.service';
+import { Observable, map, switchMap, of, catchError } from 'rxjs';
 import { Comunidad } from '../models/comunidad.model';
+import { ApiResponse } from "../models/api-response.model";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root',
 })
-export class ComunidadService extends BaseService<Comunidad> {
-  constructor(http: HttpClient) {
-    super(http, 'comunidades');
-  }
+export class ComunidadService{
+  private apiUrl = `${environment.apiUrl}/Comunidades`;
+  
+  constructor(private http: HttpClient) {}
 
+  /*
   // Get all communities with optional filtering
   getComunidades(nombre?: string, ubicacion?: string): Observable<Comunidad[]> {
     return this.getAll().pipe(
@@ -30,31 +32,128 @@ export class ComunidadService extends BaseService<Comunidad> {
       )
     );
   }
+    */
 
-  // Get community by id
+  getAll(): Observable<Comunidad[]> {
+    return this.http.get<ApiResponse<Comunidad[]>>(`${this.apiUrl}`).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || "Error obteniendo comunidades");
+        }
+        if (!response.data) {
+          throw new Error("No data received from server");
+        }
+        return response.data;
+      }),
+      catchError((error) => {
+        console.error("Error fetching users:", error);
+        return of([]);
+      }),
+    );
+  }
+
+  /* Get community by id
   getComunidadById(id: number | string): Observable<Comunidad> {
     return this.getById(id);
   }
+*/
+   // Get community by ID
+  getById(id: string): Observable<Comunidad> {
+    return this.http.get<ApiResponse<Comunidad>>(`${this.apiUrl}/${id}`).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || "Error obteniendo usuario");
+        }
+        if (!response.data) {
+          throw new Error("No data received from server");
+        }
+        return response.data;
+      }),
+    );
+  }
 
-  // Create a new community
+
+  /* Create a new community
   createComunidad(comunidad: Comunidad): Observable<Comunidad> {
     return this.create(comunidad);
   }
+  */
 
-  // Update community
+    create(community:Comunidad): Observable<Comunidad> {
+      return this.http.post<ApiResponse<Comunidad>>(`${this.apiUrl}`, community).pipe(
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || "Error creando comunidad");
+          }
+          if (!response.data) {
+            throw new Error("No data received from server");
+          }
+          return response.data;
+        }),
+      );
+    }
+
+  /* Update community
   updateComunidad(
     id: number | string,
     comunidad: Partial<Comunidad>
   ): Observable<Comunidad> {
     return this.update(id, comunidad);
   }
+    */
 
-  // Delete community
+  update(id: string, community: Partial<Comunidad>): Observable<Comunidad> {
+    return this.http
+      .put<ApiResponse<Comunidad>>(`${this.apiUrl}/${id}`, community)
+      .pipe(
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || "Error actualizando comunidad");
+          }
+          if (!response.data) {
+            throw new Error("No data received from server");
+          }
+          return response.data;
+        }),
+      );
+  }
+
+
+  /* Delete community
   deleteComunidad(id: number | string): Observable<void> {
     return this.delete(id);
   }
+    */
 
-  // Get communities by tag
+  delete(id: string): Observable<any> {
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${id}`).pipe(
+      map((response) => {
+        if (!response.success) {
+          throw new Error(response.message || "Ha ocurrido un error al eliminar la comunidad");
+        }
+        return response.data || {};
+      }),
+    );
+  }
+
+  getCommunitiesByName(name: string): Observable<Comunidad[]> {
+    return this.getAll().pipe(
+      map((comunidades) => {
+        return comunidades.filter(
+          (comunidad) =>
+            comunidad.nombre.toLowerCase().includes(name.toLowerCase())
+        );
+      }),
+      catchError((error) => {
+        console.error("Error fetching communities by name:", error);
+        return of([]);
+      }),
+    );
+  }
+
+  
+
+  /* Get communities by tag
   getComunidadesByTag(tagId: number): Observable<Comunidad[]> {
     // First get the community-tag relations
     return this.http
@@ -76,4 +175,5 @@ export class ComunidadService extends BaseService<Comunidad> {
         })
       );
   }
+      */
 }

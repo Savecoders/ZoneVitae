@@ -45,7 +45,7 @@ displayedColumns: string[] = ['nombre', 'descripcion', 'tipoComunidad',
   }
 
   cargarComunidades():void{
-    this.miServicio.getComunidades().subscribe((datos:Comunidad[])=>{
+    this.miServicio.getAll().subscribe((datos:Comunidad[])=>{
       this.dataSource.data = datos;
     });
   }
@@ -57,7 +57,7 @@ displayedColumns: string[] = ['nombre', 'descripcion', 'tipoComunidad',
     }
     let confirmado = confirm(`Estas seguro de eliminar la comunidad ${comunidad.nombre} ?`);
     if(confirmado){
-      this.miServicio.deleteComunidad(comunidad.id).subscribe(() => {
+      this.miServicio.delete(comunidad.id).subscribe(() => {
         this.toastService.success("Eliminado exitosamente");
         this.cargarComunidades();
       });
@@ -76,7 +76,7 @@ displayedColumns: string[] = ['nombre', 'descripcion', 'tipoComunidad',
 
   search(termino: string) {
     if (termino) {
-      this.miServicio.getComunidades(termino).subscribe((datos: Comunidad[]) => {
+      this.miServicio.getAll(termino).subscribe((datos: Comunidad[]) => {
       this.dataSource.data = datos;
     });
     } else {
