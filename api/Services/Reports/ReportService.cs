@@ -41,6 +41,12 @@ public class ReportService
         return Guid.Parse(userId);
     }
 
+    public async Task<Report?> GetByIdAsync(long id)
+    {
+        return await _reportRepository.GetByIdAsync(id);
+    }
+
+
 
     public async Task<IEnumerable<ReportResponseDto>> GetAllMappedAsync()
     {
@@ -268,6 +274,63 @@ public class ReportService
                 Nombre = t.Nombre
             }).ToList()
         };
+    }
+
+    public async Task EditarAsync(long id, ReportEditDto dto)
+    {
+        var report = await _reportRepository.GetByIdWithIncludesAsync(id,
+            r => r.Tags,
+            r => r.Fotos,
+            r => r.Autor);
+
+        if (report == null)
+            throw new Exception("Reporte no encontrado.");
+
+        var userId = GetCurrentUserId();  // Usa tu método que ya tienes
+
+        if (report.AutorId != userId && !await UserIsAdminOrJoinAsync(userId))
+            throw new UnauthorizedAccessException("No tienes permiso para editar este reporte.");
+
+        // Actualizar propiedades básicas
+        report.Titulo = dto.Titulo;
+        report.Contenido = dto.Contenido;
+        report.Direccion = dto.Direccion;
+        report.ComunidadId = dto.ComunidadId;
+
+        // Limpiar tags existentes
+        report.Tags.Clear();
+
+        // Añadir nuevos tags reutilizando los existentes
+        foreach (var tagName in dto.Tags.Distinct())
+        {
+            var existingTags = await _tagRepository.FindAsync(t => t.Nombre.ToLower() == tagName.ToLower());
+            var existingTag = existingTags.FirstOrDefault();
+
+            if (existingTag != null)
+            {
+                report.Tags.Add(existingTag);
+            }
+            else
+            {
+                var newTag = new Tag { Id = Guid.NewGuid(), Nombre = tagName };
+                await _tagRepository.AddAsync(newTag);
+                report.Tags.Add(newTag);
+            }
+        }
+
+        _reportRepository.Update(report);
+        await _reportRepository.SaveChangesAsync();
+    }
+
+    private async Task<bool> UserIsAdminOrJoinAsync(Guid userId)
+    {
+        var usuario = await _usuarioRepository.GetByIdWithIncludesAsync(userId,
+            u => u.UsuariosRoles,
+            u => u.UsuariosRoles.Select(ur => ur.IdRolNavigation));
+
+        var roles = usuario?.UsuariosRoles.Select(ur => ur.IdRolNavigation.Nombre).ToList();
+
+        return roles != null && (roles.Contains("Administrador") || roles.Contains("Join"));
     }
 
 

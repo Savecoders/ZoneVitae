@@ -50,12 +50,12 @@ public class ReportsController : ControllerBase
 
     [HttpPut("{id:long}")]
     [Authorize]
-    public async Task<IActionResult> Update(long id, [FromBody] ReportDto dto)
+    public async Task<IActionResult> EditarReporte(long id, [FromBody] ReportEditDto dto)
     {
         try
         {
-            var success = await _reportService.UpdateReportAsync(id, dto);
-            return success ? NoContent() : NotFound();
+            await _reportService.EditarAsync(id, dto);
+            return Ok();     
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -78,7 +78,6 @@ public class ReportsController : ControllerBase
         }
         catch (Exception ex)
         {
-            // DEV ONLY: retornar el mensaje del error en la respuesta
             return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
         }
     }
@@ -101,6 +100,7 @@ public class ReportsController : ControllerBase
 
         return Ok(resultado);
     }
+
 
     /*[HttpGet("search/by-tag")]
     [Authorize]

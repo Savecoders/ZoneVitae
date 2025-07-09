@@ -10,7 +10,23 @@ namespace api.Repositories
     public class ReportRepository(ZoneVitaeSqlContext context) : IRepository<Report>
     {
         public async Task<IEnumerable<Report>> GetAllAsync() => await context.Reports.ToListAsync();
-        public async Task<Report?> GetByIdAsync(object id) => await context.Reports.FindAsync(id);
+        public async Task<Report?> GetByIdAsync(object id)
+        {
+            if (id is not long longId)
+            {
+                try
+                {
+                    longId = Convert.ToInt64(id);
+                }
+                catch
+                {
+                    return null; // o lanzar una excepción si prefieres
+                }
+            }
+
+            return await context.Reports.FirstOrDefaultAsync(r => r.Id == longId);
+        }
+
         public Task<IEnumerable<Report>> FindAsync(Expression<Func<Report, bool>> predicate)
         {
             throw new NotImplementedException();

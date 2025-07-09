@@ -32,10 +32,9 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
 
   //Editar Reporte
-  editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    const url = `${this.jsonUrl}/${reporte.id}`;
-    return this.http.put<ReporteCompleto>(url, reporte);
-  }
+editReporte(id: number, dto: any): Observable<ReporteCompleto> {
+  return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
+}
 
   //Eliminar Reporte
   deleteReporte(id: number): Observable<void> {
@@ -84,7 +83,6 @@ getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
     )
   );
 }
-
 
 
   // Buscar reportes por autor

@@ -83,15 +83,26 @@ export class ReportsComponent implements OnInit {
   imagePreview: string | null = null;
 
   ngOnInit(): void {
+    this.cargarUsuarioActual();
+    console.log('Usuario actual:', this.usuarioActual);
     this.cargarComunidades();
     this.cargarReportes();
     this.reportsForm();
   }
+  
+cargarUsuarioActual(): void {
+  const userData = localStorage.getItem('user_data');
+  if (userData) {
+    const parsed = JSON.parse(userData);
+    this.usuarioActual = parsed.usuario ?? parsed;
+  }
+}
 
   reportsForm(): void {
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.maxLength(100)]],
       contenido: ['', [Validators.required, Validators.maxLength(280)]],
+      estado: ['Pendiente_Moderacion', Validators.required],
       anonimo: [false],
       create_at: [new Date()],
       direccion: ['', Validators.maxLength(500)],
@@ -151,6 +162,7 @@ export class ReportsComponent implements OnInit {
     this.reporteService.getReporte().subscribe((datos: ReporteCompleto[]) => {
       this.reportes = datos;
       this.reportesFiltrados = datos;
+      console.log('Reportes cargados:', datos);
       this.reportes
         .filter((reporte) => reporte.id !== undefined)
         .forEach((reporte) => this.verificarMeEncanta(reporte.id!));
@@ -202,7 +214,7 @@ guardarReporte(): void {
   };
 
   const accion = this.isEditMode && this.reporteEditando
-    ? this.reporteService.editReporte(this.reporteEditando)
+    ? this.reporteService.editReporte(this.reporteEditando.id!, dto)
     : this.reporteService.createReporte(dto);
 
   accion.subscribe({
@@ -225,6 +237,11 @@ guardarReporte(): void {
   editarReporte(id: number): void {
     const reporte = this.reportes.find((r) => r.id === id);
     if (!reporte) return;
+    
+  if (!this.usuarioActual || !reporte.autor || reporte.autor.id !== this.usuarioActual.id) {
+    this.toastService.error('No tienes permiso para editar este reporte.');
+    return;
+  }
 
     this.isEditMode = true;
     this.reporteEditando = reporte;
@@ -236,6 +253,7 @@ guardarReporte(): void {
     this.form.patchValue({
       titulo: reporte.titulo,
       contenido: reporte.contenido,
+      direccion: reporte.direccion,
       anonimo: reporte.anonimo,
       comunidad: comunidad ?? null,
       create_at: reporte.create_at,
@@ -387,14 +405,19 @@ guardarReporte(): void {
     this.fotos.removeAt(index);
   }
 
-  filtrarTag(tag: string): void {
-    this.reportesFiltrados = this.reportes.filter(
-      (r) =>
-        Array.isArray(r.tags) &&
-        r.tags.some((t) => t.nombre.toLowerCase() === tag.toLowerCase())
-    );
-    this.toastService.success(`Se filtraron los reportes por el tag ${tag}`);
-  }
+filtrarTag(tag: string): void {
+  this.reporteService.buscarPorTag(tag).subscribe({
+    next: (res) => {
+      this.reportesFiltrados = res;
+      this.toastService.success(`Se filtraron los reportes por el tag ${tag}`);
+    },
+    error: (err) => {
+      console.error('Error al filtrar:', err);
+      this.toastService.error('No se pudo filtrar los reportes');
+    },
+  });
+}
+
 
   quitarFiltro() {
     this.reportesFiltrados = this.reportes;
