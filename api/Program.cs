@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using api.Contexts;
+using api.Repositories;
+using api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
@@ -37,6 +39,8 @@ builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.R
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ActividadeRepository>();
+builder.Services.AddScoped<ActividadeService>();
 
 // Add controllers with JSON options
 // This is necessary to ensure that the API uses System.Text.Json for serialization
