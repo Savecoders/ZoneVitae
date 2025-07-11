@@ -130,7 +130,7 @@ public class ReportService
             UpdateAt = DateTime.UtcNow
         };
 
-        // Agregar tags
+        // Agrega tags
         if (dto.Tags != null && dto.Tags.Any())
         {
             foreach (var tagNombre in dto.Tags)
@@ -191,7 +191,7 @@ public class ReportService
         }
         await _fotoRepository.SaveChangesAsync();
 
-        // Eliminar el reporte
+        // Elimina el reporte
         _reportRepository.Delete(report);
         await _reportRepository.SaveChangesAsync();
 

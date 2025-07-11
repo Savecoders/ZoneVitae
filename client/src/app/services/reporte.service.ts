@@ -21,17 +21,11 @@ export class ReporteService extends BaseService<ReporteCompleto> {
   }
 
   //carga los datos del reporte
-getReporte(): Observable<ReporteCompleto[]> {
-  return this.http.get<ReporteCompleto[]>(this.jsonUrl).pipe(
-    map(reportes =>
-      reportes.map(reporte => ({
-        ...reporte,
-        createAtDate: reporte.create_at ? new Date(reporte.create_at) : null,
-        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null, 
-      }))
-    )
-  );
-}
+  getReporte(): Observable<ReporteCompleto[]> {
+    return this.http.get<{ message: string, data: ReporteCompleto[] }>(this.jsonUrl).pipe(
+      map(response => response.data)
+    );
+  }
 
   //Agregar Reporte
   createReporte(dto: any): Observable<ReporteCompleto> {
@@ -58,16 +52,12 @@ editReporte(id: number, dto: any): Observable<ReporteCompleto> {
 
 
 
-
-getReporteById(id: number): Observable<ReporteCompleto> {
-  return this.http.get<ReporteCompleto>(`${this.jsonUrl}/${id}`).pipe(
-    map(reporte => ({
-      ...reporte,
-        createAtDate: reporte.create_at ? new Date(reporte.create_at) : null,
-        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null,
-    }))
-  );
-}
+  
+  getReporteById(id: number): Observable<ReporteCompleto> {
+    return this.http
+      .get<{ message: string, data: ReporteCompleto }>(`${this.jsonUrl}/${id}`)
+      .pipe(map(response => response.data));
+  }
 
 
    
