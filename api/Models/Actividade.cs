@@ -38,11 +38,6 @@ public partial class Actividade
     [StringLength(100)]
     public string Frecuencia { get; set; } = null!;
 
-    [Column("cover")]
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Cover { get; set; } = null!;
-
     [Column("fecha")]
     public DateTime Fecha { get; set; }
 

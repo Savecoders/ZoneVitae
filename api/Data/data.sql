@@ -107,7 +107,6 @@ CREATE TABLE [actividades] (
   [ubicacion] nvarchar(500) NOT NULL,
   [virtual] bit NOT NULL DEFAULT 0,
   [frecuencia] nvarchar(100) NOT NULL,
-  [cover] VARCHAR(255) NOT NULL,
   [fecha] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
