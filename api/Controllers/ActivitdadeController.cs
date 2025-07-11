@@ -1,4 +1,5 @@
 using api.DTOs.Actividade;
+using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,8 +36,9 @@ public class ActividadesController : ControllerBase
     {
         try
         {
-            var result = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+
+            var actividad = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = actividad.Id }, actividad);
         }
         catch (ArgumentException ex)
         {

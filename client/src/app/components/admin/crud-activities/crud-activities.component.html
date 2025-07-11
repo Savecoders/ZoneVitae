@@ -63,7 +63,7 @@
               Start Date
             </th>
             <td mat-cell *matCellDef="let activity">
-              {{ activity.fecha_inicio | date : "mediumDate" }}
+              {{ activity.fechaInicio | date : "mediumDate" }}
             </td>
           </ng-container>
 
@@ -71,7 +71,7 @@
           <ng-container matColumnDef="fecha_fin">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>End Date</th>
             <td mat-cell *matCellDef="let activity">
-              {{ activity.fecha_fin | date : "mediumDate" }}
+              {{ activity.fechaFin | date : "mediumDate" }}
             </td>
           </ng-container>
 

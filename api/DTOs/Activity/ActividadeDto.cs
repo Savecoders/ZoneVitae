@@ -4,11 +4,10 @@ namespace api.DTOs.Actividade;
 public class ActividadeDto
 {
     public long Id { get; set; }
-    public long? ComunidadId { get; set; }
     public string Nombre { get; set; } = null!;
     public string? Descripcion { get; set; }
-    public DateOnly FechaInicio { get; set; }
-    public DateOnly FechaFin { get; set; }
+    public DateTime FechaInicio { get; set; }
+    public DateTime FechaFin { get; set; }
     public string Ubicacion { get; set; } = null!;
     public bool Virtual { get; set; }
     public string Frecuencia { get; set; } = null!;

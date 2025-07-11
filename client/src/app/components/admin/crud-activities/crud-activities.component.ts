@@ -422,8 +422,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
     // Format dates properly for the form
     const formattedActivity = {
       ...activity,
-      fecha_inicio: this.formatDateForInput(activity.fecha_inicio),
-      fecha_fin: this.formatDateForInput(activity.fecha_fin),
+      fecha_inicio: this.formatDateForInput(activity.fechaInicio),
+      fecha_fin: this.formatDateForInput(activity.fechaFin),
     };
 
     this.activityForm.patchValue(formattedActivity);

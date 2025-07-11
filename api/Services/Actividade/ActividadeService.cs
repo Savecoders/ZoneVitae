@@ -58,11 +58,10 @@ public class ActividadeService
     private ActividadeDto MapToDto(Actividade a) => new()
     {
         Id = a.Id,
-        ComunidadId = a.ComunidadId,
         Nombre = a.Nombre,
         Descripcion = a.Descripcion,
-        FechaInicio = a.FechaInicio,
-        FechaFin = a.FechaFin,
+        FechaInicio = a.FechaInicio.ToDateTime(new TimeOnly(0, 0)),
+        FechaFin = a.FechaFin.ToDateTime(new TimeOnly(0, 0)),
         Ubicacion = a.Ubicacion,
         Virtual = a.Virtual,
         Frecuencia = a.Frecuencia,
@@ -75,11 +74,10 @@ public class ActividadeService
     private Actividade MapToEntity(ActividadeDto dto) => new()
     {
         Id = dto.Id,
-        ComunidadId = dto.ComunidadId,
         Nombre = dto.Nombre,
         Descripcion = dto.Descripcion,
-        FechaInicio = dto.FechaInicio,
-        FechaFin = dto.FechaFin,
+        FechaInicio = DateOnly.FromDateTime(dto.FechaInicio),
+        FechaFin = DateOnly.FromDateTime(dto.FechaFin),
         Ubicacion = dto.Ubicacion,
         Virtual = dto.Virtual,
         Frecuencia = dto.Frecuencia,
