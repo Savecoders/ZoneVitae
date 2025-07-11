@@ -17,6 +17,7 @@ import {
   ReporteCompleto,
 } from '../../models';
 import { ReporteService } from '../../services/reporte.service';
+import { AuthService } from '../../services/auth.service';
 import { ComunidadService } from '../../services/comunidad.service';
 import { Comunidad } from '../../models';
 import { MatButtonModule } from '@angular/material/button';
@@ -111,7 +112,8 @@ export class AuditoriaComponent {
     private fb: FormBuilder,
     private http: HttpClient,
     private cloudinaryService: CloudinaryService,
-    private router: Router
+    private router: Router,
+     private authService: AuthService
   ) {
     this.editForm = this.fb.group({
       estado: ['', Validators.required],
@@ -128,6 +130,10 @@ export class AuditoriaComponent {
 
  ngOnInit(): void {
   // Cargar comunidades desde el API usando el servicio actualizado
+ /* if (!this.authService.hasRole('Administrador')) {
+    this.router.navigate(['/']); // Redirige a inicio o página no autorizada
+    return;
+  }*/
   this.comunidadService.getAll().subscribe({
     next: (comunidades) => {
       this.comunidadesData = comunidades;
@@ -178,9 +184,9 @@ export class AuditoriaComponent {
     return comunidad?.nombre || 'Comunidad desconocida';
   }
 
-  formatearFecha(fecha: string | Date | undefined): string {
-    if (!fecha) return '--';
-    return new Date(fecha).toLocaleDateString();
+  formatearFecha(create_at: string | Date | undefined): string {
+    if (!create_at) return '--';
+    return new Date(create_at).toLocaleDateString();
   }
 
   cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {

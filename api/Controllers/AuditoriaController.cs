@@ -77,47 +77,66 @@ public class SeguimientoReporteController : ControllerBase
         });
     }
 
-    [HttpPost]
-    //  [Authorize(Roles = "Administrador, Moderador")]
-    public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteDto seguimientoDto)
+   [HttpPost]
+public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteCreateDto seguimientoCreateDto)
+{
+    try
     {
-        try
+        // Verificar si el reporte existe (necesitarías inyectar el servicio/repositorio de Reporte)
+        // var reporteExiste = await _reporteService.ExistsAsync(seguimientoCreateDto.ReporteId);
+        // if (!reporteExiste)
+        //     return BadRequest(new ApiResponse<SeguimientoReporteDto>
+        //     {
+        //         Success = false,
+        //         Message = "El reporte especificado no existe",
+        //         Data = default
+        //     });
+
+        var seguimiento = new SeguimientoReporte
         {
-            var seguimiento = new SeguimientoReporte
-            {
-                EstadoAnterior = seguimientoDto.EstadoAnterior,
-                Estado = seguimientoDto.Estado,
-                Comentario = seguimientoDto.Comentario,
-                AccionRealizada = seguimientoDto.AccionRealizada,
-                Prioridad = seguimientoDto.Prioridad,
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
-            };
+            ReporteId = seguimientoCreateDto.ReporteId, // Asignar el ReporteId
+            EstadoAnterior = seguimientoCreateDto.EstadoAnterior,
+            Estado = seguimientoCreateDto.Estado,
+            Comentario = seguimientoCreateDto.Comentario,
+            AccionRealizada = seguimientoCreateDto.AccionRealizada,
+            Prioridad = seguimientoCreateDto.Prioridad,
+            CreateAt = DateTime.UtcNow,
+            UpdateAt = DateTime.UtcNow
+        };
 
-            await _seguimientoService.AddAsync(seguimiento);
+        await _seguimientoService.AddAsync(seguimiento);
 
-            // Actualizar el DTO con el ID generado
-            seguimientoDto.Id = seguimiento.Id;
-            seguimientoDto.CreateAt = seguimiento.CreateAt;
-            seguimientoDto.UpdateAt = seguimiento.UpdateAt;
-
-            return CreatedAtAction(nameof(GetById), new { id = seguimiento.Id }, new ApiResponse<SeguimientoReporteDto>
-            {
-                Success = true,
-                Message = "Seguimiento creado exitosamente",
-                Data = seguimientoDto
-            });
-        }
-        catch (Exception ex)
+        // Crear el DTO de respuesta
+        var seguimientoDto = new SeguimientoReporteDto
         {
-            return StatusCode(500, new ApiResponse<SeguimientoReporteDto>
-            {
-                Success = false,
-                Message = $"Error al crear el seguimiento: {ex.Message}",
-                Data = default
-            });
-        }
+            Id = seguimiento.Id,
+            ReporteId = seguimiento.ReporteId,
+            EstadoAnterior = seguimiento.EstadoAnterior,
+            Estado = seguimiento.Estado,
+            Comentario = seguimiento.Comentario,
+            AccionRealizada = seguimiento.AccionRealizada,
+            Prioridad = seguimiento.Prioridad,
+            CreateAt = seguimiento.CreateAt,
+            UpdateAt = seguimiento.UpdateAt
+        };
+
+        return CreatedAtAction(nameof(GetById), new { id = seguimiento.Id }, new ApiResponse<SeguimientoReporteDto>
+        {
+            Success = true,
+            Message = "Seguimiento creado exitosamente",
+            Data = seguimientoDto
+        });
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new ApiResponse<SeguimientoReporteDto>
+        {
+            Success = false,
+            Message = $"Error al crear el seguimiento: {ex.Message}",
+            Data = default
+        });
+    }
+}
 
     [HttpPut("{id}")]
     // [Authorize(Roles = "Administrador, Moderador")]
