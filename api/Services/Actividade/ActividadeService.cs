@@ -20,6 +20,13 @@ public class ActividadeService
         return actividades.Select(a => MapToDto(a)).ToList();
     }
 
+    public async Task<ActividadeDto?> GetByNombreAsync(string nombre)
+    {
+        var actividad = await _repository.GetByNombreAsync(nombre);
+        return actividad == null ? null : MapToDto(actividad);
+    }
+
+
     public async Task<ActividadeDto?> GetByIdAsync(long id)
     {
         var actividad = await _repository.GetByIdAsync(id);

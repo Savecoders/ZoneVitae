@@ -23,14 +23,22 @@ public class ActividadesController : ControllerBase
         var actividades = await _service.GetAllAsync();
         return Ok(actividades);
     }
-
-    [HttpGet("{id}")]
+    [HttpGet("{id:long}")]
     public async Task<ActionResult<ActividadeDto>> GetById(long id)
     {
         var actividad = await _service.GetByIdAsync(id);
         if (actividad == null) return NotFound();
+        return Ok(actividad);   
+    }
+
+    [HttpGet("buscar/{nombre}")]
+    public async Task<ActionResult<ActividadeDto>> GetByNombre(string nombre)
+    {
+        var actividad = await _service.GetByNombreAsync(nombre);
+        if (actividad == null) return NotFound();
         return Ok(actividad);
     }
+
 
     [HttpPost]
     public async Task<ActionResult<ActividadeDto>> Create(ActividadeDto dto)

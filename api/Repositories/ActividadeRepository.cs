@@ -23,6 +23,13 @@ public class ActividadeRepository
         return await _context.Set<Actividade>().FindAsync(id);
     }
 
+    public async Task<Actividade?> GetByNombreAsync(string nombre)
+    {
+    return await _context.Set<Actividade>()
+                         .FirstOrDefaultAsync(a => a.Nombre.ToLower() == nombre.ToLower());
+    }
+
+
     public async Task<Actividade> AddAsync(Actividade actividade)
     {
         _context.Set<Actividade>().Add(actividade);
@@ -34,20 +41,20 @@ public class ActividadeRepository
     {
         var existing = await _context.Set<Actividade>().FindAsync(actividade.Id);
         Console.WriteLine($"{existing?.Id} - {actividade.Id}");
-    if (existing == null) return false;
+        if (existing == null) return false;
 
-    existing.Nombre = actividade.Nombre;
-    existing.Descripcion = actividade.Descripcion;
-    existing.FechaInicio = actividade.FechaInicio;
-    existing.FechaFin = actividade.FechaFin;
-    existing.Ubicacion = actividade.Ubicacion;
-    existing.Virtual = actividade.Virtual;
-    existing.Frecuencia = actividade.Frecuencia;
-    existing.Fecha = actividade.Fecha;
-    existing.UpdateAt = actividade.UpdateAt; 
+        existing.Nombre = actividade.Nombre;
+        existing.Descripcion = actividade.Descripcion;
+        existing.FechaInicio = actividade.FechaInicio;
+        existing.FechaFin = actividade.FechaFin;
+        existing.Ubicacion = actividade.Ubicacion;
+        existing.Virtual = actividade.Virtual;
+        existing.Frecuencia = actividade.Frecuencia;
+        existing.Fecha = actividade.Fecha;
+        existing.UpdateAt = actividade.UpdateAt; 
 
-    _context.Set<Actividade>().Update(existing);
-    return await _context.SaveChangesAsync() > 0;
+        _context.Set<Actividade>().Update(existing);
+        return await _context.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> DeleteAsync(long id)
