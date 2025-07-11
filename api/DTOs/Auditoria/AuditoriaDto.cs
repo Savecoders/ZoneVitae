@@ -5,6 +5,8 @@ namespace api.DTOs.Seguimientos
 {
     public class SeguimientoReporteDto
     {
+          public Guid UsuarioId { get; set; }
+
         public long Id { get; set; }
 
         [Required(ErrorMessage = "El reporte es requerido")]
