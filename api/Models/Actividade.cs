@@ -7,16 +7,12 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Models;
 
 [Table("actividades")]
-[Index("ComunidadId", Name = "IX_actividades_comunidad_id")]
 [Index("FechaInicio", "FechaFin", Name = "IX_actividades_fechas")]
 public partial class Actividade
 {
     [Key]
     [Column("ID")]
     public long Id { get; set; }
-
-    [Column("comunidad_id")]
-    public long? ComunidadId { get; set; }
 
     [Column("nombre")]
     [StringLength(500)]
@@ -58,8 +54,4 @@ public partial class Actividade
 
     [InverseProperty("Actividades")]
     public virtual ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
-    [ForeignKey("ComunidadId")]
-    [InverseProperty("Actividades")]
-    public virtual Comunidade? Comunidad { get; set; }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using api.Models;
+
 namespace api.Contexts;
 
 public partial class ZoneVitaeSqlContext : DbContext
@@ -41,25 +42,23 @@ public partial class ZoneVitaeSqlContext : DbContext
 
     public virtual DbSet<UsuariosRole> UsuariosRoles { get; set; }
 
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //     => optionsBuilder.UseSqlServer("Name=ConnectionStrings:default");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:default");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Actividade>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__activida__3214EC27CE7FFDE7");
+            entity.HasKey(e => e.Id).HasName("PK__activida__3214EC2704CC9C9E");
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Fecha).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.UpdateAt).HasDefaultValueSql("(getdate())");
-
-            entity.HasOne(d => d.Comunidad).WithMany(p => p.Actividades).HasConstraintName("FK_actividades_comunidad");
         });
 
         modelBuilder.Entity<Comentario>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__comentar__3214EC2772F8A6E6");
+            entity.HasKey(e => e.Id).HasName("PK__comentar__3214EC27259081A3");
 
             entity.Property(e => e.FechaComentario).HasDefaultValueSql("(getdate())");
 
@@ -70,7 +69,9 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Comunidade>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__comunida__3214EC27B216DD8D");
+            entity.HasKey(e => e.Id).HasName("PK__comunida__3214EC2796D579AF");
+
+            entity.ToTable("comunidades", tb => tb.HasTrigger("tr_asignar_admin_creador"));
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Estado).HasDefaultValue("Pendiente de Revision");
@@ -89,7 +90,7 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_comunidad_tags_comunidad"),
                     j =>
                     {
-                        j.HasKey("ComunidadId", "TagId").HasName("PK__comunida__A2962651DCF5CD69");
+                        j.HasKey("ComunidadId", "TagId").HasName("PK__comunida__A29626518B665AC8");
                         j.ToTable("comunidad_tags");
                         j.HasIndex(new[] { "TagId" }, "IX_comunidad_tags_tag_id");
                         j.IndexerProperty<long>("ComunidadId").HasColumnName("comunidad_id");
@@ -99,21 +100,21 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Foto>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__fotos__3214EC271682B080");
+            entity.HasKey(e => e.Id).HasName("PK__fotos__3214EC2785EB10FF");
 
             entity.HasOne(d => d.Reports).WithMany(p => p.Fotos).HasConstraintName("FK_fotos_reports");
         });
 
         modelBuilder.Entity<GaleriaComunidad>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__galeria___3214EC27EDA5F375");
+            entity.HasKey(e => e.Id).HasName("PK__galeria___3214EC276F658F9C");
 
             entity.HasOne(d => d.Comunidad).WithMany(p => p.GaleriaComunidads).HasConstraintName("FK_galeria_comunidad_comunidad");
         });
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__reports__3214EC27F9742F17");
+            entity.HasKey(e => e.Id).HasName("PK__reports__3214EC27DFC3948F");
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Estado).HasDefaultValue("Pendiente_Moderacion");
@@ -134,7 +135,7 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_reports_tags_report"),
                     j =>
                     {
-                        j.HasKey("ReportsId", "TagId").HasName("PK__reports___C56F988D7FE1A294");
+                        j.HasKey("ReportsId", "TagId").HasName("PK__reports___C56F988DB1023F4C");
                         j.ToTable("reports_tags");
                         j.HasIndex(new[] { "TagId" }, "IX_reports_tags_tag_id");
                         j.IndexerProperty<long>("ReportsId").HasColumnName("reports_id");
@@ -144,19 +145,19 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles__3214EC27E104DC9C");
+            entity.HasKey(e => e.Id).HasName("PK__roles__3214EC276EF62A55");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<RolesComunidade>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles_co__3214EC27C177CB02");
+            entity.HasKey(e => e.Id).HasName("PK__roles_co__3214EC277049B55F");
         });
 
         modelBuilder.Entity<SeguimientoReporte>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__seguimie__3214EC279168D4AE");
+            entity.HasKey(e => e.Id).HasName("PK__seguimie__3214EC27FCBF6892");
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Prioridad).HasDefaultValue("Media");
@@ -171,14 +172,14 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Tag>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__tags__3214EC27E97D9C66");
+            entity.HasKey(e => e.Id).HasName("PK__tags__3214EC2793C444BB");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__usuarios__3214EC27F7EFDF8A");
+            entity.HasKey(e => e.Id).HasName("PK__usuarios__3214EC27952B0CA3");
 
             entity.ToTable("usuarios", tb => tb.HasTrigger("tr_asignar_rol_usuario_regular"));
 
@@ -200,7 +201,7 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_follows_usuario"),
                     j =>
                     {
-                        j.HasKey("UsuarioId", "ComunidadId").HasName("PK__follows__93BC2668726C0972");
+                        j.HasKey("UsuarioId", "ComunidadId").HasName("PK__follows__93BC2668534D06C6");
                         j.ToTable("follows");
                         j.HasIndex(new[] { "ComunidadId" }, "IX_follows_comunidad_id");
                         j.IndexerProperty<Guid>("UsuarioId").HasColumnName("usuario_id");
@@ -220,7 +221,7 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_me_encanta_usuario"),
                     j =>
                     {
-                        j.HasKey("UsuarioId", "ReportsId").HasName("PK__me_encan__55C3BD8527AF17CC");
+                        j.HasKey("UsuarioId", "ReportsId").HasName("PK__me_encan__55C3BD85822A15B5");
                         j.ToTable("me_encanta");
                         j.HasIndex(new[] { "ReportsId" }, "IX_me_encanta_reports_id");
                         j.IndexerProperty<Guid>("UsuarioId").HasColumnName("usuario_id");
@@ -230,7 +231,7 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<UsuariosComunidadesRole>(entity =>
         {
-            entity.HasKey(e => new { e.UsuarioId, e.ComunidadId }).HasName("PK__usuarios__93BC266870BA7C15");
+            entity.HasKey(e => new { e.UsuarioId, e.ComunidadId }).HasName("PK__usuarios__93BC266809EF91CD");
 
             entity.Property(e => e.FechaAsignacion).HasDefaultValueSql("(getdate())");
 
@@ -243,7 +244,7 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<UsuariosRole>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__usuarios__3213E83F9EF77779");
+            entity.HasKey(e => e.Id).HasName("PK__usuarios__3213E83FCC724F4F");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Activo).HasDefaultValue(true);
