@@ -24,6 +24,5 @@ public class ReportDto
     public DateTime CreateAt { get; set; }
     public DateTime UpdateAt { get; set; }
 
-    // Se agregó AutorId para verificaciones de autorización en el lado del cliente
     public Guid AutorId { get; set; }
 }

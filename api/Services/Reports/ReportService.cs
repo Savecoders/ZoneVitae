@@ -56,7 +56,8 @@ public class ReportService
         var reports = await repo.FindWithIncludesAsync(r => true,
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
 
         return reports.Select(MapToDto).ToList();
     }
@@ -70,7 +71,8 @@ public class ReportService
         var report = await repo.GetByIdWithIncludesAsync(id,
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
 
         return report == null ? null : MapToDto(report);
     }
@@ -207,7 +209,6 @@ public class ReportService
         {
             if (string.IsNullOrWhiteSpace(autor.FotoPerfil))
             {
-                // Tomar la primera letra mayúscula del NombreUsuario o Nombre
                 if (!string.IsNullOrEmpty(autor.NombreUsuario))
                     inicial = autor.NombreUsuario.Substring(0, 1).ToUpper();
                 else
@@ -244,7 +245,7 @@ public class ReportService
                     CreateAt = autor.CreateAt,
                     UpdateAt = autor.UpdateAt
                 },
-
+                ComunidadNombre = report.Comunidad?.Nombre,
             InicialNombre = inicial,
 
             Fotos = report.Fotos.Select(f => new FotoDto
@@ -266,7 +267,8 @@ public class ReportService
         var report = await _reportRepository.GetByIdWithIncludesAsync(id,
             r => r.Tags,
             r => r.Fotos,
-            r => r.Autor);
+            r => r.Autor,
+            r => r.Comunidad);
 
         if (report == null)
             throw new Exception("Reporte no encontrado.");
@@ -330,7 +332,8 @@ public class ReportService
             r => r.Tags.Any(t => t.Nombre.ToLower() == tagNombreNormalized),
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
 
         return reports.Select(MapToDto).ToList();
     }

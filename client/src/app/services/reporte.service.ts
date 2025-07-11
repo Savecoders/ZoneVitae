@@ -27,7 +27,7 @@ getReporte(): Observable<ReporteCompleto[]> {
       reportes.map(reporte => ({
         ...reporte,
         createAtDate: reporte.create_at ? new Date(reporte.create_at) : null,
-        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null,
+        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null, 
       }))
     )
   );
