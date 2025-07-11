@@ -100,7 +100,6 @@ GO
 
 CREATE TABLE [actividades] (
   [ID] bigint PRIMARY KEY NOT NULL IDENTITY(1, 1),
-  [comunidad_id] bigint,
   [nombre] nvarchar(500) NOT NULL,
   [descripcion] nvarchar(max),
   [fecha_inicio] date NOT NULL,
@@ -229,9 +228,6 @@ GO
 CREATE INDEX [IX_comentarios_autor_id] ON [comentarios] ([autor_id])
 GO
 
-CREATE INDEX [IX_actividades_comunidad_id] ON [actividades] ([comunidad_id])
-GO
-
 CREATE INDEX [IX_actividades_fechas] ON [actividades] ([fecha_inicio], [fecha_fin])
 GO
 
@@ -275,8 +271,6 @@ GO
 ALTER TABLE [comentarios] ADD CONSTRAINT [FK_comentarios_autor] FOREIGN KEY ([autor_id]) REFERENCES [usuarios] ([ID])
 GO
 
-ALTER TABLE [actividades] ADD CONSTRAINT [FK_actividades_comunidad] FOREIGN KEY ([comunidad_id]) REFERENCES [comunidades] ([ID])
-GO
 
 ALTER TABLE [fotos] ADD CONSTRAINT [FK_fotos_reports] FOREIGN KEY ([reports_id]) REFERENCES [reports] ([ID])
 GO
@@ -368,7 +362,7 @@ GO
 -- Create default user with Administrador role
 IF NOT EXISTS (SELECT 1 FROM [usuarios] WHERE [nombre_usuario] = 'admin')
 BEGIN
-    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
+    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta])
     VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
 END;
 GO
