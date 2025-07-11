@@ -31,8 +31,10 @@ public class ActividadeService
             throw new ArgumentException("La fecha de inicio no puede ser mayor que la fecha de fin.");
 
         var actividad = MapToEntity(dto);
+        Console.WriteLine($"Creating actividad: {actividad.FechaInicio} to {actividad.FechaFin}");
         actividad.CreateAt = DateTime.UtcNow;
         actividad.UpdateAt = DateTime.UtcNow;
+        Console.WriteLine($"Creating actividad: {dto.FechaInicio} to {dto.FechaFin}");
 
         var created = await _repository.AddAsync(actividad);
         return MapToDto(created);
@@ -60,12 +62,11 @@ public class ActividadeService
         Id = a.Id,
         Nombre = a.Nombre,
         Descripcion = a.Descripcion,
-        FechaInicio = a.FechaInicio.ToDateTime(new TimeOnly(0, 0)),
-        FechaFin = a.FechaFin.ToDateTime(new TimeOnly(0, 0)),
+        FechaInicio = a.FechaInicio,
+        FechaFin = a.FechaFin,
         Ubicacion = a.Ubicacion,
         Virtual = a.Virtual,
         Frecuencia = a.Frecuencia,
-        Cover = a.Cover,
         Fecha = a.Fecha,
         CreateAt = a.CreateAt,
         UpdateAt = a.UpdateAt
@@ -76,12 +77,11 @@ public class ActividadeService
         Id = dto.Id,
         Nombre = dto.Nombre,
         Descripcion = dto.Descripcion,
-        FechaInicio = DateOnly.FromDateTime(dto.FechaInicio),
-        FechaFin = DateOnly.FromDateTime(dto.FechaFin),
+        FechaInicio = dto.FechaInicio,
+        FechaFin = dto.FechaFin,
         Ubicacion = dto.Ubicacion,
         Virtual = dto.Virtual,
         Frecuencia = dto.Frecuencia,
-        Cover = dto.Cover,
         Fecha = dto.Fecha,
         CreateAt = dto.CreateAt,
         UpdateAt = dto.UpdateAt

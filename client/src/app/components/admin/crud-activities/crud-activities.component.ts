@@ -98,8 +98,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
   // Table configuration
   displayedColumns: string[] = [
     'nombre',
-    'fecha_inicio',
-    'fecha_fin',
+    'fechaInicio',
+    'fechaFin',
     'ubicacion',
     'virtual',
     'url',
@@ -130,8 +130,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
       {
         nombre: ['', [Validators.required, Validators.minLength(3)]],
         descripcion: ['', [Validators.minLength(10)]],
-        fecha_inicio: [todayFormatted, Validators.required], // Set today as default
-        fecha_fin: ['', Validators.required],
+        fechaInicio: [todayFormatted, Validators.required], // Set today as default
+        fechaFin: ['', Validators.required],
         ubicacion: ['', Validators.required],
         virtual: [false],
         frecuencia: ['', Validators.required],
@@ -151,8 +151,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
 
   // Custom validator to ensure start date is before end date and not in the past
   dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
-    const start = group.get('fecha_inicio')?.value;
-    const end = group.get('fecha_fin')?.value;
+    const start = group.get('fechaInicio')?.value;
+    const end = group.get('fechaFin')?.value;
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time component for accurate date comparison
 
@@ -163,7 +163,7 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
 
       // Check if start date is before today
       // We'll only apply this validation when the start date control has been modified by the user
-      const startControl = group.get('fecha_inicio');
+      const startControl = group.get('fechaInicio');
       if (startDate < today && startControl && startControl.dirty) {
         errors['startDatePast'] = true;
       }
@@ -281,8 +281,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
     this.activityForm.reset({
       nombre: '',
       descripcion: '',
-      fecha_inicio: todayFormatted, // Set today as default start date
-      fecha_fin: '',
+      fechaInicio: todayFormatted, // Set today as default start date
+      fechaFin: '',
       ubicacion: '',
       virtual: false,
       frecuencia: '',
@@ -322,7 +322,7 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
       }
 
       if (
-        this.activityForm.get('fecha_inicio')?.invalid &&
+        this.activityForm.get('fechaInicio')?.invalid &&
         !this.activityForm.hasError('dateRangeInvalid') &&
         !this.activityForm.hasError('startDatePast')
       ) {
@@ -330,7 +330,7 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
       }
 
       if (
-        this.activityForm.get('fecha_fin')?.invalid &&
+        this.activityForm.get('fechaFin')?.invalid &&
         !this.activityForm.hasError('dateRangeInvalid')
       ) {
         errorMessage += '\n• End date is required';
@@ -422,8 +422,8 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
     // Format dates properly for the form
     const formattedActivity = {
       ...activity,
-      fecha_inicio: this.formatDateForInput(activity.fechaInicio),
-      fecha_fin: this.formatDateForInput(activity.fechaFin),
+      fechaInicio: this.formatDateForInput(activity.fechaInicio),
+      fechaFin: this.formatDateForInput(activity.fechaFin),
     };
 
     this.activityForm.patchValue(formattedActivity);

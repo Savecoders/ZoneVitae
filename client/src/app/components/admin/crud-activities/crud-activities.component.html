@@ -58,7 +58,7 @@
           </ng-container>
 
           <!-- Start Date Column -->
-          <ng-container matColumnDef="fecha_inicio">
+          <ng-container matColumnDef="fechaInicio">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
               Start Date
             </th>
@@ -68,7 +68,7 @@
           </ng-container>
 
           <!-- End Date Column -->
-          <ng-container matColumnDef="fecha_fin">
+          <ng-container matColumnDef="fechaFin">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>End Date</th>
             <td mat-cell *matCellDef="let activity">
               {{ activity.fechaFin | date : "mediumDate" }}
@@ -234,24 +234,24 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="form-group">
           <label
-            for="fecha_inicio"
+            for="fechaInicio"
             class="block text-sm font-medium text-default-700 mb-1"
             >Start Date*</label
           >
           <app-input
-            id="fecha_inicio"
-            formControlName="fecha_inicio"
+            id="fechaInicio"
+            formControlName="fechaInicio"
             [className]="'border-default-500'"
             [type]="'date'"
             [validation]="{
               state:
-                (activityForm.get('fecha_inicio')?.invalid &&
-                activityForm.get('fecha_inicio')?.touched) ||
+                (activityForm.get('fechaInicio')?.invalid &&
+                activityForm.get('fechaInicio')?.touched) ||
                 activityForm.hasError('dateRangeInvalid') ||
                 activityForm.hasError('startDatePast')
                   ? 'invalid'
                   : 'undefined',
-              message: activityForm.get('fecha_inicio')?.errors?.['required']
+              message: activityForm.get('fechaInicio')?.errors?.['required']
                 ? 'Start date is required'
                 : activityForm.hasError('startDatePast')
                 ? 'Start date cannot be earlier than today'
@@ -263,23 +263,23 @@
         </div>
         <div class="form-group">
           <label
-            for="fecha_fin"
+            for="fechaFin"
             class="block text-sm font-medium text-default-700 mb-1"
             >End Date*</label
           >
           <app-input
-            id="fecha_fin"
-            formControlName="fecha_fin"
+            id="fechaFin"
+            formControlName="fechaFin"
             [className]="'border-default-500'"
             [type]="'date'"
             [validation]="{
               state:
-                (activityForm.get('fecha_fin')?.invalid &&
-                activityForm.get('fecha_fin')?.touched) ||
+                (activityForm.get('fechaFin')?.invalid &&
+                activityForm.get('fechaFin')?.touched) ||
                 activityForm.hasError('dateRangeInvalid')
                   ? 'invalid'
                   : 'undefined',
-              message: activityForm.get('fecha_fin')?.errors?.['required']
+              message: activityForm.get('fechaFin')?.errors?.['required']
                 ? 'End date is required'
                 : ''
             }"

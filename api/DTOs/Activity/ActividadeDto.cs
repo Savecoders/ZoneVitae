@@ -11,7 +11,6 @@ public class ActividadeDto
     public string Ubicacion { get; set; } = null!;
     public bool Virtual { get; set; }
     public string Frecuencia { get; set; } = null!;
-    public string Cover { get; set; } = null!;
     public DateTime Fecha { get; set; }
     public DateTime CreateAt { get; set; }
     public DateTime UpdateAt { get; set; }
