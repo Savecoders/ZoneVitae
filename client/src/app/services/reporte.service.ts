@@ -34,9 +34,9 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
 
   //Editar Reporte
-editReporte(id: number, dto: any): Observable<ReporteCompleto> {
-  return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
-}
+  editReporte(id: number, dto: any): Observable<ReporteCompleto> {
+    return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
+  }
 
   //Eliminar Reporte
   deleteReporte(id: number): Observable<void> {
@@ -60,32 +60,31 @@ editReporte(id: number, dto: any): Observable<ReporteCompleto> {
   }
 
 
-   
-crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
-  return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
-}
+  crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
+    return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
+  }
 
 
-
-updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
-  return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
-}
-
-getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
-    return this.getAll().pipe(
-      map((reportes) =>
-        reportes.filter(
-          (reporte) =>
-            (titulo
-              ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
-              : true) && (estado ? reporte.estado === estado : true)
+  
+  updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
+    return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
+  }
+  
+  getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
+      return this.getAll().pipe(
+        map((reportes) =>
+          reportes.filter(
+            (reporte) =>
+              (titulo
+                ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
+                : true) && (estado ? reporte.estado === estado : true)
+        )
       )
-    )
-  );
-}
+    );
+  }
 
 
-  // Buscar reportes por autor
+  // Busca reportes por autor
   getReportesByAutor(autorId: number): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(`${this.jsonUrl}?autor_id=${autorId}`);
   }
