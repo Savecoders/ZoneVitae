@@ -52,9 +52,6 @@ public partial class Comunidade
     [Column("update_at")]
     public DateTime UpdateAt { get; set; }
 
-    [InverseProperty("Comunidad")]
-    public virtual ICollection<Actividade> Actividades { get; set; } = new List<Actividade>();
-
     [ForeignKey("CreadorId")]
     [InverseProperty("Comunidades")]
     public virtual Usuario? Creador { get; set; }
