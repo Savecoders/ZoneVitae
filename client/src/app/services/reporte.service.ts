@@ -14,16 +14,24 @@ import { environment } from 'environments/environment.development';
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl: string = `${environment.jsonServerUrl}/reports`;
+  private jsonUrl: string = `${environment.apiUrl}/reports`;
 
   constructor(http: HttpClient) {
     super(http, 'reports');
   }
 
   //carga los datos del reporte
-  getReporte(): Observable<ReporteCompleto[]> {
-    return this.http.get<ReporteCompleto[]>(this.jsonUrl);
-  }
+getReporte(): Observable<ReporteCompleto[]> {
+  return this.http.get<ReporteCompleto[]>(this.jsonUrl).pipe(
+    map(reportes =>
+      reportes.map(reporte => ({
+        ...reporte,
+        createAtDate: reporte.create_at ? new Date(reporte.create_at) : null,
+        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null,
+      }))
+    )
+  );
+}
 
   //Agregar Reporte
   createReporte(dto: any): Observable<ReporteCompleto> {
@@ -50,11 +58,18 @@ editReporte(id: number, dto: any): Observable<ReporteCompleto> {
 
 
 
-  // ...existing code...
+
 getReporteById(id: number): Observable<ReporteCompleto> {
-  return this.http.get<ReporteCompleto>(`${this.jsonUrl}/${id}`);
+  return this.http.get<ReporteCompleto>(`${this.jsonUrl}/${id}`).pipe(
+    map(reporte => ({
+      ...reporte,
+        createAtDate: reporte.create_at ? new Date(reporte.create_at) : null,
+        updateAtDate: reporte.update_at ? new Date(reporte.update_at) : null,
+    }))
+  );
 }
-// ...existing code...
+
+
    
 crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
   return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);

@@ -74,6 +74,7 @@ export class ReportsComponent implements OnInit {
   reportesFiltrados: ReporteCompleto[] = [];
   comunidades: Comunidad[] = [];
   usuarioActual: UsuarioCompleto | null = null;
+  esAdmin: boolean = false;
   menuAbiertoId: number | null = null;
   meEncantaReporte: { [key: number]: boolean } = {};
   mostrarFormulario = false;
@@ -94,8 +95,20 @@ cargarUsuarioActual(): void {
   if (userData) {
     const parsed = JSON.parse(userData);
     this.usuarioActual = parsed.usuario ?? parsed;
+
+    const rolesRaw = this.usuarioActual?.roles ?? [];
+
+    const roles = rolesRaw.map((r: any) => {
+      if (typeof r === 'string') return r.toLowerCase();
+      if (typeof r === 'object' && r.nombre) return r.nombre.toLowerCase();
+      return null;
+    }).filter((r: string | null) => r !== null);
+
+    this.esAdmin = roles.includes('administrador');
   }
 }
+
+
 
   reportsForm(): void {
     this.form = this.fb.group({
@@ -203,10 +216,9 @@ guardarReporte(): void {
     return;
   }
 
-  // Obtener URLs de las fotos subidas
+  // Obtener URLs
   const fotosUrls: string[] = this.fotos.value.map((f: any) => f.image);
 
-  // Construir el DTO compatible con el backend (ReportCreateDto)
   const dto = {
   titulo: reportForm.titulo,
   contenido: reportForm.contenido,
@@ -242,10 +254,10 @@ editarReporte(id: number): void {
   const reporte = this.reportes.find((r) => r.id === id);
   if (!reporte) return;
   
-  if (!this.usuarioActual || !reporte.autor || reporte.autor.id !== this.usuarioActual.id) {
-    this.toastService.error('No tienes permiso para editar este reporte.');
-    return;
-  }
+if (!this.usuarioActual || !reporte.autor || (reporte.autor.id !== this.usuarioActual.id && !this.esAdmin)) {
+  this.toastService.error('No tienes permiso para editar este reporte.');
+  return;
+}
   
   this.isEditMode = true;
   this.reporteEditando = reporte;

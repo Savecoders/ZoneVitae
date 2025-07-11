@@ -180,7 +180,7 @@ public class ReportService
         if (!await CanEditReportAsync(report))
             throw new UnauthorizedAccessException("No tienes permisos para eliminar este reporte.");
 
-        // Obtener fotos relacionadas (deberías tener un repositorio o contexto para Fotos)
+        // Obtiene fotos relacionadas
         var fotosRelacionadas = await _fotoRepository.FindAsync(f => f.ReportsId == id);
 
         foreach (var foto in fotosRelacionadas)
@@ -189,7 +189,7 @@ public class ReportService
         }
         await _fotoRepository.SaveChangesAsync();
 
-        // Ahora eliminar el reporte
+        // Eliminar el reporte
         _reportRepository.Delete(report);
         await _reportRepository.SaveChangesAsync();
 
@@ -271,7 +271,7 @@ public class ReportService
         if (report == null)
             throw new Exception("Reporte no encontrado.");
 
-        var userId = GetCurrentUserId();  // Usa tu método que ya tienes
+        var userId = GetCurrentUserId();
 
         if (report.AutorId != userId && !await UserIsAdminOrJoinAsync(userId))
             throw new UnauthorizedAccessException("No tienes permiso para editar este reporte.");
