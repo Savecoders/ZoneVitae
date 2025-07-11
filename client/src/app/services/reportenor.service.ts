@@ -5,11 +5,13 @@ import { BaseService } from './base.service';
 import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
 import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReportenorService extends BaseService<Reporte> {
+  private apiUrl = `${environment.apiUrl}/Reports`;
   constructor(http: HttpClient) {
     super(http, 'reports');
   }
@@ -39,9 +41,11 @@ export class ReportenorService extends BaseService<Reporte> {
   }
 
   // Update report
-  updateReporte(id: number, reporte: Partial<Reporte>): Observable<Reporte> {
-    return this.update(id, reporte);
-  }
+  // ...existing code...
+updateReporte(id: number, data: Partial<Reporte>): Observable<Reporte> {
+  return this.http.put<Reporte>(`${this.apiUrl}/${id}`, data);
+}
+// ...existing code...
 
   // Delete report
   deleteReporte(id: number): Observable<void> {

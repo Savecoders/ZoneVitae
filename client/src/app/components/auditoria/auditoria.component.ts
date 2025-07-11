@@ -126,9 +126,7 @@ export class AuditoriaComponent {
     });
   }
 
- 
-
-ngOnInit(): void {
+ ngOnInit(): void {
   // Cargar comunidades desde el API usando el servicio actualizado
   this.comunidadService.getAll().subscribe({
     next: (comunidades) => {
@@ -142,7 +140,6 @@ ngOnInit(): void {
     }
   });
 }
-
   aplicarFiltro() {
     if (!this.filtro) {
       this.cargarDatos();
@@ -187,6 +184,7 @@ ngOnInit(): void {
   }
 
   cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
+    
     this.reporteService
       .updateReporte(reporte.id!, { estado: nuevoEstado })
       .subscribe({
@@ -226,7 +224,7 @@ ngOnInit(): void {
       ...this.selectedReport,
       estado: this.currentStatusChange as EstadoReporte,
     };
-
+console.log('Enviando a updateReporte:', reporteActualizado);
     this.reporteService
       .updateReporte(this.selectedReport.id!, reporteActualizado)
       .subscribe({
@@ -250,15 +248,15 @@ ngOnInit(): void {
                   estado_nuevo: this.currentStatusChange,
                   comentario: this.commentText,
                   accion_realizada: 'Cambio de estado',
-                  accion_recomendada: 'Revisar el reporte',
-                  documentos_adjuntos:
-                    this.selectedReport.documentos_adjuntos || [],
+                 // accion_recomendada: 'Revisar el reporte',
+                 // documentos_adjuntos:
+                    //this.selectedReport.documentos_adjuntos || [],
                   prioridad: PrioridadSeguimientoReporte.MEDIA,
                   update_at: new Date().toISOString(),
                 };
                 const seguimientoId = seguimientoExistente.id;
                 this.seguimientoService
-                  .updateSeguimiento(
+                  .update(
                     Number(seguimientoId),
                     seguimientoActualizado
                   )
@@ -337,7 +335,7 @@ ngOnInit(): void {
             };
 
             this.seguimientoService
-              .updateSeguimiento(
+              .update(
                 seguimientoExistente.id!,
                 seguimientoActualizado
               )
@@ -350,8 +348,8 @@ ngOnInit(): void {
               estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
               comentario: '',
               accion_realizada: this.seguimientoForm.value.acciones,
-              accion_recomendada: '',
-              documentos_adjuntos: false,
+             // accion_recomendada: '',
+             // documentos_adjuntos: false,
               prioridad: this.seguimientoForm.value.prioridad,
               create_at: new Date().toISOString(),
               update_at: new Date().toISOString(),
@@ -359,7 +357,7 @@ ngOnInit(): void {
             };
 
             this.seguimientoService
-              .createSeguimiento(nuevoSeguimiento)
+              .create(nuevoSeguimiento)
               .subscribe(/* ... */);
           }
 

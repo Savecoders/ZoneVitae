@@ -115,7 +115,7 @@ export class FormCommunityComponent {
 
         forkJoin([
           this.servTags.getTags(),
-          this.miServicio.getById(this.currentId)
+          this.miServicio.getComunidadById(this.currentId)
         ]).subscribe(([tags, comunidad]) => {
           this.tags = tags;
 
@@ -156,7 +156,7 @@ export class FormCommunityComponent {
       if(this.isEditMode){ 
         newComunidad.id = this.currentId;
         this.formGroup.get('update_at')?.setValue(new Date());
-        this.miServicio.update(newComunidad.id,newComunidad).subscribe((updateComunidad)=>{
+        this.miServicio.updateComunidad(newComunidad.id,newComunidad).subscribe((updateComunidad)=>{
           this.toastService.success("La comunidad ha sido actualizada");
           this.router.navigate(['/crud-communities']);
         });
@@ -164,7 +164,7 @@ export class FormCommunityComponent {
         const now = new Date();
         this.formGroup.get('create_at')?.setValue(now);
         this.formGroup.get('update_at')?.setValue(now);
-        this.miServicio.create(newComunidad).subscribe((addComunidad)=>{
+        this.miServicio.createComunidad(newComunidad).subscribe((addComunidad)=>{
         this.toastService.success("La comunidad ha sido creada");
         this.router.navigate(['/crud-communities']);
         });

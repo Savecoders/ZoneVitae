@@ -5,8 +5,7 @@ namespace api.DTOs.Seguimientos
 {
     public class SeguimientoReporteCreateDto
     {
-        [Required(ErrorMessage = "El ID del reporte es requerido")]
-        public long ReporteId { get; set; }
+       
 
         [Required(ErrorMessage = "El estado actual es requerido")]
         [StringLength(50, ErrorMessage = "El estado actual no puede exceder 50 caracteres")]

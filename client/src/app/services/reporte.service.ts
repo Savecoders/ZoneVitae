@@ -6,15 +6,15 @@ import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
 
 import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+import { environment } from 'environments/environment.development';
 
-import { environment } from '../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl: string = `${environment.jsonServerUrl}reports`;
+  private jsonUrl: string = `${environment.jsonServerUrl}/reports`;
 
   constructor(http: HttpClient) {
     super(http, 'reports');
@@ -26,15 +26,15 @@ export class ReporteService extends BaseService<ReporteCompleto> {
   }
 
   //Agregar Reporte
-  createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte);
+  createReporte(dto: any): Observable<ReporteCompleto> {
+    return this.http.post<ReporteCompleto>(this.jsonUrl, dto);
   }
 
+
   //Editar Reporte
-  editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    const url = `${this.jsonUrl}/${reporte.id}`;
-    return this.http.put<ReporteCompleto>(url, reporte);
-  }
+editReporte(id: number, dto: any): Observable<ReporteCompleto> {
+  return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
+}
 
   //Eliminar Reporte
   deleteReporte(id: number): Observable<void> {
@@ -44,15 +44,10 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
   //BuscarTag
   buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
-    const nombreTagLower = nombreTag.toLowerCase();
-    return this.getReporte().pipe(
-      map((reportes) =>
-        reportes.filter((r) =>
-          r.tags?.some((tag) => tag.nombre.toLowerCase() === nombreTagLower)
-        )
-      )
-    );
+    const url = `${this.jsonUrl}/filtrar-por-tag?tag=${encodeURIComponent(nombreTag)}`;
+    return this.http.get<ReporteCompleto[]>(url);
   }
+
 
 
   // ...existing code...
@@ -83,7 +78,6 @@ getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
     )
   );
 }
-
 
 
   // Buscar reportes por autor

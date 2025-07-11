@@ -82,15 +82,4 @@ export class ComunidadService extends BaseService<Comunidad> {
     const url = `${this.baseUrl.split('/comunidades')[0]}/reports/comunidades`;
     return this.http.get<Comunidad[]>(url);
   }
-  getNombreComunidadPorId(id: number | string): Observable<string> {
-    return this.getById(id).pipe(
-      map((comunidad) => comunidad.nombre),
-      switchMap((nombre) => {
-        if (!nombre) {
-          return of('Comunidad no encontrada');
-        }
-        return of(nombre);
-      })
-    );
-  }
 }

@@ -91,7 +91,6 @@ export class HomeComponent implements OnInit {
       .getAll()
       .pipe(
         switchMap((reports) => {
-          console.log('Reports recibidos:', reports); // Debug
           if (reports.length === 0) {
             return of([]);
           }
