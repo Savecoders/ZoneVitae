@@ -9,7 +9,7 @@ import { Actividad } from '../models/actividad.model';
 })
 export class ActividadService extends BaseService<Actividad> {
   constructor(http: HttpClient) {
-    super(http, 'actividades');
+    super(http, 'Actividades');
   }
 
   // Get all activities with optional filtering

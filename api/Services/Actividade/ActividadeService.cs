@@ -1,4 +1,5 @@
 using api.DTOs.Actividade;
+using api.DTOs.ActividadeUpdate;
 using api.Models;
 using api.Repositories;
 
@@ -40,15 +41,18 @@ public class ActividadeService
         return MapToDto(created);
     }
 
-    public async Task<bool> UpdateAsync(long id, ActividadeDto dto)
+    public async Task<bool> UpdateAsync(long id, ActividadeUpdateDto dto)
     {
-        if (id != dto.Id) return false;
-        if (dto.FechaInicio > dto.FechaFin)
+        var existing = await _repository.GetByIdAsync(id);
+        Console.WriteLine($"Service with ID {id}: {existing?.Nombre}");
+        if (existing == null)
+            throw new ArgumentException("Actividad no encontrada.");
+
+        var actividad = MapToEntity(id, dto);
+        actividad.CreateAt = existing.CreateAt; 
+        actividad.UpdateAt = DateTime.UtcNow; 
+        if (actividad.FechaInicio > actividad.FechaFin)
             throw new ArgumentException("La fecha de inicio no puede ser mayor que la fecha de fin.");
-
-        var actividad = MapToEntity(dto);
-        actividad.UpdateAt = DateTime.UtcNow;
-
         return await _repository.UpdateAsync(actividad);
     }
 
@@ -85,5 +89,17 @@ public class ActividadeService
         Fecha = dto.Fecha,
         CreateAt = dto.CreateAt,
         UpdateAt = dto.UpdateAt
+    };
+    private Actividade MapToEntity(long id, ActividadeUpdateDto dto) => new()
+    {
+        Id = id,
+        Nombre = dto.Nombre,
+        Descripcion = dto.Descripcion,
+        FechaInicio = dto.FechaInicio,
+        FechaFin = dto.FechaFin,
+        Ubicacion = dto.Ubicacion,
+        Virtual = dto.Virtual,
+        Frecuencia = dto.Frecuencia,
+
     };
 }

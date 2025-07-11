@@ -135,7 +135,6 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
         ubicacion: ['', Validators.required],
         virtual: [false],
         frecuencia: ['', Validators.required],
-        comunidad_id: [null],
         url: [
           '',
           [
@@ -286,7 +285,6 @@ export class CrudActivitiesComponent implements OnInit, OnDestroy {
       ubicacion: '',
       virtual: false,
       frecuencia: '',
-      comunidad_id: null,
       url: '', // Will be validated only if virtual is true
     });
     this.isEditing = false;

@@ -1,4 +1,5 @@
 using api.DTOs.Actividade;
+using api.DTOs.ActividadeUpdate;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -46,8 +47,8 @@ public class ActividadesController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, ActividadeDto dto)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Update(long id, ActividadeUpdateDto dto)
     {
         try
         {
@@ -59,6 +60,7 @@ public class ActividadesController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+       
     }
 
     [HttpDelete("{id}")]

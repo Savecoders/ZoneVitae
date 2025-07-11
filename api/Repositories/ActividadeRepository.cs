@@ -32,8 +32,22 @@ public class ActividadeRepository
 
     public async Task<bool> UpdateAsync(Actividade actividade)
     {
-        _context.Entry(actividade).State = EntityState.Modified;
-        return await _context.SaveChangesAsync() > 0;
+        var existing = await _context.Set<Actividade>().FindAsync(actividade.Id);
+        Console.WriteLine($"{existing?.Id} - {actividade.Id}");
+    if (existing == null) return false;
+
+    existing.Nombre = actividade.Nombre;
+    existing.Descripcion = actividade.Descripcion;
+    existing.FechaInicio = actividade.FechaInicio;
+    existing.FechaFin = actividade.FechaFin;
+    existing.Ubicacion = actividade.Ubicacion;
+    existing.Virtual = actividade.Virtual;
+    existing.Frecuencia = actividade.Frecuencia;
+    existing.Fecha = actividade.Fecha;
+    existing.UpdateAt = actividade.UpdateAt; 
+
+    _context.Set<Actividade>().Update(existing);
+    return await _context.SaveChangesAsync() > 0;
     }
 
     public async Task<bool> DeleteAsync(long id)
