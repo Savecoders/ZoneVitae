@@ -47,7 +47,9 @@ export class ReporteService extends BaseService<ReporteCompleto> {
   //BuscarTag
   buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
     const url = `${this.jsonUrl}/filtrar-por-tag?tag=${encodeURIComponent(nombreTag)}`;
-    return this.http.get<ReporteCompleto[]>(url);
+    return this.http.get<{ message: string, data: ReporteCompleto[] }>(url).pipe(
+      map(response => response.data)
+    );
   }
 
 
