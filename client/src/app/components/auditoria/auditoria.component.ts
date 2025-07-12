@@ -65,7 +65,7 @@ export class AuditoriaComponent {
   displayedColumns: string[] = [
     'titulo',
     'comunidad',
-    'fecha',
+   // 'fecha',
     'estado',
     'seguimiento',
     'acciones',
