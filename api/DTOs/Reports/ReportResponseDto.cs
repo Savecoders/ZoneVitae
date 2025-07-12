@@ -18,7 +18,6 @@ namespace api.DTOs.Reports
         public string? InicialNombre { get; set; }
         public List<FotoDto> Fotos { get; set; } = new();
         public List<TagDto> Tags { get; set; } = new();
-        public string? ComunidadNombre { get; set; }
-
+        public ComunidadDto? Comunidad { get; set; }
     }
 }

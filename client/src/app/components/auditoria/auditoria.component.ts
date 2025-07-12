@@ -70,7 +70,7 @@ export class AuditoriaComponent {
     'seguimiento',
     'acciones',
   ];
-  dataSource: Reporte[] = [];
+  dataSource: ReporteCompleto[] = [];
   comunidades: Comunidad[] = [];
   loading = true;
   filtroBusqueda: string = '';
@@ -159,30 +159,22 @@ export class AuditoriaComponent {
         .toLowerCase()
         .includes(textoBusqueda);
 
-      const nombreComunidad = this.getNombreComunidad(
-        reporte.comunidad_id
-      ).toLowerCase();
+      const nombreComunidad = reporte.comunidad?.nombre?.toLowerCase() || '';
+
       const coincideComunidad = nombreComunidad.includes(textoBusqueda);
 
       return coincideTitulo || coincideComunidad;
     });
   }
   cargarDatos(): void {
-    this.reportecomservice.getReporte().subscribe((reportes) => {
-      this.dataSource = reportes.map((reporte) => ({
-        ...reporte,
-        nombreComunidad: this.getNombreComunidad(reporte.comunidad_id),
-      }));
+    this.reportecomservice.getReporte().subscribe((reportes: ReporteCompleto[]) => {
+      this.dataSource = reportes;
     });
   }
 
-  getNombreComunidad(comunidadId: number | null | undefined): string {
-    if (!comunidadId) return 'Sin comunidad';
-    const comunidad = this.comunidadesData?.find(
-      (c: any) => Number(c.id) === Number(comunidadId)
-    );
-    return comunidad?.nombre || 'Comunidad desconocida';
-  }
+getNombreComunidad(reporte: ReporteCompleto): string {
+  return reporte.comunidad?.nombre || 'Sin comunidad';
+}
 
   formatearFecha(create_at: string | Date | undefined): string {
     if (!create_at) return '--';
@@ -215,8 +207,7 @@ cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
 
     return this.dataSource.filter((reporte) => {
       const titulo = reporte.titulo?.toLowerCase() || '';
-      const comunidad =
-        this.getNombreComunidad(reporte.comunidad_id)?.toLowerCase() || '';
+      const comunidad = this.getNombreComunidad(reporte)?.toLowerCase() || '';
       return titulo.includes(termino) || comunidad.includes(termino);
     });
   }

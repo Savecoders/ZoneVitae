@@ -204,72 +204,74 @@ public class ReportService
         return true;
     }
 
-    public static ReportResponseDto MapToDto(Report report)
+public static ReportResponseDto MapToDto(Report report)
+{
+    var autor = report.Autor;
+    var esAnonimo = report.Anonimo;
+
+    string? inicial = null;
+    if (!esAnonimo && autor != null && string.IsNullOrWhiteSpace(autor.FotoPerfil))
     {
-        var autor = report.Autor;
-        var esAnonimo = report.Anonimo;
-
-        string? inicial = null;
-
-        if (!esAnonimo && autor != null)
-        {
-            if (string.IsNullOrWhiteSpace(autor.FotoPerfil))
-            {
-
-                if (!string.IsNullOrEmpty(autor.NombreUsuario))
-                    inicial = autor.NombreUsuario.Substring(0, 1).ToUpper();
-                else
-                    inicial = "?";
-            }
-        }
-
-        return new ReportResponseDto
-        {
-            Id = report.Id,
-            Titulo = report.Titulo,
-            Contenido = report.Contenido,
-            Anonimo = esAnonimo,
-            Direccion = report.Direccion,
-            Estado = report.Estado,
-            CreateAt = report.CreateAt,
-            UpdateAt = report.UpdateAt,
-
-            Autor = esAnonimo
-                ? new UsuarioResponseDto
-                {
-                    NombreUsuario = "Anónimo",
-                    FotoPerfil = null
-                }
-                : autor == null ? null : new UsuarioResponseDto
-                {
-                    Id = autor.Id,
-                    NombreUsuario = autor.NombreUsuario,
-                    Email = autor.Email,
-                    FotoPerfil = autor.FotoPerfil,
-                    FechaNacimiento = autor.FechaNacimiento,
-                    Genero = autor.Genero,
-                    EstadoCuenta = autor.EstadoCuenta,
-                    CreateAt = autor.CreateAt,
-                    UpdateAt = autor.UpdateAt
-                },
-
-                ComunidadNombre = report.Comunidad?.Nombre,
-
-            InicialNombre = inicial,
-
-            Fotos = report.Fotos.Select(f => new FotoDto
-            {
-                Id = f.Id,
-                Image = f.Image
-            }).ToList(),
-
-            Tags = report.Tags.Select(t => new TagDto
-            {
-                Id = t.Id,
-                Nombre = t.Nombre
-            }).ToList()
-        };
+        inicial = !string.IsNullOrEmpty(autor.NombreUsuario)
+            ? autor.NombreUsuario.Substring(0, 1).ToUpper()
+            : "?";
     }
+
+    return new ReportResponseDto
+    {
+        Id = report.Id,
+        Titulo = report.Titulo,
+        Contenido = report.Contenido,
+        Anonimo = esAnonimo,
+        Direccion = report.Direccion,
+        Estado = report.Estado,
+        CreateAt = report.CreateAt,
+        UpdateAt = report.UpdateAt,
+
+        Autor = esAnonimo ? new UsuarioResponseDto
+        {
+            NombreUsuario = "Anónimo",
+            FotoPerfil = null
+        }
+        : autor == null ? null : new UsuarioResponseDto
+        {
+            Id = autor.Id,
+            NombreUsuario = autor.NombreUsuario,
+            Email = autor.Email,
+            FotoPerfil = autor.FotoPerfil,
+            FechaNacimiento = autor.FechaNacimiento,
+            Genero = autor.Genero,
+            EstadoCuenta = autor.EstadoCuenta,
+            CreateAt = autor.CreateAt,
+            UpdateAt = autor.UpdateAt
+        },
+
+        InicialNombre = inicial,
+
+        Comunidad = report.Comunidad == null ? null : new ComunidadDto
+        {
+            Id = report.Comunidad.Id,
+            Nombre = report.Comunidad.Nombre,
+            Descripcion = report.Comunidad.Descripcion,
+            Logo = report.Comunidad.Logo,
+            Cover = report.Comunidad.Cover,
+            Estado = report.Comunidad.Estado
+        },
+
+        Fotos = report.Fotos.Select(f => new FotoDto
+        {
+            Id = f.Id,
+            Image = f.Image
+        }).ToList(),
+
+        Tags = report.Tags.Select(t => new TagDto
+        {
+            Id = t.Id,
+            Nombre = t.Nombre
+        }).ToList()
+    };
+}
+
 
     public async Task EditarAsync(long id, ReportEditDto dto)
     {
