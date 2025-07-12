@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+import {Reporte} from '../models/reporte.model';
+import { Comunidad } from 'app/models';
 import { ApiResponse } from 'app/models';
 import { environment } from '../../environments/environment';
 
@@ -59,6 +61,11 @@ export class SeguimientoService  {
   getSeguimientosByUsuario(usuarioId: number): Observable<SeguimientoReporte[]> {
     return this.getAll().pipe(
       map(seguimientos => seguimientos.filter(s => s.usuario_id === usuarioId))
+    );
+  }
+  getAllComunidades(): Observable<Comunidad[]> {
+    return this.http.get<ApiResponse<Comunidad[]>>(`${environment.apiUrl}/Comunidades`).pipe(
+      map(response => response.data ?? [])
     );
   }
 }

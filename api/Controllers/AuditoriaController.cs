@@ -13,10 +13,11 @@ namespace api.Controllers;
 public class SeguimientoReporteController : ControllerBase
 {
     private readonly SeguimientoReporteService _seguimientoService;
-    // private readonly IRepository<Comunidade> _comunidadRepository;
-    public SeguimientoReporteController(SeguimientoReporteService seguimientoService)
+     private readonly IRepository<Comunidade> _comunidadRepository;
+    public SeguimientoReporteController(SeguimientoReporteService seguimientoService, IRepository<Comunidade> comunidadRepository)
     {
         _seguimientoService = seguimientoService;
+        _comunidadRepository = comunidadRepository;
     }
 
     [HttpGet]
@@ -78,8 +79,8 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpPost]
-  // [Authorize(Roles = "Administrador, Moderador")]
-public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteCreateDto seguimientoCreateDto)
+    // [Authorize(Roles = "Administrador, Moderador")]
+    public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(SeguimientoReporteCreateDto seguimientoCreateDto)
     {
         try
         {
@@ -187,7 +188,21 @@ public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(Segui
             });
         }
     }
+       [HttpGet("comunidades")]
+    public async Task<IActionResult> GetComunidadesParaReportes()
+    {
+        var comunidades = await _comunidadRepository.GetAllAsync();
 
+        var resultado = comunidades
+            .Where(c => c.DeletedAt == null)
+            .Select(c => new
+            {
+                c.Id,
+                c.Nombre
+            });
+
+        return Ok(resultado);
+    }
     [HttpDelete("{id}")]
     // [Authorize(Roles = "Administrador")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(long id)
@@ -222,6 +237,11 @@ public async Task<ActionResult<ApiResponse<SeguimientoReporteDto>>> Create(Segui
             });
         }
     }
-    
-    
+
+   // [HttpPut("Reportes")]
+    // [Authorize
+    /*public async Task<IActionResult> EditarReport([FromBody] AuditoriaEstadoDto dto)
+    {
+        return "fsfs";
+    }*/
 }

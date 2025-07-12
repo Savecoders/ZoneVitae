@@ -13,8 +13,8 @@ export interface SeguimientoReporte {
   estado_nuevo: string;
   comentario: string;
   accion_realizada: string;
-  ///accion_recomendada?: string | null;
- // documentos_adjuntos: boolean;
+  accion_recomendada?: string | null;
+ documentos_adjuntos: boolean;
   prioridad: PrioridadSeguimientoReporte;
   create_at?: Date | string;
   update_at?: Date | string;

@@ -11,7 +11,7 @@ import { environment } from 'environments/environment';
   providedIn: 'root',
 })
 export class ReportenorService extends BaseService<Reporte> {
-  private apiUrl = `${environment.apiUrl}/Reports`;
+  private apiUrl = `${environment.apiUrl}/reports`;
   constructor(http: HttpClient) {
     super(http, 'reports');
   }

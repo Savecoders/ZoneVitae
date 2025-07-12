@@ -134,7 +134,7 @@ export class AuditoriaComponent {
     this.router.navigate(['/']); // Redirige a inicio o página no autorizada
     return;
   }*/
-  this.comunidadService.getAll().subscribe({
+  this.seguimientoService.getAllComunidades().subscribe({
     next: (comunidades) => {
       this.comunidadesData = comunidades;
       this.cargarDatos();
@@ -189,18 +189,26 @@ export class AuditoriaComponent {
     return new Date(create_at).toLocaleDateString();
   }
 
-  cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
-    
-    this.reporteService
-      .updateReporte(reporte.id!, { estado: nuevoEstado })
-      .subscribe({
-        next: () => {
-          this.cargarDatos();
-        },
-        error: (err) => console.error('Error al actualizar estado', err),
-      });
-  }
+cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
+    // Obtener el reporte completo primero
+    this.reporteService.getReporteById(reporte.id!).subscribe({
+        next: (reporteCompleto) => {
+            // Actualizar solo el estado
+            const reporteActualizado = {
+                ...reporteCompleto,
+                estado: nuevoEstado,
+                update_at: new Date().toISOString()
+            };
 
+            // Enviar el reporte completo
+            this.reporteService.updateReporte(reporte.id!, reporteActualizado).subscribe({
+                next: () => this.cargarDatos(),
+                error: (err) => console.error('Error al actualizar estado', err),
+            });
+        },
+        error: (err) => console.error('Error al obtener reporte', err)
+    });
+}
   get dataFiltrada(): Reporte[] {
     const termino = this.filtroBusqueda.toLowerCase().trim();
     if (!termino) return this.dataSource;
@@ -254,9 +262,9 @@ console.log('Enviando a updateReporte:', reporteActualizado);
                   estado_nuevo: this.currentStatusChange,
                   comentario: this.commentText,
                   accion_realizada: 'Cambio de estado',
-                 // accion_recomendada: 'Revisar el reporte',
-                 // documentos_adjuntos:
-                    //this.selectedReport.documentos_adjuntos || [],
+                 accion_recomendada: 'Revisar el reporte',
+                 documentos_adjuntos:
+                    this.selectedReport.documentos_adjuntos || [],
                   prioridad: PrioridadSeguimientoReporte.MEDIA,
                   update_at: new Date().toISOString(),
                 };
@@ -314,6 +322,7 @@ console.log('Enviando a updateReporte:', reporteActualizado);
 
   async guardarSeguimiento() {
     if (!this.seguimientoForm.valid || !this.currentSeguimientoReport) {
+       console.error('Formulario inválido', this.seguimientoForm.errors);
       console.error('Formulario inválido o reporte no seleccionado');
       return;
     }
@@ -349,13 +358,13 @@ console.log('Enviando a updateReporte:', reporteActualizado);
           } else {
             const nuevoSeguimiento: SeguimientoReporte = {
               reporte_id: reporte.id!,
-              usuario_id: 1,
+              usuario_id: this.seguimientoForm.value.usuario_id || 0,
               estado_anterior: reporte.estado,
               estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
               comentario: '',
               accion_realizada: this.seguimientoForm.value.acciones,
-             // accion_recomendada: '',
-             // documentos_adjuntos: false,
+             accion_recomendada: '',
+              documentos_adjuntos: false,
               prioridad: this.seguimientoForm.value.prioridad,
               create_at: new Date().toISOString(),
               update_at: new Date().toISOString(),
@@ -426,7 +435,7 @@ console.log('Enviando a updateReporte:', reporteActualizado);
     if (!confirmado) return;
 
     const reporteActualizado: Partial<Reporte> = {
-      ...reporte,
+        id: reporte.id,
       estado: EstadoReporte.PENDIENTE_REVISION, // Usar el enum
       estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION, // Usar el enum
       update_at: new Date().toISOString(),
