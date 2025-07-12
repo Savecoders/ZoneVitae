@@ -21,7 +21,7 @@ public partial class Tag
 
     [ForeignKey("TagId")]
     [InverseProperty("Tags")]
-    public virtual ICollection<Comunidade> Comunidads { get; set; } = new List<Comunidade>();
+    public virtual ICollection<Comunidad> Comunidads { get; set; } = new List<Comunidad>();
 
     [ForeignKey("TagId")]
     [InverseProperty("Tags")]
