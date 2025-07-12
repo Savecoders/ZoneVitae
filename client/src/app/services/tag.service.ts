@@ -15,6 +15,7 @@ export class TagService{
   constructor(private http: HttpClient) {
   }
 
+
   // Get all tags
     getAll(): Observable<Tag[]> {
       return this.http.get<ApiResponse<Tag[]>>(`${this.apiUrl}`).pipe(
@@ -89,5 +90,6 @@ export class TagService{
       })
     );
   }
+
 
 }

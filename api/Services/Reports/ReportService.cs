@@ -59,6 +59,7 @@ public class ReportService
             r => r.Tags,
             r => r.Comunidad);
 
+
         return reports.Select(MapToDto).ToList();
     }
 
@@ -130,7 +131,9 @@ public class ReportService
             UpdateAt = DateTime.UtcNow
         };
 
+
         // Agrega tags
+
         if (dto.Tags != null && dto.Tags.Any())
         {
             foreach (var tagNombre in dto.Tags)
@@ -182,7 +185,9 @@ public class ReportService
         if (!await CanEditReportAsync(report))
             throw new UnauthorizedAccessException("No tienes permisos para eliminar este reporte.");
 
+
         // Obtiene fotos relacionadas
+
         var fotosRelacionadas = await _fotoRepository.FindAsync(f => f.ReportsId == id);
 
         foreach (var foto in fotosRelacionadas)
@@ -190,6 +195,7 @@ public class ReportService
             _fotoRepository.Delete(foto);
         }
         await _fotoRepository.SaveChangesAsync();
+
 
         // Elimina el reporte
         _reportRepository.Delete(report);
@@ -209,6 +215,7 @@ public class ReportService
         {
             if (string.IsNullOrWhiteSpace(autor.FotoPerfil))
             {
+
                 if (!string.IsNullOrEmpty(autor.NombreUsuario))
                     inicial = autor.NombreUsuario.Substring(0, 1).ToUpper();
                 else
@@ -245,7 +252,9 @@ public class ReportService
                     CreateAt = autor.CreateAt,
                     UpdateAt = autor.UpdateAt
                 },
+
                 ComunidadNombre = report.Comunidad?.Nombre,
+
             InicialNombre = inicial,
 
             Fotos = report.Fotos.Select(f => new FotoDto
@@ -267,13 +276,17 @@ public class ReportService
         var report = await _reportRepository.GetByIdWithIncludesAsync(id,
             r => r.Tags,
             r => r.Fotos,
+
             r => r.Autor,
             r => r.Comunidad);
+
 
         if (report == null)
             throw new Exception("Reporte no encontrado.");
 
+
         var userId = GetCurrentUserId();
+
 
         if (report.AutorId != userId && !await UserIsAdminOrJoinAsync(userId))
             throw new UnauthorizedAccessException("No tienes permiso para editar este reporte.");
@@ -334,6 +347,7 @@ public class ReportService
             r => r.Fotos,
             r => r.Tags,
             r => r.Comunidad);
+
 
         return reports.Select(MapToDto).ToList();
     }

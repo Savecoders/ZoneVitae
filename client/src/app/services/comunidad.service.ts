@@ -9,7 +9,6 @@ import { environment } from "../../environments/environment";
 @Injectable({
   providedIn: 'root',
 })
-
 export class ComunidadService{
   private apiUrl = `${environment.apiUrl}/Comunidades`;
   
@@ -118,6 +117,7 @@ getComunidadesParaReportes(): Observable<Comunidad[]> {
   return this.http.get<{ message: string, data: Comunidad[] }>(url).pipe(
     map(response => response.data)
   );
+
 }
 
 }

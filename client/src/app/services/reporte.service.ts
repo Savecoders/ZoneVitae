@@ -21,11 +21,13 @@ export class ReporteService extends BaseService<ReporteCompleto> {
   }
 
   //carga los datos del reporte
+
   getReporte(): Observable<ReporteCompleto[]> {
     return this.http.get<{ message: string, data: ReporteCompleto[] }>(this.jsonUrl).pipe(
       map(response => response.data)
     );
   }
+
 
   //Agregar Reporte
   createReporte(dto: any): Observable<ReporteCompleto> {
@@ -34,9 +36,12 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
 
   //Editar Reporte
+
   editReporte(id: number, dto: any): Observable<ReporteCompleto> {
     return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
   }
+
+
 
   //Eliminar Reporte
   deleteReporte(id: number): Observable<void> {
@@ -51,6 +56,7 @@ export class ReporteService extends BaseService<ReporteCompleto> {
       map(response => response.data)
     );
   }
+
 
 
 
@@ -85,8 +91,8 @@ export class ReporteService extends BaseService<ReporteCompleto> {
     );
   }
 
-
   // Busca reportes por autor
+
   getReportesByAutor(autorId: number): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(`${this.jsonUrl}?autor_id=${autorId}`);
   }

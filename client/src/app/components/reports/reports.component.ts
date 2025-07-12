@@ -96,6 +96,7 @@ cargarUsuarioActual(): void {
     const parsed = JSON.parse(userData);
     this.usuarioActual = parsed.usuario ?? parsed;
 
+
     const rolesRaw = this.usuarioActual?.roles ?? [];
 
     const roles = rolesRaw.map((r: any) => {
@@ -147,11 +148,10 @@ nuevoReporte() {
   this.isEditMode = false;
   this.menuAbiertoId = null;
   this.imagePreview = null;
-
   this.form.reset();
-
   this.fotos.clear();
   this.tags.clear();
+
 
   this.form.patchValue({
     estado: 'Pendiente_Moderacion',
@@ -203,6 +203,7 @@ guardarReporte(): void {
     return;
   }
 
+
   const reportForm = this.form.value;
 
   // Obtener tags como string[]
@@ -211,10 +212,12 @@ guardarReporte(): void {
     .map((t: any) => t.nombre.trim().toLowerCase())
     .filter((nombre: string) => nombre.length > 0);
 
+
   if (tagsNom.length === 0) {
     this.toastService.error('Debes agregar al menos un tag válido');
     return;
   }
+
 
   // Obtener URLs
   const fotosUrls: string[] = this.fotos.value.map((f: any) => f.image);
@@ -254,10 +257,12 @@ editarReporte(id: number): void {
   const reporte = this.reportes.find((r) => r.id === id);
   if (!reporte) return;
   
+
 if (!this.usuarioActual || !reporte.autor || (reporte.autor.id !== this.usuarioActual.id && !this.esAdmin)) {
   this.toastService.error('No tienes permiso para editar este reporte.');
   return;
 }
+
   
   this.isEditMode = true;
   this.reporteEditando = reporte;

@@ -16,7 +16,8 @@ using System.Text;
 using api.Contexts;
 using api.Repositories;
 using api.Services;
-
+using api.Services.Seguimiento;
+using api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,8 @@ builder.Services.AddScoped<api.Repositories.IRepository<Foto>, api.Repositories.
 builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.Repositories.GaleriaComunidadRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<UsuariosComunidadesRole>, api.Repositories.UsuariosComunidadesRolesRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<RolesComunidade>, api.Repositories.RolesComunidadesRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<SeguimientoReporte>, api.Repositories.SeguimientoRepository>();
+
 // builder.Services.AddScoped<api.Repositories.IRepository<api.Models.SeguimientoReporte>, api.Repositories.ReportRepository>();
 
 
@@ -56,7 +59,7 @@ builder.Services.AddScoped<IRepository<Report>, ReportRepository>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<SeguimientoReporteService>();
 
 
 // Add controllers with JSON options

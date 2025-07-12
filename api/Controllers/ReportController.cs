@@ -21,16 +21,19 @@ public class ReportsController : ControllerBase
         _comunidadRepository = comunidadRepository;
     }
 
+
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> GetAll()
     {
         var reports = await _reportService.GetAllMappedAsync();
+
         return Ok(new
         {
             message = "Reportes obtenidos correctamente.",
             data = reports
         });
+
     }
 
     [HttpGet("{id:long}")]
@@ -38,6 +41,7 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> GetById(long id)
     {
         var report = await _reportService.GetByIdMappedAsync(id);
+
         return report == null
             ? NotFound(new { message = "Reporte no encontrado." })
             : Ok(new
@@ -47,10 +51,12 @@ public class ReportsController : ControllerBase
             });
     }
 
+
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] ReportCreateDto dto)
     {
+
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -69,7 +75,9 @@ public class ReportsController : ControllerBase
         try
         {
             await _reportService.EditarAsync(id, dto);
+            
             return Ok(new { message = "Reporte editado correctamente." });
+
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -84,9 +92,11 @@ public class ReportsController : ControllerBase
         try
         {
             var deleted = await _reportService.DeleteReportAsync(id);
+
             return deleted
                 ? Ok(new { message = "Reporte eliminado correctamente." })
                 : NotFound(new { message = "Reporte no encontrado." });
+
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -103,6 +113,7 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> FiltrarPorTag([FromQuery] string tag)
     {
         if (string.IsNullOrEmpty(tag))
+
             return BadRequest(new { message = "El parámetro tag es obligatorio." });
 
         var reports = await _reportService.GetByTagAsync(tag);
@@ -112,6 +123,7 @@ public class ReportsController : ControllerBase
             data = reports
         });
     }
+
 
     [HttpGet("comunidades")]
     public async Task<IActionResult> GetComunidadesParaReportes()
@@ -131,5 +143,6 @@ public class ReportsController : ControllerBase
             message = "Comunidades disponibles para reportes obtenidas correctamente.",
             data = resultado
         });
+
     }
 }

@@ -17,6 +17,7 @@ import {
   ReporteCompleto,
 } from '../../models';
 import { ReporteService } from '../../services/reporte.service';
+import { AuthService } from '../../services/auth.service';
 import { ComunidadService } from '../../services/comunidad.service';
 import { Comunidad } from '../../models';
 import { MatButtonModule } from '@angular/material/button';
@@ -111,7 +112,8 @@ export class AuditoriaComponent {
     private fb: FormBuilder,
     private http: HttpClient,
     private cloudinaryService: CloudinaryService,
-    private router: Router
+    private router: Router,
+     private authService: AuthService
   ) {
     this.editForm = this.fb.group({
       estado: ['', Validators.required],
@@ -126,25 +128,24 @@ export class AuditoriaComponent {
     });
   }
 
-  ngOnInit(): void {
-    const usuario = JSON.parse(localStorage.getItem('user_data') || '{}');
-    const roles: string[] = usuario.user.roles || [];
-
-    console.log('Roles del usuario:', roles.join(', '));
-
-    if (!roles.includes('admin')) {
-      alert(
-        `No tienes permisos para acceder a esta sección. ${roles.join('')} `
-      );
-      this.router.navigate(['/']);
-      return;
-    }
-
-    this.http.get<any>('../preview/data.json').subscribe((data) => {
-      this.comunidadesData = data.comunidades;
+ ngOnInit(): void {
+  // Cargar comunidades desde el API usando el servicio actualizado
+ /* if (!this.authService.hasRole('Administrador')) {
+    this.router.navigate(['/']); // Redirige a inicio o página no autorizada
+    return;
+  }*/
+  this.seguimientoService.getAllComunidades().subscribe({
+    next: (comunidades) => {
+      this.comunidadesData = comunidades;
       this.cargarDatos();
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Error al cargar comunidades', err);
+      this.comunidadesData = [];
+      this.cargarDatos();
+    }
+  });
+}
   aplicarFiltro() {
     if (!this.filtro) {
       this.cargarDatos();
@@ -183,22 +184,31 @@ export class AuditoriaComponent {
     return comunidad?.nombre || 'Comunidad desconocida';
   }
 
-  formatearFecha(fecha: string | Date | undefined): string {
-    if (!fecha) return '--';
-    return new Date(fecha).toLocaleDateString();
+  formatearFecha(create_at: string | Date | undefined): string {
+    if (!create_at) return '--';
+    return new Date(create_at).toLocaleDateString();
   }
 
-  cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
-    this.reporteService
-      .updateReporte(reporte.id!, { estado: nuevoEstado })
-      .subscribe({
-        next: () => {
-          this.cargarDatos();
+cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
+    // Obtener el reporte completo primero
+    this.reporteService.getReporteById(reporte.id!).subscribe({
+        next: (reporteCompleto) => {
+            // Actualizar solo el estado
+            const reporteActualizado = {
+                ...reporteCompleto,
+                estado: nuevoEstado,
+                update_at: new Date().toISOString()
+            };
+
+            // Enviar el reporte completo
+            this.reporteService.updateReporte(reporte.id!, reporteActualizado).subscribe({
+                next: () => this.cargarDatos(),
+                error: (err) => console.error('Error al actualizar estado', err),
+            });
         },
-        error: (err) => console.error('Error al actualizar estado', err),
-      });
-  }
-
+        error: (err) => console.error('Error al obtener reporte', err)
+    });
+}
   get dataFiltrada(): Reporte[] {
     const termino = this.filtroBusqueda.toLowerCase().trim();
     if (!termino) return this.dataSource;
@@ -228,7 +238,7 @@ export class AuditoriaComponent {
       ...this.selectedReport,
       estado: this.currentStatusChange as EstadoReporte,
     };
-
+console.log('Enviando a updateReporte:', reporteActualizado);
     this.reporteService
       .updateReporte(this.selectedReport.id!, reporteActualizado)
       .subscribe({
@@ -252,15 +262,15 @@ export class AuditoriaComponent {
                   estado_nuevo: this.currentStatusChange,
                   comentario: this.commentText,
                   accion_realizada: 'Cambio de estado',
-                  accion_recomendada: 'Revisar el reporte',
-                  documentos_adjuntos:
+                 accion_recomendada: 'Revisar el reporte',
+                 documentos_adjuntos:
                     this.selectedReport.documentos_adjuntos || [],
                   prioridad: PrioridadSeguimientoReporte.MEDIA,
                   update_at: new Date().toISOString(),
                 };
                 const seguimientoId = seguimientoExistente.id;
                 this.seguimientoService
-                  .updateSeguimiento(
+                  .update(
                     Number(seguimientoId),
                     seguimientoActualizado
                   )
@@ -312,6 +322,7 @@ export class AuditoriaComponent {
 
   async guardarSeguimiento() {
     if (!this.seguimientoForm.valid || !this.currentSeguimientoReport) {
+       console.error('Formulario inválido', this.seguimientoForm.errors);
       console.error('Formulario inválido o reporte no seleccionado');
       return;
     }
@@ -339,7 +350,7 @@ export class AuditoriaComponent {
             };
 
             this.seguimientoService
-              .updateSeguimiento(
+              .update(
                 seguimientoExistente.id!,
                 seguimientoActualizado
               )
@@ -347,12 +358,12 @@ export class AuditoriaComponent {
           } else {
             const nuevoSeguimiento: SeguimientoReporte = {
               reporte_id: reporte.id!,
-              usuario_id: 1,
+              usuario_id: this.seguimientoForm.value.usuario_id || 0,
               estado_anterior: reporte.estado,
               estado_nuevo: this.seguimientoForm.value.estadoSeguimiento,
               comentario: '',
               accion_realizada: this.seguimientoForm.value.acciones,
-              accion_recomendada: '',
+             accion_recomendada: '',
               documentos_adjuntos: false,
               prioridad: this.seguimientoForm.value.prioridad,
               create_at: new Date().toISOString(),
@@ -361,7 +372,7 @@ export class AuditoriaComponent {
             };
 
             this.seguimientoService
-              .createSeguimiento(nuevoSeguimiento)
+              .create(nuevoSeguimiento)
               .subscribe(/* ... */);
           }
 
@@ -424,7 +435,7 @@ export class AuditoriaComponent {
     if (!confirmado) return;
 
     const reporteActualizado: Partial<Reporte> = {
-      ...reporte,
+        id: reporte.id,
       estado: EstadoReporte.PENDIENTE_REVISION, // Usar el enum
       estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION, // Usar el enum
       update_at: new Date().toISOString(),

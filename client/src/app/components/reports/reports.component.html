@@ -374,7 +374,9 @@
                               class="absolute right-0 mt-1 bg-background shadow rounded z-10 w-32"
                               >
                               <!-- Muestra solo si el usuario actual es el autor del reporte -->
+
                                <ng-container *ngIf="usuarioActual?.id === reporte.autor?.id || esAdmin">
+
                                 <button
                                   (click)="editarReporte(reporte.id!)"
                                   class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm"
