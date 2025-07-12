@@ -6,15 +6,15 @@ import { Reporte } from '../models/reporte.model';
 import { ReporteCompleto } from '../models';
 
 import { SeguimientoReporte } from '../models/seguimiento-reporte.model';
+import { environment } from 'environments/environment.development';
 
-import { environment } from '../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReporteService extends BaseService<ReporteCompleto> {
-  private jsonUrl: string = `${environment.jsonServerUrl}/reports`;
+  private jsonUrl: string = `${environment.apiUrl}/reports`;
 
   constructor(http: HttpClient) {
     super(http, 'reports');
@@ -22,18 +22,20 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
   //carga los datos del reporte
   getReporte(): Observable<ReporteCompleto[]> {
-    return this.http.get<ReporteCompleto[]>(this.jsonUrl);
+    return this.http.get<{ message: string, data: ReporteCompleto[] }>(this.jsonUrl).pipe(
+      map(response => response.data)
+    );
   }
 
   //Agregar Reporte
-  createReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    return this.http.post<ReporteCompleto>(this.jsonUrl, reporte);
+  createReporte(dto: any): Observable<ReporteCompleto> {
+    return this.http.post<ReporteCompleto>(this.jsonUrl, dto);
   }
 
+
   //Editar Reporte
-  editReporte(reporte: ReporteCompleto): Observable<ReporteCompleto> {
-    const url = `${this.jsonUrl}/${reporte.id}`;
-    return this.http.put<ReporteCompleto>(url, reporte);
+  editReporte(id: number, dto: any): Observable<ReporteCompleto> {
+    return this.http.put<ReporteCompleto>(`${this.jsonUrl}/${id}`, dto);
   }
 
   //Eliminar Reporte
@@ -44,49 +46,47 @@ export class ReporteService extends BaseService<ReporteCompleto> {
 
   //BuscarTag
   buscarPorTag(nombreTag: string): Observable<ReporteCompleto[]> {
-    const nombreTagLower = nombreTag.toLowerCase();
-    return this.getReporte().pipe(
-      map((reportes) =>
-        reportes.filter((r) =>
-          r.tags?.some((tag) => tag.nombre.toLowerCase() === nombreTagLower)
+    const url = `${this.jsonUrl}/filtrar-por-tag?tag=${encodeURIComponent(nombreTag)}`;
+    return this.http.get<{ message: string, data: ReporteCompleto[] }>(url).pipe(
+      map(response => response.data)
+    );
+  }
+
+
+
+  
+  getReporteById(id: number): Observable<ReporteCompleto> {
+    return this.http
+      .get<{ message: string, data: ReporteCompleto }>(`${this.jsonUrl}/${id}`)
+      .pipe(map(response => response.data));
+  }
+
+
+  crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
+    return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
+  }
+
+
+  
+  updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
+    return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
+  }
+  
+  getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
+      return this.getAll().pipe(
+        map((reportes) =>
+          reportes.filter(
+            (reporte) =>
+              (titulo
+                ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
+                : true) && (estado ? reporte.estado === estado : true)
         )
       )
     );
   }
 
 
-  // ...existing code...
-getReporteById(id: number): Observable<ReporteCompleto> {
-  return this.http.get<ReporteCompleto>(`${this.jsonUrl}/${id}`);
-}
-// ...existing code...
-   
-crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<SeguimientoReporte> {
-  return this.http.post<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes`, seguimiento);
-}
-
-
-
-updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
-  return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
-}
-
-getReportes(titulo?: string, estado?: string): Observable<Reporte[]> {
-    return this.getAll().pipe(
-      map((reportes) =>
-        reportes.filter(
-          (reporte) =>
-            (titulo
-              ? reporte.titulo.toLowerCase().includes(titulo.toLowerCase())
-              : true) && (estado ? reporte.estado === estado : true)
-      )
-    )
-  );
-}
-
-
-
-  // Buscar reportes por autor
+  // Busca reportes por autor
   getReportesByAutor(autorId: number): Observable<Reporte[]> {
     return this.http.get<Reporte[]>(`${this.jsonUrl}?autor_id=${autorId}`);
   }

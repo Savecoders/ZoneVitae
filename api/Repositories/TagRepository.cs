@@ -11,15 +11,22 @@ namespace api.Repositories
     {
         public async Task<IEnumerable<Tag>> GetAllAsync() => await context.Tags.ToListAsync();
         public async Task<Tag?> GetByIdAsync(object id) => await context.Tags.FindAsync(id);
-        public Task<IEnumerable<Tag>> FindAsync(Expression<Func<Tag, bool>> predicate)
+        public async Task<IEnumerable<Tag>> FindAsync(Expression<Func<Tag, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return await context.Tags.Where(predicate).ToListAsync();
+        }
+                                                           
+
+        public async Task<IEnumerable<Tag>> FindWithIncludesAsync(Expression<Func<Tag, bool>> predicate, params Expression<Func<Tag, object>>[] includes)
+        {
+            IQueryable<Tag> query = context.Tags.Where(predicate);
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToListAsync();
         }
 
-        public Task<IEnumerable<Tag>> FindWithIncludesAsync(Expression<Func<Tag, bool>> predicate, params Expression<Func<Tag, object>>[] includes)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<Tag?> GetByIdWithIncludesAsync(object id, params Expression<Func<Tag, object>>[] includes)
         {

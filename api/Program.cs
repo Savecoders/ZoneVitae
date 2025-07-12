@@ -13,6 +13,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using api.Contexts;
+using api.Repositories;
+using api.Services;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
@@ -45,6 +50,13 @@ builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ComunidadService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ActividadeRepository>();
+builder.Services.AddScoped<ActividadeService>();
+builder.Services.AddScoped<IRepository<Report>, ReportRepository>();
+builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddHttpContextAccessor();
+
 
 
 // Add controllers with JSON options
@@ -184,7 +196,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAllOrigins");
 

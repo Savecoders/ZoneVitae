@@ -8,6 +8,7 @@ import { Observable, map, switchMap, of, catchError } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
+
 export class TagService{
   private apiUrl = `${environment.apiUrl}/Tags`;
   
@@ -88,4 +89,5 @@ export class TagService{
       })
     );
   }
+
 }

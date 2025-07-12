@@ -49,7 +49,9 @@ public partial class ZoneVitaeSqlContext : DbContext
     {
         modelBuilder.Entity<Actividade>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__activida__3214EC27F3BF543A");
+
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Fecha).HasDefaultValueSql("(getdate())");
@@ -58,7 +60,9 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Comentario>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__comentar__3214EC271DC18C9D");
+
 
             entity.Property(e => e.FechaComentario).HasDefaultValueSql("(getdate())");
 
@@ -69,7 +73,9 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Comunidade>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__comunida__3214EC27665D2A2F");
+
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Estado).HasDefaultValue("Pendiente de Revision");
@@ -88,7 +94,9 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_comunidad_tags_comunidad"),
                     j =>
                     {
+
                         j.HasKey("ComunidadId", "TagId").HasName("PK__comunida__A2962651958D2E5C");
+
                         j.ToTable("comunidad_tags");
                         j.HasIndex(new[] { "TagId" }, "IX_comunidad_tags_tag_id");
                         j.IndexerProperty<long>("ComunidadId").HasColumnName("comunidad_id");
@@ -98,13 +106,16 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Foto>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__fotos__3214EC27AA7AA1B6");
+
 
             entity.HasOne(d => d.Reports).WithMany(p => p.Fotos).HasConstraintName("FK_fotos_reports");
         });
 
         modelBuilder.Entity<GaleriaComunidad>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__galeria___3214EC27379F0835");
 
             entity.HasOne(d => d.Comunidad).WithMany(p => p.GaleriaComunidads).HasConstraintName("FK_galeria_comunidad_comunidad");
@@ -112,6 +123,7 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__reports__3214EC27ACD2DCD0");
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
@@ -133,7 +145,9 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_reports_tags_report"),
                     j =>
                     {
+
                         j.HasKey("ReportsId", "TagId").HasName("PK__reports___C56F988D49375E4F");
+
                         j.ToTable("reports_tags");
                         j.HasIndex(new[] { "TagId" }, "IX_reports_tags_tag_id");
                         j.IndexerProperty<long>("ReportsId").HasColumnName("reports_id");
@@ -143,19 +157,25 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__roles__3214EC273FF305C8");
+
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<RolesComunidade>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__roles_co__3214EC27DCD9248A");
+
         });
 
         modelBuilder.Entity<SeguimientoReporte>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__seguimie__3214EC2742FAA04C");
+
 
             entity.Property(e => e.CreateAt).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Prioridad).HasDefaultValue("Media");
@@ -170,14 +190,18 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<Tag>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__tags__3214EC27FC59F1D2");
+
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__usuarios__3214EC27C26D3FF6");
+
 
             entity.ToTable("usuarios", tb => tb.HasTrigger("tr_asignar_rol_usuario_regular"));
 
@@ -199,7 +223,9 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_follows_usuario"),
                     j =>
                     {
+
                         j.HasKey("UsuarioId", "ComunidadId").HasName("PK__follows__93BC26688BAED29D");
+
                         j.ToTable("follows");
                         j.HasIndex(new[] { "ComunidadId" }, "IX_follows_comunidad_id");
                         j.IndexerProperty<Guid>("UsuarioId").HasColumnName("usuario_id");
@@ -219,7 +245,9 @@ public partial class ZoneVitaeSqlContext : DbContext
                         .HasConstraintName("FK_me_encanta_usuario"),
                     j =>
                     {
+
                         j.HasKey("UsuarioId", "ReportsId").HasName("PK__me_encan__55C3BD85FA1E98FC");
+
                         j.ToTable("me_encanta");
                         j.HasIndex(new[] { "ReportsId" }, "IX_me_encanta_reports_id");
                         j.IndexerProperty<Guid>("UsuarioId").HasColumnName("usuario_id");
@@ -229,6 +257,7 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<UsuariosComunidadesRole>(entity =>
         {
+
             entity.HasKey(e => new { e.UsuarioId, e.ComunidadId }).HasName("PK__usuarios__93BC26684BEBAFBB");
 
             entity.Property(e => e.FechaAsignacion).HasDefaultValueSql("(getdate())");
@@ -242,7 +271,9 @@ public partial class ZoneVitaeSqlContext : DbContext
 
         modelBuilder.Entity<UsuariosRole>(entity =>
         {
+
             entity.HasKey(e => e.Id).HasName("PK__usuarios__3213E83FA1F66C8E");
+
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Activo).HasDefaultValue(true);

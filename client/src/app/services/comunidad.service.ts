@@ -5,13 +5,16 @@ import { Comunidad } from '../models/comunidad.model';
 import { ApiResponse } from "../models/api-response.model";
 import { environment } from "../../environments/environment";
 
+
 @Injectable({
   providedIn: 'root',
 })
+
 export class ComunidadService{
   private apiUrl = `${environment.apiUrl}/Comunidades`;
   
   constructor(private http: HttpClient) {}
+
 
   // Get all communities
   getAll(): Observable<Comunidad[]> {
@@ -109,4 +112,13 @@ export class ComunidadService{
     );
   }
 
+
+getComunidadesParaReportes(): Observable<Comunidad[]> {
+  const url = `${environment.apiUrl}/reports/comunidades`;
+  return this.http.get<{ message: string, data: Comunidad[] }>(url).pipe(
+    map(response => response.data)
+  );
 }
+
+}
+

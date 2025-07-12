@@ -370,7 +370,7 @@ GO
 -- Create default user with Administrador role
 IF NOT EXISTS (SELECT 1 FROM [usuarios] WHERE [nombre_usuario] = 'admin')
 BEGIN
-    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
+    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta])
     VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
 END;
 GO

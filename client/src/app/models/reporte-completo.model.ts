@@ -23,4 +23,5 @@ export interface ReporteCompleto {
   me_encanta_count?: number;
   usuarios_me_encanta?: Usuario[];
   seguimientos?: SeguimientoReporte[];
+  direccion?: string;
 }
