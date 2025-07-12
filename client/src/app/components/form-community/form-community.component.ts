@@ -19,6 +19,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { LucideAngularModule, Save, CircleX, ImageUp} from 'lucide-angular';
 import { ToastService } from 'app/services/toast.service';
+import { AuthService } from 'app/services/auth.service';
 
 @Component({
   selector: 'app-form-community',
@@ -36,23 +37,26 @@ export class FormCommunityComponent {
     tags:Tag[]=[];
     estado:EstadoComunidad = EstadoComunidad.POR_APROBAR;
     tipoComunidad:TipoComunidad = TipoComunidad.PUBLICA;
+    
     public guardar = Save;
     public cancel = CircleX;
     public upload = ImageUp;
+    public userId: string | null = null;
     
     constructor(private miServicio:ComunidadService, private servTags:TagService,
       private formBuild:FormBuilder, private cloudinaryService: CloudinaryService,
       private router: Router, private route: ActivatedRoute, private servTag:TagService,
-      private toastService: ToastService){}
+      private toastService: ToastService,
+      public auth: AuthService){}
 
     estadosComunidad = Object.entries(EstadoComunidad).map(([key, value]) => ({
-      value: key,    
+      value: value,   
       label: value   
     }));
 
-    tiposComunidades = Object.entries(TipoComunidad).map(([key, value]) => ({
-      value: key,    
-      label: value   
+    tiposComunidades = Object.values(TipoComunidad).map(value => ({
+      value: value,   
+      label: value
     }));
 
     fileInputs: { [key: string]: File | null } = {
@@ -60,20 +64,17 @@ export class FormCommunityComponent {
       cover: null
     };
 
-    uploadedUrls: { [key: string]: string } = {
-      logo: '',
-      cover: ''
-    };
-
+    previewUrls: { [key: string]: string } = {};
 
     ngOnInit(): void {
+      this.userId = this.auth.getUserIdFromCurrentToken();
       this.cargarTags();
       this.formGroup = this.formBuild.group({
         nombre:["", [Validators.required, Validators.minLength(10)]],
         descripcion:["", [Validators.required, Validators.minLength(10)]],
         ubicacion:["", [Validators.required, Validators.minLength(10)]],
-        logo:[this.uploadedUrls['logo']],
-        cover: [this.uploadedUrls['cover']],
+        logo:[this.previewUrls['logo']],
+        cover: [this.previewUrls['cover']],
         tipoComunidad:["", Validators.required],
         soloMayoresEdad:[false],
         tags: [[], Validators.required],
@@ -85,9 +86,13 @@ export class FormCommunityComponent {
     }
 
     cargarTags():void{
-        this.servTags.getTags().subscribe((datos:Tag[])=>{
+        this.servTags.getAll().subscribe((datos:Tag[])=>{
           this.tags = datos;
         });
+    }
+
+    esCreador(comunidad: Comunidad): boolean {
+      return String(comunidad.creadorId) === String(this.userId);
     }
 
     clearForm() {
@@ -96,6 +101,7 @@ export class FormCommunityComponent {
       descripcion:"",
       ubicacion:"",
       logo:"",
+      cover:"",
       tipoComunidad:"",
       soloMayoresEdad:false,
       tags: [],
@@ -114,8 +120,8 @@ export class FormCommunityComponent {
         this.currentId = id;
 
         forkJoin([
-          this.servTags.getTags(),
-          this.miServicio.getComunidadById(this.currentId)
+          this.servTags.getAll(),
+          this.miServicio.getById(this.currentId)
         ]).subscribe(([tags, comunidad]) => {
           this.tags = tags;
 
@@ -124,7 +130,7 @@ export class FormCommunityComponent {
             (comunidad.tags ?? []).some((t: any) => t.id ? t.id === tag.id : t === tag.id)
           );
 
-          //Actualizar valores del formulario
+          //Actualiza valores del formulario
           this.formGroup.patchValue({
             nombre: comunidad.nombre,
             descripcion: comunidad.descripcion,
@@ -138,38 +144,76 @@ export class FormCommunityComponent {
             create_at: comunidad.create_at ? new Date(comunidad.create_at) : new Date(),
             update_at: comunidad.update_at ? new Date(comunidad.update_at) : new Date()
           });
-          this.uploadedUrls['logo'] = comunidad.logo || '';
-          this.uploadedUrls['cover'] = comunidad.cover || '';
+          this.previewUrls['logo'] = comunidad.logo || '';
+          this.previewUrls['cover'] = comunidad.cover || '';
           this.titulo = "Editar comunidad";
         });
       }
     }
 
     onSubmit() {
-      if(this.formGroup.invalid){
+      if (this.formGroup.invalid) {
         this.formGroup.markAllAsTouched();
         return;
       }
-      this.formGroup.get('logo')?.setValue(this.uploadedUrls['logo']);
-      this.formGroup.get('cover')?.setValue(this.uploadedUrls['cover']);
-      let newComunidad:Comunidad = this.formGroup.value;
-      if(this.isEditMode){ 
-        newComunidad.id = this.currentId;
-        this.formGroup.get('update_at')?.setValue(new Date());
-        this.miServicio.updateComunidad(newComunidad.id,newComunidad).subscribe((updateComunidad)=>{
-          this.toastService.success("La comunidad ha sido actualizada");
-          this.router.navigate(['/crud-communities']);
+
+      const formData = new FormData();
+      const values = this.formGroup.value;
+
+      formData.append('nombre', values.nombre);
+      formData.append('descripcion', values.descripcion);
+      formData.append('ubicacion', values.ubicacion);
+      formData.append('tipoComunidad', values.tipoComunidad);
+      formData.append('soloMayoresEdad', values.soloMayoresEdad.toString());
+      formData.append('estado', values.estado);
+
+      values.tags.forEach((tag: any, index: number) => {
+        const tagId = typeof tag === 'object' ? tag.id : tag;  
+        formData.append(`tags[${index}]`, tagId);
+      });
+
+      if (this.fileInputs['logo']) {
+        formData.append('logo', this.fileInputs['logo']);
+      }
+      if (this.fileInputs['cover']) {
+        formData.append('cover', this.fileInputs['cover']);
+      }
+
+      if (this.isEditMode) {
+        this.miServicio.update(this.currentId, formData).subscribe({
+          next: (comunidadActualizada: Comunidad) => {
+            this.toastService.success("La comunidad ha sido actualizada");
+            const creadorId = comunidadActualizada?.creadorId;
+            if(this.auth.isLoggedIn() && (this.auth.hasRole('Administrador') 
+              || this.esCreador(comunidadActualizada))){
+                this.router.navigate(['/crud-communities']);
+            } else {
+              this.router.navigate(['/comunities']);
+            }
+          },
+          error: (err) => {
+            this.toastService.error("Error al actualizar comunidad");
+            console.error(err);
+          }
         });
-      }else{ 
-        const now = new Date();
-        this.formGroup.get('create_at')?.setValue(now);
-        this.formGroup.get('update_at')?.setValue(now);
-        this.miServicio.createComunidad(newComunidad).subscribe((addComunidad)=>{
-        this.toastService.success("La comunidad ha sido creada");
-        this.router.navigate(['/crud-communities']);
+      } else {
+        this.miServicio.create(formData).subscribe({
+          next: (comunidadCreada: Comunidad) => {
+            this.toastService.success("La comunidad ha sido creada");
+            const creadorId = comunidadCreada?.creadorId;
+            if(this.auth.isLoggedIn() && (this.auth.hasRole('Administrador')
+            || this.esCreador(comunidadCreada))){
+              this.router.navigate(['/crud-communities']);
+            }else{
+              this.router.navigate(['/comunities']);
+            }
+          },
+          error: (err) => {
+            this.toastService.error("Error al crear comunidad");
+            console.error(err);
+          }
         });
       }
-      this.clearForm(); 
     }
 
     onFileSelected(event: Event, field: 'logo' | 'cover'): void {
@@ -177,31 +221,15 @@ export class FormCommunityComponent {
       let file = fileInput.files?.[0];
       if (file) {
         this.fileInputs[field] = file;
+        this.previewUrls[field] = URL.createObjectURL(file);
       }
     }
 
-    uploadFile(field: 'logo' | 'cover'): void {
-      let file = this.fileInputs[field];
-      if (!file) return;
-
-      this.cloudinaryService.uploadImage(file).subscribe({
-        next: (res) => {
-          this.uploadedUrls[field] = res;
-          this.formGroup.get(field)?.setValue(res);
-          alert(`${field} subido correctamente`);
-        },
-        error: (err) => {
-          console.error(`Error al subir ${field}:`, err);
-        }
-      });
-    }
-
     cancelar() {
-    if (this.isEditMode) {
+    if (this.isEditMode && this.auth.isLoggedIn()) {
       this.router.navigate(['/crud-communities']);
     } else {
       this.clearForm();
     }
   }
-
 }

@@ -68,6 +68,8 @@ CREATE TABLE [comunidades] (
   [creador_id] uniqueidentifier,
   [ubicacion] nvarchar(500) NOT NULL,
   [estado] nvarchar(50) NOT NULL CHECK ([estado] IN ('Aprobado', 'Pendiente de Revision', 'Rechazado', 'Suspendido')) DEFAULT 'Pendiente de Revision',
+  [tipo_comunidad] nvarchar(50) NOT NULL CHECK ([tipo_comunidad] IN ('Publica', 'Restringida', 'Privada')),
+  [solo_mayores_edad] bit NOT NULL DEFAULT 0,
   [deleted_at] datetime2,
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -334,6 +336,13 @@ INSERT INTO [roles_comunidades] ([nombre], [descripcion]) VALUES ('Moderador', '
 INSERT INTO [roles_comunidades] ([nombre], [descripcion]) VALUES ('Miembro', 'Miembro regular de la comunidad');
 GO
 
+INSERT INTO [tags] ([nombre]) VALUES ('Medio Ambiente');
+INSERT INTO [tags] ([nombre]) VALUES ('Seguridad');
+INSERT INTO [tags] ([nombre]) VALUES ('Infraestructura');
+INSERT INTO [tags] ([nombre]) VALUES ('Salud Pública');
+INSERT INTO [tags] ([nombre]) VALUES ('Educación');
+GO
+
 -- Create triggers
 CREATE TRIGGER [tr_asignar_rol_usuario_regular]
 ON [usuarios]
@@ -372,33 +381,6 @@ BEGIN
     INSERT INTO [usuarios_roles] ([id_usuario], [id_rol])
     VALUES (@admin_id, (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'));
 END;
-GO
-
--- Trigger to assign the creator as an admin in the community
-CREATE TRIGGER [tr_asignar_admin_creador]
-ON [comunidades]
-AFTER INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    DECLARE @admin_rol_id BIGINT;
-    SELECT @admin_rol_id = ID FROM [roles_comunidades] WHERE [nombre] = 'Administrador';
-
-    INSERT INTO [usuarios_comunidades_roles] ([usuario_id], [comunidad_id], [rol_id])
-    SELECT
-        i.[creador_id],
-        i.[ID],
-        @admin_rol_id
-    FROM inserted i
-    WHERE i.[creador_id] IS NOT NULL
-    AND NOT EXISTS (
-        SELECT 1 FROM [usuarios_comunidades_roles] ucr
-        WHERE ucr.[usuario_id] = i.[creador_id]
-        AND ucr.[comunidad_id] = i.[ID]
-    );
-END;
-
 GO
 
 -- Add constraints

@@ -43,6 +43,13 @@ public partial class Comunidade
     [StringLength(50)]
     public string Estado { get; set; } = null!;
 
+    [Column("tipo_comunidad")]
+    [StringLength(50)]
+    public string TipoComunidad { get; set; } = null!;
+
+    [Column("solo_mayores_edad")]
+    public bool SoloMayoresEdad { get; set; }
+
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 

@@ -24,14 +24,16 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'crud-communities',
+    path: "crud-communities",
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/crud-communities/crud-communities.component').then(
         (m) => m.CrudComunitiesComponent
       ),
   },
   {
-    path: 'form-communities',
+    path: "form-communities",
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./components/form-community/form-community.component').then(
         (m) => m.FormCommunityComponent
