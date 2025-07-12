@@ -11,7 +11,7 @@ namespace api.Services.Comunidades
 {
     public class ComunidadService 
     {
-        private readonly IRepository<Comunidad> _comunidadRepository;
+        private readonly IRepository<Comunidade> _comunidadRepository;
         private readonly CloudinaryService _cloudinaryService;
         private readonly IRepository<Tag> _tagRepository;
         private readonly IRepository<RolesComunidade> _rolesComunidadesRepository;
@@ -19,7 +19,7 @@ namespace api.Services.Comunidades
         private readonly IHttpContextAccessor _httpContextAccessor;
 
     public ComunidadService(
-        IRepository<Comunidad> comunidadRepository,
+        IRepository<Comunidade> comunidadRepository,
         CloudinaryService cloudinaryService,
         IRepository<Tag> tagRepository,
         IRepository<RolesComunidade> rolesComunidadesRepository,
@@ -35,28 +35,27 @@ namespace api.Services.Comunidades
         _httpContextAccessor = httpContextAccessor;
     }
 
-        public Task<IEnumerable<Comunidad>> GetAllAsync() => _comunidadRepository.GetAllAsync();
+        public Task<IEnumerable<Comunidade>> GetAllAsync() => _comunidadRepository.GetAllAsync();
 
-        public Task<Comunidad?> GetByIdAsync(long id) => _comunidadRepository.GetByIdAsync(id);
+        public Task<Comunidade?> GetByIdAsync(long id) => _comunidadRepository.GetByIdAsync(id);
 
-        public async Task<IEnumerable<Comunidad>> SearchComunidadesAsync(string? nombre)
+        public async Task<IEnumerable<Comunidade>> SearchComunidadesAsync(string? nombre)
         {
             return await _comunidadRepository.FindAsync(c =>
             c.Nombre.ToLower().Contains(nombre.ToLower()));
         }
 
-        public async Task<Comunidad?> GetByNameAsync(string name) =>
+        public async Task<Comunidade?> GetByNameAsync(string name) =>
         (await _comunidadRepository.FindAsync(c => c.Nombre.ToLower() == name.ToLower())).FirstOrDefault();
 
-        public async Task<Comunidad?> GetByIdWithRelationshipsAsync(object id)
+        public async Task<Comunidade?> GetByIdWithRelationshipsAsync(object id)
         {
             if (_comunidadRepository is api.Repositories.ComunidadeRepository comunidadRepo)
             {
                 return await comunidadRepo.GetByIdWithIncludesAsync(id,
                     c => c.Tags,
                     c => c.Creador,
-                    c => c.UsuariosComunidadesRoles,
-                    c => c.Actividades);
+                    c => c.UsuariosComunidadesRoles);
             }
             return await _comunidadRepository.GetByIdAsync(id);
         }
@@ -92,7 +91,7 @@ namespace api.Services.Comunidades
             
             Guid creadorId = Guid.Parse(userIdString);
 
-            var comunidad = new Comunidad
+            var comunidad = new Comunidade
             {
                 Nombre = comunidadDto.Nombre,
                 Descripcion = comunidadDto.Descripcion,
@@ -148,7 +147,7 @@ namespace api.Services.Comunidades
             };
         }
 
-        public async Task<IEnumerable<Comunidad>> GetByCreadorIdAsync(Guid creadorId)
+        public async Task<IEnumerable<Comunidade>> GetByCreadorIdAsync(Guid creadorId)
         {
             return await _comunidadRepository.FindAsync(c => c.CreadorId == creadorId);
         }
@@ -227,7 +226,7 @@ namespace api.Services.Comunidades
             };
         }
 
-        public async Task DeleteAsync(Comunidad comunidad)
+        public async Task DeleteAsync(Comunidade comunidad)
         {
             comunidad.DeletedAt = DateTime.UtcNow;
             _comunidadRepository.Delete(comunidad);

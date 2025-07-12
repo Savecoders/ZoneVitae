@@ -26,7 +26,7 @@ public partial class UsuariosComunidadesRole
 
     [ForeignKey("ComunidadId")]
     [InverseProperty("UsuariosComunidadesRoles")]
-    public virtual Comunidad Comunidad { get; set; } = null!;
+    public virtual Comunidade Comunidad { get; set; } = null!;
 
     [ForeignKey("RolId")]
     [InverseProperty("UsuariosComunidadesRoles")]

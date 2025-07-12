@@ -3,7 +3,6 @@ using api.DTOs.Common;
 using api.DTOs.Comunidad;
 using api.DTOs.Tag;
 using api.Services.Comunidades;
-using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

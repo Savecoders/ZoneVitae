@@ -102,7 +102,6 @@ GO
 
 CREATE TABLE [actividades] (
   [ID] bigint PRIMARY KEY NOT NULL IDENTITY(1, 1),
-  [comunidad_id] bigint,
   [nombre] nvarchar(500) NOT NULL,
   [descripcion] nvarchar(max),
   [fecha_inicio] date NOT NULL,
@@ -110,7 +109,6 @@ CREATE TABLE [actividades] (
   [ubicacion] nvarchar(500) NOT NULL,
   [virtual] bit NOT NULL DEFAULT 0,
   [frecuencia] nvarchar(100) NOT NULL,
-  [cover] VARCHAR(255) NOT NULL,
   [fecha] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -231,9 +229,6 @@ GO
 CREATE INDEX [IX_comentarios_autor_id] ON [comentarios] ([autor_id])
 GO
 
-CREATE INDEX [IX_actividades_comunidad_id] ON [actividades] ([comunidad_id])
-GO
-
 CREATE INDEX [IX_actividades_fechas] ON [actividades] ([fecha_inicio], [fecha_fin])
 GO
 
@@ -277,8 +272,6 @@ GO
 ALTER TABLE [comentarios] ADD CONSTRAINT [FK_comentarios_autor] FOREIGN KEY ([autor_id]) REFERENCES [usuarios] ([ID])
 GO
 
-ALTER TABLE [actividades] ADD CONSTRAINT [FK_actividades_comunidad] FOREIGN KEY ([comunidad_id]) REFERENCES [comunidades] ([ID])
-GO
 
 ALTER TABLE [fotos] ADD CONSTRAINT [FK_fotos_reports] FOREIGN KEY ([reports_id]) REFERENCES [reports] ([ID])
 GO

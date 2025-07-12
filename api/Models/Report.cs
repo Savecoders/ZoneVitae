@@ -57,7 +57,7 @@ public partial class Report
 
     [ForeignKey("ComunidadId")]
     [InverseProperty("Reports")]
-    public virtual Comunidad? Comunidad { get; set; }
+    public virtual Comunidade? Comunidad { get; set; }
 
     [InverseProperty("Reports")]
     public virtual ICollection<Foto> Fotos { get; set; } = new List<Foto>();

@@ -5,23 +5,23 @@ using System.Linq.Expressions;
 
 namespace api.Repositories
 {
-    public class ComunidadeRepository(ZoneVitaeSqlContext _context) : IRepository<Comunidad>
+    public class ComunidadeRepository(ZoneVitaeSqlContext _context) : IRepository<Comunidade>
     {
-        public async Task<IEnumerable<Comunidad>> GetAllAsync()
+        public async Task<IEnumerable<Comunidade>> GetAllAsync()
         {
             return await _context.Comunidades
                 .Include(c => c.Tags)
                 .ToListAsync();
         }
            
-        public async Task<Comunidad?> GetByIdAsync(object id)
+        public async Task<Comunidade?> GetByIdAsync(object id)
         {
             return await _context.Comunidades
                  .Include(c => c.Tags)
                  .FirstOrDefaultAsync(c => c.Id == (long)id); 
         }
 
-        public async Task<IEnumerable<Comunidad>> FindAsync(Expression<Func<Comunidad, bool>> predicate)
+        public async Task<IEnumerable<Comunidade>> FindAsync(Expression<Func<Comunidade, bool>> predicate)
         {
             return await _context.Comunidades
                .Include(c => c.Tags)
@@ -29,9 +29,9 @@ namespace api.Repositories
                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Comunidad>> FindWithIncludesAsync(Expression<Func<Comunidad, bool>> predicate, params Expression<Func<Comunidad, object>>[] includes)
+        public async Task<IEnumerable<Comunidade>> FindWithIncludesAsync(Expression<Func<Comunidade, bool>> predicate, params Expression<Func<Comunidade, object>>[] includes)
         {
-            IQueryable<Comunidad> query = _context.Comunidades;
+            IQueryable<Comunidade> query = _context.Comunidades;
 
             try
             {
@@ -50,9 +50,9 @@ namespace api.Repositories
             }
         }
 
-        public async Task<Comunidad?> GetByIdWithIncludesAsync(object id, params Expression<Func<Comunidad, object>>[] includes)
+        public async Task<Comunidade?> GetByIdWithIncludesAsync(object id, params Expression<Func<Comunidade, object>>[] includes)
         {
-            IQueryable<Comunidad> query = _context.Comunidades;
+            IQueryable<Comunidade> query = _context.Comunidades;
             foreach (var include in includes)
             {
                 query = query.Include(include);
@@ -60,17 +60,17 @@ namespace api.Repositories
             return await query.FirstOrDefaultAsync(c => c.Id == (long)id);
         }
 
-        public async Task AddAsync(Comunidad entity)
+        public async Task AddAsync(Comunidade entity)
         {
             await _context.Comunidades.AddAsync(entity);
         }
 
-        public void Update(Comunidad entity)
+        public void Update(Comunidade entity)
         {
             _context.Comunidades.Update(entity);
         }
 
-        public void Delete(Comunidad entity)
+        public void Delete(Comunidade entity)
         {
             _context.Comunidades.Remove(entity);
         }

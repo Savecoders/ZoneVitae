@@ -29,7 +29,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<api.Repositories.IRepository<Usuario>, api.Repositories.UsuarioRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<UsuariosRole>, api.Repositories.UsuariosRoleRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Role>, api.Repositories.RoleRepository>();
-builder.Services.AddScoped<api.Repositories.IRepository<Comunidad>, api.Repositories.ComunidadeRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<Comunidade>, api.Repositories.ComunidadeRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Tag>, api.Repositories.TagRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Comentario>, api.Repositories.ComentarioRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Foto>, api.Repositories.FotoRepository>();
