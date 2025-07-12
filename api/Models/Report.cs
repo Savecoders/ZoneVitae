@@ -13,6 +13,7 @@ namespace api.Models;
 [Index("Estado", "CreateAt", Name = "IX_reports_estado_fecha")]
 public partial class Report
 {
+
     [Key]
     [Column("ID")]
     public long Id { get; set; }

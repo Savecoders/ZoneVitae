@@ -6,17 +6,14 @@ namespace api.DTOs.Reports
     {
         [Required(ErrorMessage = "El título del reporte es requerido")]
         [StringLength(200, MinimumLength = 5, ErrorMessage = "El título debe tener entre 5 y 200 caracteres")]
-        public string Titulo { get; set; } = null!;
+        public string titulo { get; set; } = null!;
 
         [Required(ErrorMessage = "El contenido del reporte es requerido")]
         [StringLength(2000, MinimumLength = 10, ErrorMessage = "El contenido debe tener entre 10 y 2000 caracteres")]
-        public string Contenido { get; set; } = null!;
+        public string contenido { get; set; } = null!;
 
-        public bool Anonimo { get; set; } = false;
+        public bool anonimo { get; set; } = false;
 
-        [Required(ErrorMessage = "El tipo de reporte es requerido")]
-        public string TipoReporte { get; set; } = null!;
-        
         [StringLength(500, ErrorMessage = "La dirección no puede exceder los 500 caracteres")]
         public string? Direccion { get; set; }
 
@@ -25,5 +22,7 @@ namespace api.DTOs.Reports
         public long? PublicacionId { get; set; }
 
         public long? ComunidadId { get; set; }
+        public List<string>? Tags { get; set; }
+        public List<string>? FotosUrls { get; set; }
     }
 }
