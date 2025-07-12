@@ -1,5 +1,6 @@
-﻿using api.DTOs.Comunidad;
-using api.DTOs.Tag;
+﻿using api.DTOs;
+using api.DTOs.Comunidad;
+
 using api.Models;
 using api.Repositories;
 using api.Services.Cloudinary;

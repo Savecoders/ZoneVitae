@@ -168,7 +168,7 @@ export class AuditoriaComponent {
     });
   }
   cargarDatos(): void {
-    this.reporteService.getReportes().subscribe((reportes) => {
+    this.reportecomservice.getReporte().subscribe((reportes) => {
       this.dataSource = reportes.map((reporte) => ({
         ...reporte,
         nombreComunidad: this.getNombreComunidad(reporte.comunidad_id),

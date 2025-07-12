@@ -117,7 +117,7 @@ export class HomeComponent implements OnInit {
               communityIds.length > 0
                 ? forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number),
+                      this.comunidadService.getById(String(id)),
                     ),
                   )
                 : of([]),
@@ -330,9 +330,9 @@ export class HomeComponent implements OnInit {
               communityIds.length > 0
                 ? forkJoin(
                     communityIds.map((id) =>
-                      this.comunidadService.getById(id as number),
+                      this.comunidadService.getById(String(id),
                     ),
-                  )
+                  ))
                 : of([]),
             authors:
               authorIds.length > 0

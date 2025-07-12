@@ -1,5 +1,6 @@
-﻿using api.DTOs.Common;
-using api.DTOs.Tag;
+﻿using api.DTOs;
+using api.DTOs.Common;
+
 using api.Models;
 using api.Services.Tags;
 using Microsoft.AspNetCore.Mvc;

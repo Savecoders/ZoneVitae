@@ -149,7 +149,7 @@ export class UserProfileComponent implements OnInit {
                   return forkJoin(
                     communityIds.map((id) =>
                       this.comunidadService
-                        .getById(id as number)
+                        .getById(String(id))
                         .pipe(catchError(() => of(null))),
                     ),
                   ).pipe(
