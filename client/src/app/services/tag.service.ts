@@ -9,7 +9,7 @@ import { Tag } from '../models/tag.model';
 })
 export class TagService extends BaseService<Tag> {
   constructor(http: HttpClient) {
-    super(http, 'reports_tags');
+    super(http, 'tags');
   }
 
   // Get all tags
@@ -17,23 +17,5 @@ export class TagService extends BaseService<Tag> {
     return this.getAll();
   }
 
-  // Get tag by id
-  getTagById(id: number): Observable<Tag> {
-    return this.getById(id);
-  }
-
-  // Create a new tag
-  createTag(tag: Tag): Observable<Tag> {
-    return this.create(tag);
-  }
-
-  // Update tag
-  updateTag(id: number, tag: Partial<Tag>): Observable<Tag> {
-    return this.update(id, tag);
-  }
-
-  // Delete tag
-  deleteTag(id: number): Observable<void> {
-    return this.delete(id);
-  }
+  
 }

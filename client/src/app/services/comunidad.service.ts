@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, switchMap, of } from 'rxjs';
 import { BaseService } from './base.service';
 import { Comunidad } from '../models/comunidad.model';
+import { environment } from 'environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ComunidadService extends BaseService<Comunidad> {
+  
   constructor(http: HttpClient) {
     super(http, 'comunidades');
   }
@@ -76,4 +78,12 @@ export class ComunidadService extends BaseService<Comunidad> {
         })
       );
   }
+
+getComunidadesParaReportes(): Observable<Comunidad[]> {
+  const url = `${environment.apiUrl}/reports/comunidades`;
+  return this.http.get<{ message: string, data: Comunidad[] }>(url).pipe(
+    map(response => response.data)
+  );
 }
+}
+

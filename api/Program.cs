@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using api.Contexts;
 using api.Repositories;
 using api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
@@ -41,6 +42,11 @@ builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<ActividadeRepository>();
 builder.Services.AddScoped<ActividadeService>();
+builder.Services.AddScoped<IRepository<Report>, ReportRepository>();
+builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddHttpContextAccessor();
+
 
 // Add controllers with JSON options
 // This is necessary to ensure that the API uses System.Text.Json for serialization

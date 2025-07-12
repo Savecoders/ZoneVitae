@@ -202,6 +202,7 @@ public class AuthService(
                 new(JwtRegisteredClaimNames.Email, usuario.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("nombreUsuario", usuario.NombreUsuario),
+                new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new(ClaimTypes.Role, string.Join(",", roles))
             };
 
