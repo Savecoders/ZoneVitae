@@ -30,6 +30,11 @@ export class ReportenorService extends BaseService<Reporte> {
     );
   }
 
+  getReporteCompleto(): Observable<ReporteCompleto[]> {
+    return this.http.get<{ message: string; data: ReporteCompleto[] }>(`${environment.apiUrl}/seguimientoReporte`).pipe(
+    map(response => response.data)
+  );}
+
   // Get report by id
   getReporteById(id: number): Observable<Reporte> {
     return this.getById(id);

@@ -167,7 +167,7 @@ export class AuditoriaComponent {
     });
   }
   cargarDatos(): void {
-    this.reportecomservice.getReporte().subscribe((reportes: ReporteCompleto[]) => {
+    this.reporteService.getReporteCompleto().subscribe((reportes: ReporteCompleto[]) => {
       this.dataSource = reportes;
     });
   }
