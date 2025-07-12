@@ -24,5 +24,5 @@ public partial class GaleriaComunidad
 
     [ForeignKey("ComunidadId")]
     [InverseProperty("GaleriaComunidads")]
-    public virtual Comunidade? Comunidad { get; set; }
+    public virtual Comunidad? Comunidad { get; set; }
 }

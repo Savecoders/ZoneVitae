@@ -1,34 +1,82 @@
+using api.Contexts;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using api.Contexts;
 
 namespace api.Repositories
 {
-    public class ComunidadeRepository(ZoneVitaeSqlContext context) : IRepository<Comunidade>
+    public class ComunidadeRepository(ZoneVitaeSqlContext _context) : IRepository<Comunidad>
     {
-        public async Task<IEnumerable<Comunidade>> GetAllAsync() => await context.Comunidades.ToListAsync();
-        public async Task<Comunidade?> GetByIdAsync(object id) => await context.Comunidades.FindAsync(id);
-        public Task<IEnumerable<Comunidade>> FindAsync(Expression<Func<Comunidade, bool>> predicate)
+        public async Task<IEnumerable<Comunidad>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Comunidades
+                .Include(c => c.Tags)
+                .ToListAsync();
+        }
+           
+        public async Task<Comunidad?> GetByIdAsync(object id)
+        {
+            return await _context.Comunidades
+                 .Include(c => c.Tags)
+                 .FirstOrDefaultAsync(c => c.Id == (long)id); 
         }
 
-        public Task<IEnumerable<Comunidade>> FindWithIncludesAsync(Expression<Func<Comunidade, bool>> predicate, params Expression<Func<Comunidade, object>>[] includes)
+        public async Task<IEnumerable<Comunidad>> FindAsync(Expression<Func<Comunidad, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return await _context.Comunidades
+               .Include(c => c.Tags)
+               .Where(predicate)
+               .ToListAsync();
         }
 
-        public Task<Comunidade?> GetByIdWithIncludesAsync(object id, params Expression<Func<Comunidade, object>>[] includes)
+        public async Task<IEnumerable<Comunidad>> FindWithIncludesAsync(Expression<Func<Comunidad, bool>> predicate, params Expression<Func<Comunidad, object>>[] includes)
         {
-            throw new NotImplementedException();
+            IQueryable<Comunidad> query = _context.Comunidades;
+
+            try
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+                return await query.Where(predicate).ToListAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                return await _context.Comunidades
+                    .Include(c => c.Tags)
+                    .Where(predicate)
+                    .ToListAsync();
+            }
         }
 
-        public async Task AddAsync(Comunidade entity) => await context.Comunidades.AddAsync(entity);
-        public void Update(Comunidade entity) => context.Comunidades.Update(entity);
-        public void Delete(Comunidade entity) => context.Comunidades.Remove(entity);
-        public async Task SaveChangesAsync() => await context.SaveChangesAsync();
+        public async Task<Comunidad?> GetByIdWithIncludesAsync(object id, params Expression<Func<Comunidad, object>>[] includes)
+        {
+            IQueryable<Comunidad> query = _context.Comunidades;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.FirstOrDefaultAsync(c => c.Id == (long)id);
+        }
+
+        public async Task AddAsync(Comunidad entity)
+        {
+            await _context.Comunidades.AddAsync(entity);
+        }
+
+        public void Update(Comunidad entity)
+        {
+            _context.Comunidades.Update(entity);
+        }
+
+        public void Delete(Comunidad entity)
+        {
+            _context.Comunidades.Remove(entity);
+        }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

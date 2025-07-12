@@ -61,5 +61,5 @@ public partial class Actividade
 
     [ForeignKey("ComunidadId")]
     [InverseProperty("Actividades")]
-    public virtual Comunidade? Comunidad { get; set; }
+    public virtual Comunidad? Comunidad { get; set; }
 }

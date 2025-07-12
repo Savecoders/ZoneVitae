@@ -2,8 +2,9 @@ import { Tag } from "./tag.model";
 
 export enum EstadoComunidad {
   APROBADO = "Aprobado",
-  POR_APROBAR = "Por Aprobar",
+  POR_APROBAR = "Pendiente de Revision",
   RECHAZADO = "Rechazado",
+  SUSPENDIDO = "Suspendido"
 }
 
 export enum TipoComunidad {
@@ -21,7 +22,7 @@ export interface Comunidad {
   tipoComunidad: TipoComunidad;
   soloMayoresEdad: boolean;
   tags?: Tag[];
-  creador_id?: number | null;
+  creadorId?: string | null;
   estado?: EstadoComunidad;
   ubicacion: string;
   create_at?: Date | string;
