@@ -19,7 +19,7 @@ public partial class ZoneVitaeSqlContext : DbContext
 
     public virtual DbSet<Comentario> Comentarios { get; set; }
 
-    public virtual DbSet<Comunidade> Comunidades { get; set; }
+    public virtual DbSet<Comunidad> Comunidades { get; set; }
 
     public virtual DbSet<Foto> Fotos { get; set; }
 
@@ -68,7 +68,7 @@ public partial class ZoneVitaeSqlContext : DbContext
             entity.HasOne(d => d.Autor).WithMany(p => p.Comentarios).HasConstraintName("FK_comentarios_autor");
         });
 
-        modelBuilder.Entity<Comunidade>(entity =>
+        modelBuilder.Entity<Comunidad>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__comunida__3214EC27B216DD8D");
 
@@ -84,7 +84,7 @@ public partial class ZoneVitaeSqlContext : DbContext
                     r => r.HasOne<Tag>().WithMany()
                         .HasForeignKey("TagId")
                         .HasConstraintName("FK_comunidad_tags_tag"),
-                    l => l.HasOne<Comunidade>().WithMany()
+                    l => l.HasOne<Comunidad>().WithMany()
                         .HasForeignKey("ComunidadId")
                         .HasConstraintName("FK_comunidad_tags_comunidad"),
                     j =>
@@ -190,7 +190,7 @@ public partial class ZoneVitaeSqlContext : DbContext
             entity.HasMany(d => d.Comunidads).WithMany(p => p.Usuarios)
                 .UsingEntity<Dictionary<string, object>>(
                     "Follow",
-                    r => r.HasOne<Comunidade>().WithMany()
+                    r => r.HasOne<Comunidad>().WithMany()
                         .HasForeignKey("ComunidadId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_follows_comunidad"),
