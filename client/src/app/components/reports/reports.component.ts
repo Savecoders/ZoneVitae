@@ -74,6 +74,7 @@ export class ReportsComponent implements OnInit {
   reportesFiltrados: ReporteCompleto[] = [];
   comunidades: Comunidad[] = [];
   usuarioActual: UsuarioCompleto | null = null;
+  esAdmin: boolean = false;
   menuAbiertoId: number | null = null;
   meEncantaReporte: { [key: number]: boolean } = {};
   mostrarFormulario = false;
@@ -94,8 +95,21 @@ cargarUsuarioActual(): void {
   if (userData) {
     const parsed = JSON.parse(userData);
     this.usuarioActual = parsed.usuario ?? parsed;
+
+
+    const rolesRaw = this.usuarioActual?.roles ?? [];
+
+    const roles = rolesRaw.map((r: any) => {
+      if (typeof r === 'string') return r.toLowerCase();
+      if (typeof r === 'object' && r.nombre) return r.nombre.toLowerCase();
+      return null;
+    }).filter((r: string | null) => r !== null);
+
+    this.esAdmin = roles.includes('administrador');
   }
 }
+
+
 
   reportsForm(): void {
     this.form = this.fb.group({
@@ -134,11 +148,10 @@ nuevoReporte() {
   this.isEditMode = false;
   this.menuAbiertoId = null;
   this.imagePreview = null;
-
   this.form.reset();
-
   this.fotos.clear();
   this.tags.clear();
+
 
   this.form.patchValue({
     estado: 'Pendiente_Moderacion',
@@ -190,6 +203,7 @@ guardarReporte(): void {
     return;
   }
 
+
   const reportForm = this.form.value;
 
   // Obtener tags como string[]
@@ -198,15 +212,16 @@ guardarReporte(): void {
     .map((t: any) => t.nombre.trim().toLowerCase())
     .filter((nombre: string) => nombre.length > 0);
 
+
   if (tagsNom.length === 0) {
     this.toastService.error('Debes agregar al menos un tag válido');
     return;
   }
 
-  // Obtener URLs de las fotos subidas
+
+  // Obtener URLs
   const fotosUrls: string[] = this.fotos.value.map((f: any) => f.image);
 
-  // Construir el DTO compatible con el backend (ReportCreateDto)
   const dto = {
   titulo: reportForm.titulo,
   contenido: reportForm.contenido,
@@ -242,10 +257,12 @@ editarReporte(id: number): void {
   const reporte = this.reportes.find((r) => r.id === id);
   if (!reporte) return;
   
-  if (!this.usuarioActual || !reporte.autor || reporte.autor.id !== this.usuarioActual.id) {
-    this.toastService.error('No tienes permiso para editar este reporte.');
-    return;
-  }
+
+if (!this.usuarioActual || !reporte.autor || (reporte.autor.id !== this.usuarioActual.id && !this.esAdmin)) {
+  this.toastService.error('No tienes permiso para editar este reporte.');
+  return;
+}
+
   
   this.isEditMode = true;
   this.reporteEditando = reporte;

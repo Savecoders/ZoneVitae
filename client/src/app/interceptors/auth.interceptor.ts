@@ -73,7 +73,6 @@ function isPublicRequest(url: string, method: string = "GET"): boolean {
   const publicGetEndpoints = [
     "/api/Roles",
     "/api/Actividades",
-    "/api/Comunidades",
     "/api/Reports",
   ];
 

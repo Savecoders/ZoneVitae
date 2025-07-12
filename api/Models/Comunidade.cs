@@ -43,6 +43,13 @@ public partial class Comunidade
     [StringLength(50)]
     public string Estado { get; set; } = null!;
 
+    [Column("tipo_comunidad")]
+    [StringLength(50)]
+    public string TipoComunidad { get; set; } = null!;
+
+    [Column("solo_mayores_edad")]
+    public bool SoloMayoresEdad { get; set; }
+
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
 
@@ -51,9 +58,6 @@ public partial class Comunidade
 
     [Column("update_at")]
     public DateTime UpdateAt { get; set; }
-
-    [InverseProperty("Comunidad")]
-    public virtual ICollection<Actividade> Actividades { get; set; } = new List<Actividade>();
 
     [ForeignKey("CreadorId")]
     [InverseProperty("Comunidades")]

@@ -56,7 +56,9 @@ public class ReportService
         var reports = await repo.FindWithIncludesAsync(r => true,
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
+
 
         return reports.Select(MapToDto).ToList();
     }
@@ -70,7 +72,8 @@ public class ReportService
         var report = await repo.GetByIdWithIncludesAsync(id,
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
 
         return report == null ? null : MapToDto(report);
     }
@@ -128,7 +131,9 @@ public class ReportService
             UpdateAt = DateTime.UtcNow
         };
 
-        // Agregar tags
+
+        // Agrega tags
+
         if (dto.Tags != null && dto.Tags.Any())
         {
             foreach (var tagNombre in dto.Tags)
@@ -180,7 +185,9 @@ public class ReportService
         if (!await CanEditReportAsync(report))
             throw new UnauthorizedAccessException("No tienes permisos para eliminar este reporte.");
 
-        // Obtener fotos relacionadas (deberías tener un repositorio o contexto para Fotos)
+
+        // Obtiene fotos relacionadas
+
         var fotosRelacionadas = await _fotoRepository.FindAsync(f => f.ReportsId == id);
 
         foreach (var foto in fotosRelacionadas)
@@ -189,7 +196,8 @@ public class ReportService
         }
         await _fotoRepository.SaveChangesAsync();
 
-        // Ahora eliminar el reporte
+
+        // Elimina el reporte
         _reportRepository.Delete(report);
         await _reportRepository.SaveChangesAsync();
 
@@ -207,7 +215,7 @@ public class ReportService
         {
             if (string.IsNullOrWhiteSpace(autor.FotoPerfil))
             {
-                // Tomar la primera letra mayúscula del NombreUsuario o Nombre
+
                 if (!string.IsNullOrEmpty(autor.NombreUsuario))
                     inicial = autor.NombreUsuario.Substring(0, 1).ToUpper();
                 else
@@ -245,6 +253,8 @@ public class ReportService
                     UpdateAt = autor.UpdateAt
                 },
 
+                ComunidadNombre = report.Comunidad?.Nombre,
+
             InicialNombre = inicial,
 
             Fotos = report.Fotos.Select(f => new FotoDto
@@ -266,12 +276,17 @@ public class ReportService
         var report = await _reportRepository.GetByIdWithIncludesAsync(id,
             r => r.Tags,
             r => r.Fotos,
-            r => r.Autor);
+
+            r => r.Autor,
+            r => r.Comunidad);
+
 
         if (report == null)
             throw new Exception("Reporte no encontrado.");
 
-        var userId = GetCurrentUserId();  // Usa tu método que ya tienes
+
+        var userId = GetCurrentUserId();
+
 
         if (report.AutorId != userId && !await UserIsAdminOrJoinAsync(userId))
             throw new UnauthorizedAccessException("No tienes permiso para editar este reporte.");
@@ -330,7 +345,9 @@ public class ReportService
             r => r.Tags.Any(t => t.Nombre.ToLower() == tagNombreNormalized),
             r => r.Autor,
             r => r.Fotos,
-            r => r.Tags);
+            r => r.Tags,
+            r => r.Comunidad);
+
 
         return reports.Select(MapToDto).ToList();
     }

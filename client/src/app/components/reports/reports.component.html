@@ -9,9 +9,9 @@
       <app-header> </app-header>
     </div>
     <main class="flex-1 mx-auto w-full p-4 mt-8 bg-default-50 pb-12 pt-4">
-      <section class="grid grid-cols-12 gap-6 p-6">
+      <section class="grid grid-cols-1 md:grid-cols-12 gap-6 p-4">
         <!-- Main content area -->
-        <div class="col-span-8 space-y-6 mt-6">
+        <div class="md:col-span-8 col-span-12 space-y-6 mt-6">
           <div class="p-6">
             <section class="w-full col-span-8 space-y-6 mt-6">
               <ng-content>
@@ -374,7 +374,9 @@
                               class="absolute right-0 mt-1 bg-background shadow rounded z-10 w-32"
                               >
                               <!-- Muestra solo si el usuario actual es el autor del reporte -->
-                              <ng-container *ngIf="usuarioActual?.id === reporte.autor?.id">
+
+                               <ng-container *ngIf="usuarioActual?.id === reporte.autor?.id || esAdmin">
+
                                 <button
                                   (click)="editarReporte(reporte.id!)"
                                   class="flex items-center gap-2 w-full text-left px-4 py-2 text-white hover:bg-zinc-700 text-sm"
@@ -587,7 +589,7 @@
             -->
 
         <!-- Sidebar content -->
-        <div class="col-span-4 mt-6 max-w-xs">
+        <div class="md:col-span-4 col-span-12 mt-6 max-w-full md:max-w-xs">
           <div class="sticky top-24 space-y-6">
             <!-- Follow section -->
             <app-follow-section></app-follow-section>

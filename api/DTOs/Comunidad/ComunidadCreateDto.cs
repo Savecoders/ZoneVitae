@@ -14,21 +14,26 @@ namespace api.DTOs.Comunidad
         [StringLength(500, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 500 caracteres")]
         public string Descripcion { get; set; } = null!;
 
-        [Required(ErrorMessage = "La categoría es requerida")]
-        [RegularExpression(@"^(Tecnologia|Deportes|Arte|Musica|Gaming|Educacion|Ciencia|Entretenimiento|Salud|Negocios|Otro)$",
-            ErrorMessage = "La categoría debe ser una de las opciones válidas")]
-        public string Categoria { get; set; } = null!;
-
         public IFormFile? Logo { get; set; }
 
         public IFormFile? Cover { get; set; }
 
-        [Range(1, 10000, ErrorMessage = "El límite de miembros debe estar entre 1 y 10,000")]
-        public int LimiteMiembros { get; set; } = 1000;
+        [Required(ErrorMessage = "La ubicación de la comunidad es requerida")]
+        [StringLength(50, MinimumLength = 10, ErrorMessage = "La ubicación debe tener entre 10 y 50 caracteres")]
+        public string Ubicacion { get; set; } = null!;
 
-        public bool EsPrivada { get; set; } = false;
+        [Required(ErrorMessage = "El tipo de comunidad es requerido")]
+        [RegularExpression(@"^(Publica|Restringida|Privada)$",
+          ErrorMessage = "El tipo de comunidad no es válido")]
+        public string TipoComunidad { get; set; } = null!;
 
-        [StringLength(200, ErrorMessage = "Las reglas no pueden exceder los 200 caracteres")]
-        public string? Reglas { get; set; }
+        [Required(ErrorMessage = "Debe especificar si es solo para mayores de edad")]
+        public bool SoloMayoresEdad { get; set; } = false;
+
+        [Required(ErrorMessage = "Debe seleccionar al menos un tag")]
+        [MinLength(1, ErrorMessage = "Debe seleccionar al menos un tag")]
+        public List<Guid> Tags { get; set; } = new();
+
+        public Guid? CreadorId { get; set; }
     }
 }

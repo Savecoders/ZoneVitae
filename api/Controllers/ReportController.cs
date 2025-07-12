@@ -27,7 +27,13 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var reports = await _reportService.GetAllMappedAsync();
-        return Ok(reports);
+
+        return Ok(new
+        {
+            message = "Reportes obtenidos correctamente.",
+            data = reports
+        });
+
     }
 
     [HttpGet("{id:long}")]
@@ -35,7 +41,14 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> GetById(long id)
     {
         var report = await _reportService.GetByIdMappedAsync(id);
-        return report == null ? NotFound() : Ok(report);
+
+        return report == null
+            ? NotFound(new { message = "Reporte no encontrado." })
+            : Ok(new
+            {
+                message = "Reporte obtenido correctamente.",
+                data = report
+            });
     }
 
 
@@ -43,19 +56,28 @@ public class ReportsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromBody] ReportCreateDto dto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         var id = await _reportService.CreateReportAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id }, new { id });
+        return CreatedAtAction(nameof(GetById), new { id }, new
+        {
+            message = "Reporte creado exitosamente.",
+            id
+        });
     }
 
     [HttpPut("{id:long}")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> EditarReporte(long id, [FromBody] ReportEditDto dto)
     {
         try
         {
             await _reportService.EditarAsync(id, dto);
-            return Ok();     
+            
+            return Ok(new { message = "Reporte editado correctamente." });
+
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -70,7 +92,11 @@ public class ReportsController : ControllerBase
         try
         {
             var deleted = await _reportService.DeleteReportAsync(id);
-            return deleted ? NoContent() : NotFound();
+
+            return deleted
+                ? Ok(new { message = "Reporte eliminado correctamente." })
+                : NotFound(new { message = "Reporte no encontrado." });
+
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -87,13 +113,16 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> FiltrarPorTag([FromQuery] string tag)
     {
         if (string.IsNullOrEmpty(tag))
-            return BadRequest("El parámetro tag es obligatorio.");
+
+            return BadRequest(new { message = "El parámetro tag es obligatorio." });
 
         var reports = await _reportService.GetByTagAsync(tag);
-        return Ok(reports);
+        return Ok(new
+        {
+            message = $"Reportes filtrados por tag: {tag}",
+            data = reports
+        });
     }
-
-
 
 
     [HttpGet("comunidades")]
@@ -109,6 +138,11 @@ public class ReportsController : ControllerBase
                 c.Nombre
             });
 
-        return Ok(resultado);
+        return Ok(new
+        {
+            message = "Comunidades disponibles para reportes obtenidas correctamente.",
+            data = resultado
+        });
+
     }
 }

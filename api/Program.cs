@@ -1,19 +1,24 @@
-using System.Text;
 using api.Config;
 using api.Contexts;
-using Microsoft.EntityFrameworkCore;
+using api.Contexts;
 using api.Models;
 using api.Services.Auth;
 using api.Services.Cloudinary;
+using api.Services.Comunidades;
 using api.Services.Usuario;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using api.Services.Tags;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using api.Contexts;
+using api.Repositories;
 using api.Services;
 using api.Services.Seguimiento;
 using api.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
@@ -24,6 +29,8 @@ var connectionString = builder.Configuration.GetConnectionString("default") ?? "
 // Check if the connection string is empty
 builder.Services.AddDbContext<ZoneVitaeSqlContext>(o => o.UseSqlServer(connectionString));
 
+builder.Services.AddHttpContextAccessor();
+
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped<api.Repositories.IRepository<Usuario>, api.Repositories.UsuarioRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<UsuariosRole>, api.Repositories.UsuariosRoleRepository>();
@@ -33,7 +40,10 @@ builder.Services.AddScoped<api.Repositories.IRepository<Tag>, api.Repositories.T
 builder.Services.AddScoped<api.Repositories.IRepository<Comentario>, api.Repositories.ComentarioRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<Foto>, api.Repositories.FotoRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.Repositories.GaleriaComunidadRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<UsuariosComunidadesRole>, api.Repositories.UsuariosComunidadesRolesRepository>();
+builder.Services.AddScoped<api.Repositories.IRepository<RolesComunidade>, api.Repositories.RolesComunidadesRepository>();
 builder.Services.AddScoped<api.Repositories.IRepository<SeguimientoReporte>, api.Repositories.SeguimientoRepository>();
+
 // builder.Services.AddScoped<api.Repositories.IRepository<api.Models.SeguimientoReporte>, api.Repositories.ReportRepository>();
 
 
@@ -41,14 +51,15 @@ builder.Services.AddScoped<api.Repositories.IRepository<SeguimientoReporte>, api
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ComunidadService>();
+builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ActividadeRepository>();
+builder.Services.AddScoped<ActividadeService>();
 builder.Services.AddScoped<IRepository<Report>, ReportRepository>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<UsuarioRepository>();
-builder.Services.AddScoped<SeguimientoReporteService>();
 builder.Services.AddHttpContextAccessor();
-
-
-
+builder.Services.AddScoped<SeguimientoReporteService>();
 
 
 // Add controllers with JSON options
@@ -157,7 +168,7 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
             RequireExpirationTime = true,
-            ValidateTokenReplay = false
+            ValidateTokenReplay = false,
         };
         options.MapInboundClaims = false; // Do not map claims from the token to the user principal
     });
@@ -188,7 +199,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAllOrigins");
 

@@ -21,21 +21,9 @@
                         hover:file:bg-gray-500"
                     />
                     </div>
-
-                    <app-button
-                        color="default"
-                        size="sm"
-                        intensity="soft"
-                        [disabled]="!fileInputs['logo']"
-                        [icon]="upload"
-                        class="self-start mt-2 md:mt-6"
-                        (click)="uploadFile('logo')"
-                        >
-                    Subir logo
-                    </app-button>
-
-                    <div *ngIf="uploadedUrls['logo']" class="md:ml-6 mt-4 md:mt-0">
-                    <img [src]="uploadedUrls['logo']" alt="Logo de la comunidad"
+                   
+                    <div *ngIf="previewUrls['logo']" class="md:ml-6 mt-4 md:mt-0">
+                    <img [src]="previewUrls['logo']" alt="Logo de la comunidad"
                         class="w-24 h-24 object-cover rounded-full shadow" />
                     </div>
                 </div>
@@ -61,22 +49,9 @@
                         hover:file:bg-gray-500"
                     />
                     </div>
-
-                    <app-button
-                        color="default"
-                        size="sm"
-                        intensity="soft"
-                        [icon]="upload"
-                        [disabled]="!fileInputs['cover']"
-                        class="self-start mt-2 md:mt-6"
-                        (click)="uploadFile('cover')"
-                        >
-                    Subir portada
-                    </app-button>
-
-                    
-                    <div *ngIf="uploadedUrls['cover']" class="md:ml-6 mt-4 md:mt-0">
-                    <img [src]="uploadedUrls['cover']" alt="Portada de la comunidad"
+                   
+                    <div *ngIf="previewUrls['cover']" class="md:ml-6 mt-4 md:mt-0">
+                    <img [src]="previewUrls['cover']" alt="Portada de la comunidad"
                         class="w-24 h-24 object-cover rounded-full shadow" />
                     </div>
                 </div>
@@ -192,7 +167,8 @@
                     </mat-error>
                 </mat-form-field>
 
-                <div *ngIf="isEditMode">
+                <div 
+                *ngIf="isEditMode && auth.isLoggedIn() && (auth.hasRole('Administrador'))">
                 <mat-form-field appearance="fill" class="w-full">
                     <mat-label>Estado de la comunidad</mat-label>
                     <mat-select formControlName="estado">

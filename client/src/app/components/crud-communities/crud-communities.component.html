@@ -11,6 +11,7 @@
       </app-input>
 
       <app-button
+        *ngIf="auth.isLoggedIn()"
         color="primary"
         size="sm"
         [icon]="group" 
@@ -46,8 +47,17 @@
             <th mat-header-cell *matHeaderCellDef> Acciones </th>
             <td mat-cell *matCellDef="let comunidad">
               <div class="flex flex-wrap gap-2 mt-2 mb-2">
-                <app-button color="primary" size="xs" [icon]="edit" (click)="editar(comunidad)">Editar</app-button>
-                <app-button color="danger" size="xs" [icon]="delete" (click)="eliminar(comunidad)">Eliminar</app-button>
+                <app-button 
+                  *ngIf="auth.isLoggedIn() && (auth.hasRole('Administrador') || esCreador(comunidad))"
+                  color="primary" 
+                  size="xs" [icon]="edit" 
+                  (click)="editar(comunidad)">Editar</app-button>
+                
+                <app-button 
+                  *ngIf="auth.isLoggedIn() && (auth.hasRole('Administrador'))"
+                  color="danger" 
+                  size="xs" [icon]="delete" 
+                  (click)="eliminar(comunidad)">Eliminar</app-button>
               </div>
             </td>
           </ng-container>

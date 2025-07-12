@@ -17,7 +17,8 @@ namespace api.DTOs.Reports
         public UsuarioResponseDto? Autor { get; set; }
         public string? InicialNombre { get; set; }
         public List<FotoDto> Fotos { get; set; } = new();
-        
         public List<TagDto> Tags { get; set; } = new();
+        public string? ComunidadNombre { get; set; }
+
     }
 }

@@ -68,6 +68,8 @@ CREATE TABLE [comunidades] (
   [creador_id] uniqueidentifier,
   [ubicacion] nvarchar(500) NOT NULL,
   [estado] nvarchar(50) NOT NULL CHECK ([estado] IN ('Aprobado', 'Pendiente de Revision', 'Rechazado', 'Suspendido')) DEFAULT 'Pendiente de Revision',
+  [tipo_comunidad] nvarchar(50) NOT NULL CHECK ([tipo_comunidad] IN ('Publica', 'Restringida', 'Privada')),
+  [solo_mayores_edad] bit NOT NULL DEFAULT 0,
   [deleted_at] datetime2,
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -100,7 +102,6 @@ GO
 
 CREATE TABLE [actividades] (
   [ID] bigint PRIMARY KEY NOT NULL IDENTITY(1, 1),
-  [comunidad_id] bigint,
   [nombre] nvarchar(500) NOT NULL,
   [descripcion] nvarchar(max),
   [fecha_inicio] date NOT NULL,
@@ -108,7 +109,6 @@ CREATE TABLE [actividades] (
   [ubicacion] nvarchar(500) NOT NULL,
   [virtual] bit NOT NULL DEFAULT 0,
   [frecuencia] nvarchar(100) NOT NULL,
-  [cover] VARCHAR(255) NOT NULL,
   [fecha] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [create_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   [update_at] datetime2 NOT NULL DEFAULT (CURRENT_TIMESTAMP)
@@ -229,9 +229,6 @@ GO
 CREATE INDEX [IX_comentarios_autor_id] ON [comentarios] ([autor_id])
 GO
 
-CREATE INDEX [IX_actividades_comunidad_id] ON [actividades] ([comunidad_id])
-GO
-
 CREATE INDEX [IX_actividades_fechas] ON [actividades] ([fecha_inicio], [fecha_fin])
 GO
 
@@ -275,8 +272,6 @@ GO
 ALTER TABLE [comentarios] ADD CONSTRAINT [FK_comentarios_autor] FOREIGN KEY ([autor_id]) REFERENCES [usuarios] ([ID])
 GO
 
-ALTER TABLE [actividades] ADD CONSTRAINT [FK_actividades_comunidad] FOREIGN KEY ([comunidad_id]) REFERENCES [comunidades] ([ID])
-GO
 
 ALTER TABLE [fotos] ADD CONSTRAINT [FK_fotos_reports] FOREIGN KEY ([reports_id]) REFERENCES [reports] ([ID])
 GO
@@ -341,6 +336,13 @@ INSERT INTO [roles_comunidades] ([nombre], [descripcion]) VALUES ('Moderador', '
 INSERT INTO [roles_comunidades] ([nombre], [descripcion]) VALUES ('Miembro', 'Miembro regular de la comunidad');
 GO
 
+INSERT INTO [tags] ([nombre]) VALUES ('Medio Ambiente');
+INSERT INTO [tags] ([nombre]) VALUES ('Seguridad');
+INSERT INTO [tags] ([nombre]) VALUES ('Infraestructura');
+INSERT INTO [tags] ([nombre]) VALUES ('Salud Pública');
+INSERT INTO [tags] ([nombre]) VALUES ('Educación');
+GO
+
 -- Create triggers
 CREATE TRIGGER [tr_asignar_rol_usuario_regular]
 ON [usuarios]
@@ -368,7 +370,7 @@ GO
 -- Create default user with Administrador role
 IF NOT EXISTS (SELECT 1 FROM [usuarios] WHERE [nombre_usuario] = 'admin')
 BEGIN
-    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta]) 
+    INSERT INTO [usuarios] ([nombre_usuario], [email], [password], [foto_perfil], [fecha_nacimiento], [genero], [estado_cuenta])
     VALUES ('admin', 'admin@gmail.com', 'admin123', NULL, NULL, 'O', 'Activo');
 END;
 GO
@@ -379,33 +381,6 @@ BEGIN
     INSERT INTO [usuarios_roles] ([id_usuario], [id_rol])
     VALUES (@admin_id, (SELECT [ID] FROM [roles] WHERE [nombre] = 'Administrador'));
 END;
-GO
-
--- Trigger to assign the creator as an admin in the community
-CREATE TRIGGER [tr_asignar_admin_creador]
-ON [comunidades]
-AFTER INSERT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    DECLARE @admin_rol_id BIGINT;
-    SELECT @admin_rol_id = ID FROM [roles_comunidades] WHERE [nombre] = 'Administrador';
-
-    INSERT INTO [usuarios_comunidades_roles] ([usuario_id], [comunidad_id], [rol_id])
-    SELECT
-        i.[creador_id],
-        i.[ID],
-        @admin_rol_id
-    FROM inserted i
-    WHERE i.[creador_id] IS NOT NULL
-    AND NOT EXISTS (
-        SELECT 1 FROM [usuarios_comunidades_roles] ucr
-        WHERE ucr.[usuario_id] = i.[creador_id]
-        AND ucr.[comunidad_id] = i.[ID]
-    );
-END;
-
 GO
 
 -- Add constraints

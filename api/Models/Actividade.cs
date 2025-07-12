@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,16 +7,12 @@ using Microsoft.EntityFrameworkCore;
 namespace api.Models;
 
 [Table("actividades")]
-[Index("ComunidadId", Name = "IX_actividades_comunidad_id")]
 [Index("FechaInicio", "FechaFin", Name = "IX_actividades_fechas")]
 public partial class Actividade
 {
     [Key]
     [Column("ID")]
     public long Id { get; set; }
-
-    [Column("comunidad_id")]
-    public long? ComunidadId { get; set; }
 
     [Column("nombre")]
     [StringLength(500)]
@@ -26,10 +22,10 @@ public partial class Actividade
     public string? Descripcion { get; set; }
 
     [Column("fecha_inicio")]
-    public DateOnly FechaInicio { get; set; }
+    public DateTime FechaInicio { get; set; }
 
     [Column("fecha_fin")]
-    public DateOnly FechaFin { get; set; }
+    public DateTime FechaFin { get; set; }
 
     [Column("ubicacion")]
     [StringLength(500)]
@@ -42,11 +38,6 @@ public partial class Actividade
     [StringLength(100)]
     public string Frecuencia { get; set; } = null!;
 
-    [Column("cover")]
-    [StringLength(255)]
-    [Unicode(false)]
-    public string Cover { get; set; } = null!;
-
     [Column("fecha")]
     public DateTime Fecha { get; set; }
 
@@ -58,8 +49,4 @@ public partial class Actividade
 
     [InverseProperty("Actividades")]
     public virtual ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
-
-    [ForeignKey("ComunidadId")]
-    [InverseProperty("Actividades")]
-    public virtual Comunidade? Comunidad { get; set; }
 }
