@@ -9,7 +9,7 @@ import { Actividad } from '../models/actividad.model';
 })
 export class ActividadService extends BaseService<Actividad> {
   constructor(http: HttpClient) {
-    super(http, 'actividades');
+    super(http, 'Actividades');
   }
 
   // Get all activities with optional filtering
@@ -27,10 +27,10 @@ export class ActividadService extends BaseService<Actividad> {
               ? actividad.nombre.toLowerCase().includes(nombre.toLowerCase())
               : true) &&
             (fechaInicio
-              ? new Date(actividad.fecha_inicio) >= new Date(fechaInicio)
+              ? new Date(actividad.fechaInicio) >= new Date(fechaInicio)
               : true) &&
             (fechaFin
-              ? new Date(actividad.fecha_fin) <= new Date(fechaFin)
+              ? new Date(actividad.fechaFin) <= new Date(fechaFin)
               : true) &&
             (ubicacion
               ? actividad.ubicacion
@@ -65,17 +65,6 @@ export class ActividadService extends BaseService<Actividad> {
     return this.delete(id);
   }
 
-  // Get activities by community
-  getActividadesByComunidad(comunidadId: number): Observable<Actividad[]> {
-    return this.getAll().pipe(
-      map((actividades) =>
-        actividades.filter(
-          (actividad) => actividad.comunidad_id === comunidadId
-        )
-      )
-    );
-  }
-
   // Get upcoming activities
   getActividadesProximas(): Observable<Actividad[]> {
     const today = new Date();
@@ -83,11 +72,11 @@ export class ActividadService extends BaseService<Actividad> {
     return this.getAll().pipe(
       map((actividades) =>
         actividades
-          .filter((actividad) => new Date(actividad.fecha_inicio) >= today)
+          .filter((actividad) => new Date(actividad.fechaInicio) >= today)
           .sort(
             (a, b) =>
-              new Date(a.fecha_inicio).getTime() -
-              new Date(b.fecha_inicio).getTime()
+              new Date(a.fechaInicio).getTime() -
+              new Date(b.fechaInicio).getTime()
           )
       )
     );

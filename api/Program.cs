@@ -11,8 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authorization;
 using api.Contexts;
-using api.Services;
 using api.Repositories;
+using api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from the .env file
@@ -39,13 +40,12 @@ builder.Services.AddScoped<api.Repositories.IRepository<GaleriaComunidad>, api.R
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CloudinaryService>();
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ActividadeRepository>();
+builder.Services.AddScoped<ActividadeService>();
 builder.Services.AddScoped<IRepository<Report>, ReportRepository>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddHttpContextAccessor();
-
-
-
 
 
 // Add controllers with JSON options

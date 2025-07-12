@@ -22,10 +22,10 @@ public partial class Actividade
     public string? Descripcion { get; set; }
 
     [Column("fecha_inicio")]
-    public DateOnly FechaInicio { get; set; }
+    public DateTime FechaInicio { get; set; }
 
     [Column("fecha_fin")]
-    public DateOnly FechaFin { get; set; }
+    public DateTime FechaFin { get; set; }
 
     [Column("ubicacion")]
     [StringLength(500)]
