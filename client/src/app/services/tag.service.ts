@@ -1,39 +1,91 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, switchMap, of } from 'rxjs';
-import { BaseService } from './base.service';
 import { Tag } from '../models/tag.model';
+import { environment } from "../../environments/environment";
+import { ApiResponse } from "../models/api-response.model";
+import { Observable, map, switchMap, of, catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TagService extends BaseService<Tag> {
-  constructor(http: HttpClient) {
-    super(http, 'reports_tags');
+export class TagService{
+  private apiUrl = `${environment.apiUrl}/Tags`;
+  
+  constructor(private http: HttpClient) {
   }
 
   // Get all tags
-  getTags(): Observable<Tag[]> {
-    return this.getAll();
-  }
-
-  // Get tag by id
-  getTagById(id: number): Observable<Tag> {
-    return this.getById(id);
+    getAll(): Observable<Tag[]> {
+      return this.http.get<ApiResponse<Tag[]>>(`${this.apiUrl}`).pipe(
+        map((response) => {
+          if (!response.success) {
+            throw new Error(response.message || "Error obteniendo comunidades");
+          }
+          if (!response.data) {
+            throw new Error("No data received from server");
+          }
+          return response.data;
+        }),
+        catchError((error) => {
+          console.error("Error fetching users:", error);
+          return of([]);
+        }),
+      );
+    }
+    
+   // Get tag by ID
+  getById(id: string): Observable<Tag | null> {
+    return this.http.get<ApiResponse<Tag>>(`${this.apiUrl}/${id}`).pipe(
+      map((response) => {
+        if (!response.success) throw new Error(response.message || "Error obteniendo el tag");
+        return response.data ?? null;
+      }),
+      catchError((error) => {
+        console.error("Error fetching tag:", error);
+        return of(null);
+      })
+    );
   }
 
   // Create a new tag
-  createTag(tag: Tag): Observable<Tag> {
-    return this.create(tag);
+  create(tag: Tag): Observable<Tag | null> {
+    return this.http.post<ApiResponse<Tag>>(`${this.apiUrl}`, tag).pipe(
+      map((response) => {
+        if (!response.success) throw new Error(response.message || "Error creando el tag");
+        return response.data ?? null;
+      }),
+      catchError((error) => {
+        console.error("Error creating tag:", error);
+        return of(null);
+      })
+    );
   }
 
-  // Update tag
-  updateTag(id: number, tag: Partial<Tag>): Observable<Tag> {
-    return this.update(id, tag);
+  // Update an existing tag
+  update(id: string, tag: Partial<Tag>): Observable<Tag | null> {
+    return this.http.put<ApiResponse<Tag>>(`${this.apiUrl}/${id}`, tag).pipe(
+      map((response) => {
+        if (!response.success) throw new Error(response.message || "Error actualizando el tag");
+        return response.data ?? null;
+      }),
+      catchError((error) => {
+        console.error("Error updating tag:", error);
+        return of(null);
+      })
+    );
   }
 
-  // Delete tag
-  deleteTag(id: number): Observable<void> {
-    return this.delete(id);
+  // Delete a tag
+  delete(id: string): Observable<boolean> {
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${id}`).pipe(
+      map((response) => {
+        if (!response.success) throw new Error(response.message || "Error eliminando el tag");
+        return true;
+      }),
+      catchError((error) => {
+        console.error("Error deleting tag:", error);
+        return of(false);
+      })
+    );
   }
 }
