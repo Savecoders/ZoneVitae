@@ -1,5 +1,6 @@
 ﻿using api.Models;
 using api.Services.Seguimiento;
+using System.Security.Claims;
 using api.DTOs.Seguimientos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -33,6 +34,30 @@ public class SeguimientoReporteController : ControllerBase
         });
 
     }
+
+[HttpPost("cambiar-estado/{reporteId}")]
+[Authorize] // requiere usuario autenticado
+public async Task<IActionResult> CambiarEstado(long reporteId, [FromBody] AuditoriaEstadoDto dto)
+{
+    try
+    {
+        // Obtén usuario actual desde claims
+        var usuarioIdString = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(usuarioIdString) || !Guid.TryParse(usuarioIdString, out Guid usuarioId))
+            return Unauthorized(new { error = "Usuario no autenticado." });
+
+        await _seguimientoService.CambiarEstadoAsync(reporteId, dto, usuarioId);
+
+        return Ok(new { message = "Estado actualizado correctamente." });
+    }
+    catch (Exception ex)
+    {
+        return BadRequest(new { error = ex.Message });
+    }
+}
+
+
+
 
 
     [HttpGet("{id}")]

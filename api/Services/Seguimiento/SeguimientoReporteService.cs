@@ -104,73 +104,128 @@ public class SeguimientoReporteService
 
         return report == null ? null : MapToDto(report);
     }
-public static AuditoriaSeguimientoResponse MapToDto(Report report)
-{
-    var autor = report.Autor;
-    var esAnonimo = report.Anonimo;
-
-    string? inicial = null;
-    if (!esAnonimo && autor != null && string.IsNullOrWhiteSpace(autor.FotoPerfil))
+    public static AuditoriaSeguimientoResponse MapToDto(Report report)
     {
-        inicial = !string.IsNullOrEmpty(autor.NombreUsuario)
-            ? autor.NombreUsuario.Substring(0, 1).ToUpper()
-            : "?";
+        var autor = report.Autor;
+        var esAnonimo = report.Anonimo;
+
+        string? inicial = null;
+        if (!esAnonimo && autor != null && string.IsNullOrWhiteSpace(autor.FotoPerfil))
+        {
+            inicial = !string.IsNullOrEmpty(autor.NombreUsuario)
+                ? autor.NombreUsuario.Substring(0, 1).ToUpper()
+                : "?";
+        }
+
+        return new AuditoriaSeguimientoResponse
+        {
+            Id = report.Id,
+            Titulo = report.Titulo,
+            Contenido = report.Contenido,
+            Anonimo = esAnonimo,
+            Direccion = report.Direccion,
+            Estado = report.Estado,
+            CreateAt = report.CreateAt,
+            UpdateAt = report.UpdateAt,
+
+            Autor = esAnonimo ? new UsuarioResponseDto
+            {
+                NombreUsuario = "Anónimo",
+                FotoPerfil = null
+            }
+            : autor == null ? null : new UsuarioResponseDto
+            {
+                Id = autor.Id,
+                NombreUsuario = autor.NombreUsuario,
+                Email = autor.Email,
+                FotoPerfil = autor.FotoPerfil,
+                FechaNacimiento = autor.FechaNacimiento,
+                Genero = autor.Genero,
+                EstadoCuenta = autor.EstadoCuenta,
+                CreateAt = autor.CreateAt,
+                UpdateAt = autor.UpdateAt
+            },
+
+            InicialNombre = inicial,
+
+            Comunidad = report.Comunidad == null ? null : new ComunidadDto
+            {
+                Id = report.Comunidad.Id,
+                Nombre = report.Comunidad.Nombre,
+                Descripcion = report.Comunidad.Descripcion,
+                Logo = report.Comunidad.Logo,
+                Cover = report.Comunidad.Cover,
+                Estado = report.Comunidad.Estado
+            },
+
+            Fotos = report.Fotos.Select(f => new FotoDto
+            {
+                Id = f.Id,
+                Image = f.Image
+            }).ToList(),
+
+            Tags = report.Tags.Select(t => new TagDto
+            {
+                Id = t.Id,
+                Nombre = t.Nombre
+            }).ToList()
+        };
     }
 
-    return new AuditoriaSeguimientoResponse
+public async Task CambiarEstadoAsync(long reporteId, AuditoriaEstadoDto dto, Guid usuarioId)
+{
+    var reporte = await _reportRepository.GetByIdAsync(reporteId);
+    if (reporte == null)
+        throw new ArgumentException("Reporte no encontrado");
+
+    // Mapea estados si es necesario, asegurándote que coincidan con los CHECK constraints
+    string estadoAnteriorMapeado = MapEstadoSeguimiento(dto.EstadoAnterior);
+    string estadoMapeado = MapEstadoSeguimiento(dto.Estado);
+
+    var seguimiento = new SeguimientoReporte
     {
-        Id = report.Id,
-        Titulo = report.Titulo,
-        Contenido = report.Contenido,
-        Anonimo = esAnonimo,
-        Direccion = report.Direccion,
-        Estado = report.Estado,
-        CreateAt = report.CreateAt,
-        UpdateAt = report.UpdateAt,
+        ReporteId = reporteId,
+        UsuarioId = usuarioId,
+        EstadoAnterior = estadoAnteriorMapeado,
+        Estado = estadoMapeado,
+        Comentario = dto.Comentario ?? string.Empty,
+        CreateAt = DateTime.UtcNow,
+        UpdateAt = DateTime.UtcNow,
+        AccionRealizada = "Cambio de estado",
+        Prioridad = "Media",
+        DocumentosAdjuntos = false
+    };
 
-        Autor = esAnonimo ? new UsuarioResponseDto
-        {
-            NombreUsuario = "Anónimo",
-            FotoPerfil = null
-        }
-        : autor == null ? null : new UsuarioResponseDto
-        {
-            Id = autor.Id,
-            NombreUsuario = autor.NombreUsuario,
-            Email = autor.Email,
-            FotoPerfil = autor.FotoPerfil,
-            FechaNacimiento = autor.FechaNacimiento,
-            Genero = autor.Genero,
-            EstadoCuenta = autor.EstadoCuenta,
-            CreateAt = autor.CreateAt,
-            UpdateAt = autor.UpdateAt
-        },
+    await _seguimientoRepository.AddAsync(seguimiento);
 
-        InicialNombre = inicial,
+    // Actualizar estado del reporte
+    reporte.Estado = dto.Estado;
+    _reportRepository.Update(reporte);
 
-        Comunidad = report.Comunidad == null ? null : new ComunidadDto
-        {
-            Id = report.Comunidad.Id,
-            Nombre = report.Comunidad.Nombre,
-            Descripcion = report.Comunidad.Descripcion,
-            Logo = report.Comunidad.Logo,
-            Cover = report.Comunidad.Cover,
-            Estado = report.Comunidad.Estado
-        },
+    await _reportRepository.SaveChangesAsync();
+    await _seguimientoRepository.SaveChangesAsync();
+}
 
-        Fotos = report.Fotos.Select(f => new FotoDto
-        {
-            Id = f.Id,
-            Image = f.Image
-        }).ToList(),
-
-        Tags = report.Tags.Select(t => new TagDto
-        {
-            Id = t.Id,
-            Nombre = t.Nombre
-        }).ToList()
+private string MapEstadoSeguimiento(string estado)
+{
+    // Mapear estados del dto a los permitidos en la tabla seguimiento_reportes
+    // Ejemplo:
+    return estado switch
+    {
+        "Pendiente_Moderacion" => "Pendiente de Revision",
+        "Aprobado" => "Revisado",
+        "En_Seguimiento" => "En Progreso",
+        "En_Proceso" => "En Progreso",
+        "Rechazado" => "Cancelado",
+        "Resuelto" => "Resuelto",
+        _ => throw new ArgumentException($"Estado inválido: {estado}")
     };
 }
+
+
+
+
+
 
 
 

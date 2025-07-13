@@ -116,4 +116,13 @@ updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<
   return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
 }
 
+// Define aquí la forma esperada del objeto DTO inline, sin importar un import que no existe
+cambiarEstadoPorSeguimiento(
+  reporteId: number,
+  dto: { estadoAnterior: string; estado: string; comentario: string }
+): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/seguimientoReporte/cambiar-estado/${reporteId}`, dto);
+}
+
+
 }

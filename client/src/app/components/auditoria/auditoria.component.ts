@@ -222,71 +222,35 @@ cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
     }
   }
 
-  aplicarCambioEstado() {
-    if (!this.selectedReport || !this.currentStatusChange) return;
+aplicarCambioEstado() {
+  if (!this.selectedReport || !this.currentStatusChange) return;
 
-    const reporteActualizado = {
-      ...this.selectedReport,
-      estado: this.currentStatusChange as EstadoReporte,
-    };
-console.log('Enviando a updateReporte:', reporteActualizado);
-    this.reporteService
-      .updateReporte(this.selectedReport.id!, reporteActualizado)
-      .subscribe({
-        next: () => {
-          this.seguimientoService
-            .getSeguimientosByReporte(this.selectedReport.id!)
-            .subscribe((seguimientos) => {
-              if (seguimientos.length > 0) {
-                const seguimientoExistente = seguimientos[0];
-
-                if (!seguimientoExistente.id) {
-                  console.error('El seguimiento existente no tiene ID');
-                  this.cargarDatos();
-                  this.resetCommentForm();
-                  return;
-                }
-
-                const seguimientoActualizado: Partial<SeguimientoReporte> = {
-                  ...seguimientoExistente,
-                  estado_anterior: this.selectedReport.estado,
-                  estado_nuevo: this.currentStatusChange,
-                  comentario: this.commentText,
-                  accion_realizada: 'Cambio de estado',
-                 accion_recomendada: 'Revisar el reporte',
-                 documentos_adjuntos:
-                    this.selectedReport.documentos_adjuntos || [],
-                  prioridad: PrioridadSeguimientoReporte.MEDIA,
-                  update_at: new Date().toISOString(),
-                };
-                const seguimientoId = seguimientoExistente.id;
-                this.seguimientoService
-                  .update(
-                    Number(seguimientoId),
-                    seguimientoActualizado
-                  )
-                  .subscribe({
-                    next: () => {
-                      this.cargarDatos();
-                      this.resetCommentForm();
-                    },
-                    error: (err) => {
-                      console.error('Error al actualizar seguimiento', err);
-                      this.resetCommentForm();
-                    },
-                  });
-              } else {
-                // Crear un nuevo seguimiento...
-                // (mantener el código existente para crear nuevo seguimiento)
-              }
-            });
-        },
-        error: (err) => {
-          console.error('Error al actualizar estado del reporte', err);
-          this.resetCommentForm();
-        },
-      });
+  if (!this.commentText && this.currentStatusChange !== 'Pendiente de Revision') {
+    alert('Debe ingresar un comentario para este cambio de estado');
+    return;
   }
+
+  this.cambiarEstadoConComentario(this.selectedReport, this.currentStatusChange as EstadoReporte, this.commentText);
+}
+cambiarEstadoConComentario(reporte: ReporteCompleto, nuevoEstado: EstadoReporte, comentario: string) {
+  const dto = {
+    estadoAnterior: reporte.estado,
+    estado: nuevoEstado,
+    comentario: comentario
+  };
+
+  this.reporteService.cambiarEstadoPorSeguimiento(reporte.id!, dto).subscribe({
+    next: () => {
+      this.cargarDatos();
+      this.resetCommentForm();
+    },
+    error: (err) => {
+      console.error('Error al cambiar estado con comentario', err);
+      this.resetCommentForm();
+    }
+  });
+}
+
 
   cancelarCambio() {
     this.selectedReport.estado = 'Pendiente de Revision';
