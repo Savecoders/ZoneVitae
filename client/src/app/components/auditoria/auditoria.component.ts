@@ -3,6 +3,7 @@ import { LayoutComponent } from '../shared/layout/layout.component';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { MatTableModule } from '@angular/material/table';
 import { CardComponent } from '../shared/primitives';
+import { environment } from 'environments/environment';
 import {
   LucideAngularModule,
   FileSearch,
@@ -98,7 +99,7 @@ export class AuditoriaComponent {
   currentSeguimientoReport: Reporte | null = null;
 
   // Opciones para los selects
-  seguimientoOptions = ['Denegado', 'Revisado', 'Resuelto'];
+  seguimientoOptions = ['Rechazado', 'Revisado', 'Resuelto'];
   prioridadOptions = ['Baja', 'Media', 'Alta', 'Crítica'];
 
   selectedImage: File | null = null;
@@ -383,26 +384,24 @@ cambiarEstadoConComentario(reporte: ReporteCompleto, nuevoEstado: EstadoReporte,
     this.commentText = '';
   }
 
-  restablecerReporte(reporte: Reporte) {
-    const confirmado = window.confirm(
-      '¿Estás seguro de que deseas restablecer el estado y seguimiento a "Pendiente de Revisión"?'
-    );
-    if (!confirmado) return;
+restablecerReporte(reporte: ReporteCompleto) {
+  const confirmado = window.confirm(
+    '¿Estás seguro de que deseas restablecer el estado y seguimiento a "Pendiente de Revisión"?'
+  );
+  if (!confirmado) return;
 
-    const reporteActualizado: Partial<Reporte> = {
-        id: reporte.id,
-      estado: EstadoReporte.PENDIENTE_REVISION, // Usar el enum
-      estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION, // Usar el enum
-      update_at: new Date().toISOString(),
-    };
+  const url = `${environment.apiUrl}/seguimientoreporte/restablecer/${reporte.id}`;
 
-    this.reporteService
-      .updateReporte(reporte.id!, reporteActualizado)
-      .subscribe({
-        next: () => this.cargarDatos(),
-        error: (err) => console.error('Error al restablecer el reporte', err),
-      });
-  }
+  this.http.post(url, {}).subscribe({
+    next: () => {
+      this.cargarDatos();
+    },
+    error: (err) => {
+      console.error('Error al restablecer el reporte', err);
+    }
+  });
+}
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {

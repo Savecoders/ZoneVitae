@@ -34,6 +34,34 @@ public class SeguimientoReporteController : ControllerBase
         });
 
     }
+    [HttpPost("restablecer/{reporteId}")]
+[Authorize]
+public async Task<IActionResult> RestablecerReporte(long reporteId)
+{
+    try
+    {
+        var usuarioIdStr = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out Guid usuarioId))
+            return Unauthorized(new { error = "Usuario no autenticado." });
+
+        // Creamos un DTO genérico para el seguimiento
+        var dto = new AuditoriaEstadoDto
+        {
+            EstadoAnterior = "Eliminado", // opcional, no afecta si no se usa
+            Estado = "Pendiente de Revision",
+            Comentario = "Eliminado lógicamente. Restablecido a estado inicial."
+        };
+
+        await _seguimientoService.CambiarEstadoAsync(reporteId, dto, usuarioId);
+
+        return Ok(new { message = "Reporte restablecido exitosamente." });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
+
 
 [HttpPost("cambiar-estado/{reporteId}")]
 [Authorize] // requiere usuario autenticado
