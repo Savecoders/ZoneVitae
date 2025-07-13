@@ -68,7 +68,7 @@ export class AuditoriaComponent {
     'comunidad',
     'fecha',
     'estado',
-    'seguimiento',
+   // 'seguimiento',
     'acciones',
   ];
   dataSource: ReporteCompleto[] = [];
