@@ -47,7 +47,7 @@ public async Task<IActionResult> RestablecerReporte(long reporteId)
         // Creamos un DTO genérico para el seguimiento
         var dto = new AuditoriaEstadoDto
         {
-            EstadoAnterior = "Eliminado", // opcional, no afecta si no se usa
+            EstadoAnterior = "Pendiente de Revision", // opcional, no afecta si no se usa
             Estado = "Pendiente de Revision",
             Comentario = "Eliminado lógicamente. Restablecido a estado inicial."
         };
