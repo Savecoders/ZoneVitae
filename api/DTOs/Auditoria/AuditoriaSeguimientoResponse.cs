@@ -3,7 +3,7 @@ using api.DTOs.Usuario;
 
 namespace api.DTOs.Reports
 {
-    public class ReportResponseDto
+    public class AuditoriaSeguimientoResponse
     {
         public long Id { get; set; }
         public string Titulo { get; set; } = null!;

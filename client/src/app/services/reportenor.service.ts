@@ -30,6 +30,24 @@ export class ReportenorService extends BaseService<Reporte> {
     );
   }
 
+getReporteCompleto(): Observable<ReporteCompleto[]> {
+  return this.http.get<{ message: string; data: any[] }>(`${environment.apiUrl}/seguimientoReporte`).pipe(
+    map(response => {
+      return response.data.map((reporte) => ({
+        ...reporte,
+        create_at: reporte.createAt,
+        update_at: reporte.updateAt,
+        autor: {
+          ...reporte.autor,
+          create_at: reporte.autor?.createAt,
+          update_at: reporte.autor?.updateAt,
+        }
+      }));
+    })
+  );
+}
+
+
   // Get report by id
   getReporteById(id: number): Observable<Reporte> {
     return this.getById(id);
@@ -97,5 +115,14 @@ crearSeguimientoReporte(seguimiento: SeguimientoReporte): Observable<Seguimiento
 updateSeguimiento(id: number, cambios: Partial<SeguimientoReporte>): Observable<SeguimientoReporte> {
   return this.http.patch<SeguimientoReporte>(`${this.baseUrl.replace('/reports', '')}/seguimiento_reportes/${id}`, cambios);
 }
+
+// Define aquí la forma esperada del objeto DTO inline, sin importar un import que no existe
+cambiarEstadoPorSeguimiento(
+  reporteId: number,
+  dto: { estadoAnterior: string; estado: string; comentario: string }
+): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/seguimientoReporte/cambiar-estado/${reporteId}`, dto);
+}
+
 
 }

@@ -3,6 +3,7 @@ import { LayoutComponent } from '../shared/layout/layout.component';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { MatTableModule } from '@angular/material/table';
 import { CardComponent } from '../shared/primitives';
+import { environment } from 'environments/environment';
 import {
   LucideAngularModule,
   FileSearch,
@@ -70,7 +71,7 @@ export class AuditoriaComponent {
     'seguimiento',
     'acciones',
   ];
-  dataSource: Reporte[] = [];
+  dataSource: ReporteCompleto[] = [];
   comunidades: Comunidad[] = [];
   loading = true;
   filtroBusqueda: string = '';
@@ -98,7 +99,7 @@ export class AuditoriaComponent {
   currentSeguimientoReport: Reporte | null = null;
 
   // Opciones para los selects
-  seguimientoOptions = ['Denegado', 'Revisado', 'Resuelto'];
+  seguimientoOptions = ['Rechazado', 'Revisado', 'Resuelto'];
   prioridadOptions = ['Baja', 'Media', 'Alta', 'Crítica'];
 
   selectedImage: File | null = null;
@@ -159,30 +160,22 @@ export class AuditoriaComponent {
         .toLowerCase()
         .includes(textoBusqueda);
 
-      const nombreComunidad = this.getNombreComunidad(
-        reporte.comunidad_id
-      ).toLowerCase();
+      const nombreComunidad = reporte.comunidad?.nombre?.toLowerCase() || '';
+
       const coincideComunidad = nombreComunidad.includes(textoBusqueda);
 
       return coincideTitulo || coincideComunidad;
     });
   }
   cargarDatos(): void {
-    this.reporteService.getReportes().subscribe((reportes) => {
-      this.dataSource = reportes.map((reporte) => ({
-        ...reporte,
-        nombreComunidad: this.getNombreComunidad(reporte.comunidad_id),
-      }));
+    this.reporteService.getReporteCompleto().subscribe((reportes: ReporteCompleto[]) => {
+      this.dataSource = reportes;
     });
   }
 
-  getNombreComunidad(comunidadId: number | null | undefined): string {
-    if (!comunidadId) return 'Sin comunidad';
-    const comunidad = this.comunidadesData?.find(
-      (c: any) => Number(c.id) === Number(comunidadId)
-    );
-    return comunidad?.nombre || 'Comunidad desconocida';
-  }
+getNombreComunidad(reporte: ReporteCompleto): string {
+  return reporte.comunidad?.nombre || 'Sin comunidad';
+}
 
   formatearFecha(create_at: string | Date | undefined): string {
     if (!create_at) return '--';
@@ -215,8 +208,7 @@ cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
 
     return this.dataSource.filter((reporte) => {
       const titulo = reporte.titulo?.toLowerCase() || '';
-      const comunidad =
-        this.getNombreComunidad(reporte.comunidad_id)?.toLowerCase() || '';
+      const comunidad = this.getNombreComunidad(reporte)?.toLowerCase() || '';
       return titulo.includes(termino) || comunidad.includes(termino);
     });
   }
@@ -231,71 +223,35 @@ cambiarEstado(reporte: Reporte, nuevoEstado: EstadoReporte): void {
     }
   }
 
-  aplicarCambioEstado() {
-    if (!this.selectedReport || !this.currentStatusChange) return;
+aplicarCambioEstado() {
+  if (!this.selectedReport || !this.currentStatusChange) return;
 
-    const reporteActualizado = {
-      ...this.selectedReport,
-      estado: this.currentStatusChange as EstadoReporte,
-    };
-console.log('Enviando a updateReporte:', reporteActualizado);
-    this.reporteService
-      .updateReporte(this.selectedReport.id!, reporteActualizado)
-      .subscribe({
-        next: () => {
-          this.seguimientoService
-            .getSeguimientosByReporte(this.selectedReport.id!)
-            .subscribe((seguimientos) => {
-              if (seguimientos.length > 0) {
-                const seguimientoExistente = seguimientos[0];
-
-                if (!seguimientoExistente.id) {
-                  console.error('El seguimiento existente no tiene ID');
-                  this.cargarDatos();
-                  this.resetCommentForm();
-                  return;
-                }
-
-                const seguimientoActualizado: Partial<SeguimientoReporte> = {
-                  ...seguimientoExistente,
-                  estado_anterior: this.selectedReport.estado,
-                  estado_nuevo: this.currentStatusChange,
-                  comentario: this.commentText,
-                  accion_realizada: 'Cambio de estado',
-                 accion_recomendada: 'Revisar el reporte',
-                 documentos_adjuntos:
-                    this.selectedReport.documentos_adjuntos || [],
-                  prioridad: PrioridadSeguimientoReporte.MEDIA,
-                  update_at: new Date().toISOString(),
-                };
-                const seguimientoId = seguimientoExistente.id;
-                this.seguimientoService
-                  .update(
-                    Number(seguimientoId),
-                    seguimientoActualizado
-                  )
-                  .subscribe({
-                    next: () => {
-                      this.cargarDatos();
-                      this.resetCommentForm();
-                    },
-                    error: (err) => {
-                      console.error('Error al actualizar seguimiento', err);
-                      this.resetCommentForm();
-                    },
-                  });
-              } else {
-                // Crear un nuevo seguimiento...
-                // (mantener el código existente para crear nuevo seguimiento)
-              }
-            });
-        },
-        error: (err) => {
-          console.error('Error al actualizar estado del reporte', err);
-          this.resetCommentForm();
-        },
-      });
+  if (!this.commentText && this.currentStatusChange !== 'Pendiente de Revision') {
+    alert('Debe ingresar un comentario para este cambio de estado');
+    return;
   }
+
+  this.cambiarEstadoConComentario(this.selectedReport, this.currentStatusChange as EstadoReporte, this.commentText);
+}
+cambiarEstadoConComentario(reporte: ReporteCompleto, nuevoEstado: EstadoReporte, comentario: string) {
+  const dto = {
+    estadoAnterior: reporte.estado,
+    estado: nuevoEstado,
+    comentario: comentario
+  };
+
+  this.reporteService.cambiarEstadoPorSeguimiento(reporte.id!, dto).subscribe({
+    next: () => {
+      this.cargarDatos();
+      this.resetCommentForm();
+    },
+    error: (err) => {
+      console.error('Error al cambiar estado con comentario', err);
+      this.resetCommentForm();
+    }
+  });
+}
+
 
   cancelarCambio() {
     this.selectedReport.estado = 'Pendiente de Revision';
@@ -428,26 +384,24 @@ console.log('Enviando a updateReporte:', reporteActualizado);
     this.commentText = '';
   }
 
-  restablecerReporte(reporte: Reporte) {
-    const confirmado = window.confirm(
-      '¿Estás seguro de que deseas restablecer el estado y seguimiento a "Pendiente de Revisión"?'
-    );
-    if (!confirmado) return;
+restablecerReporte(reporte: ReporteCompleto) {
+  const confirmado = window.confirm(
+    '¿Estás seguro de que deseas restablecer el estado y seguimiento a "Pendiente de Revisión"?'
+  );
+  if (!confirmado) return;
 
-    const reporteActualizado: Partial<Reporte> = {
-        id: reporte.id,
-      estado: EstadoReporte.PENDIENTE_REVISION, // Usar el enum
-      estado_seguimiento: SeguimientoReporteEnum.PENDIENTE_REVISION, // Usar el enum
-      update_at: new Date().toISOString(),
-    };
+  const url = `${environment.apiUrl}/seguimientoreporte/restablecer/${reporte.id}`;
 
-    this.reporteService
-      .updateReporte(reporte.id!, reporteActualizado)
-      .subscribe({
-        next: () => this.cargarDatos(),
-        error: (err) => console.error('Error al restablecer el reporte', err),
-      });
-  }
+  this.http.post(url, {}).subscribe({
+    next: () => {
+      this.cargarDatos();
+    },
+    error: (err) => {
+      console.error('Error al restablecer el reporte', err);
+    }
+  });
+}
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {

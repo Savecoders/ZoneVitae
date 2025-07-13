@@ -1,5 +1,6 @@
 ﻿using api.Models;
 using api.Services.Seguimiento;
+using System.Security.Claims;
 using api.DTOs.Seguimientos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -21,29 +22,71 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpGet]
-    // [Authorize(Roles = "Administrador, Moderador")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<SeguimientoReporteDto>>>> GetAll()
+    //[Authorize]
+    public async Task<IActionResult> GetAll()
     {
-        var seguimientos = await _seguimientoService.GetAllAsync();
-        var seguimientosDto = seguimientos.Select(s => new SeguimientoReporteDto
+        var reports = await _seguimientoService.GetAllMappedAsync();
+
+        return Ok(new
         {
-            Id = s.Id,
-            EstadoAnterior = s.EstadoAnterior,
-            Estado = s.Estado,
-            Comentario = s.Comentario,
-            AccionRealizada = s.AccionRealizada,
-            Prioridad = s.Prioridad,
-            CreateAt = s.CreateAt,
-            UpdateAt = s.UpdateAt
+            message = "Reportes obtenidos correctamente.",
+            data = reports
         });
 
-        return Ok(new ApiResponse<IEnumerable<SeguimientoReporteDto>>
-        {
-            Success = true,
-            Message = "Seguimientos obtenidos exitosamente",
-            Data = seguimientosDto
-        });
     }
+    [HttpPost("restablecer/{reporteId}")]
+[Authorize]
+public async Task<IActionResult> RestablecerReporte(long reporteId)
+{
+    try
+    {
+        var usuarioIdStr = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(usuarioIdStr) || !Guid.TryParse(usuarioIdStr, out Guid usuarioId))
+            return Unauthorized(new { error = "Usuario no autenticado." });
+
+        // Creamos un DTO genérico para el seguimiento
+        var dto = new AuditoriaEstadoDto
+        {
+            EstadoAnterior = "Pendiente de Revision", // opcional, no afecta si no se usa
+            Estado = "Pendiente de Revision",
+            Comentario = "Eliminado lógicamente. Restablecido a estado inicial."
+        };
+
+        await _seguimientoService.CambiarEstadoAsync(reporteId, dto, usuarioId);
+
+        return Ok(new { message = "Reporte restablecido exitosamente." });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
+
+
+[HttpPost("cambiar-estado/{reporteId}")]
+[Authorize] // requiere usuario autenticado
+public async Task<IActionResult> CambiarEstado(long reporteId, [FromBody] AuditoriaEstadoDto dto)
+{
+    try
+    {
+        // Obtén usuario actual desde claims
+        var usuarioIdString = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(usuarioIdString) || !Guid.TryParse(usuarioIdString, out Guid usuarioId))
+            return Unauthorized(new { error = "Usuario no autenticado." });
+
+        await _seguimientoService.CambiarEstadoAsync(reporteId, dto, usuarioId);
+
+        return Ok(new { message = "Estado actualizado correctamente." });
+    }
+    catch (Exception ex)
+    {
+        return BadRequest(new { error = ex.Message });
+    }
+}
+
+
+
+
 
     [HttpGet("{id}")]
     // [Authorize(Roles = "Administrador, Moderador")]

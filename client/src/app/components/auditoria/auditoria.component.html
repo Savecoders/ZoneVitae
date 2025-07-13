@@ -214,7 +214,7 @@
 
               <div>
                 <p class="text-sm text-gray-500">Comunidad</p>
-                <p>{{reporteSeleccionado.comunidad?.nombre || getNombreComunidad(reporteSeleccionado.comunidad_id)}}</p>
+                <p>{{ reporteSeleccionado.comunidad?.nombre || 'Sin comunidad' }}</p>
               </div>
 
               <div>
@@ -305,21 +305,20 @@
 </ng-container>
 
   <!-- Comunidad  -->
-  <ng-container matColumnDef="comunidad" class="bg-transparent">
-    <th mat-header-cell *matHeaderCellDef  > COMUNIDAD </th>
-    <td mat-cell *matCellDef="let reporte">
-      {{getNombreComunidad(reporte.comunidad_id || 0)}}
+<ng-container matColumnDef="comunidad">
+  <th mat-header-cell *matHeaderCellDef> COMUNIDAD </th>
+  <td mat-cell *matCellDef="let reporte">
+    {{ reporte.comunidad?.nombre || 'Sin comunidad' }}
+  </td>
+</ng-container>
 
-    </td>
-  </ng-container>
-
-  <!-- Fecha  -->
-  <ng-container matColumnDef="fecha" class="bg-transparent">
+  Fecha  <ng-container matColumnDef="fecha" class="bg-transparent">
     <th mat-header-cell *matHeaderCellDef > FECHA </th>
     <td mat-cell *matCellDef="let reporte">
       {{formatearFecha(reporte.create_at)}}
     </td>
-  </ng-container>
+</ng-container>
+
 
   <!-- Estado  -->
 <ng-container matColumnDef="estado" class="bg-transparent">

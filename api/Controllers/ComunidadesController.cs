@@ -1,7 +1,7 @@
 ﻿using api.DTOs;
 using api.DTOs.Common;
 using api.DTOs.Comunidad;
-using api.DTOs.Tag;
+
 using api.Services.Comunidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
