@@ -21,29 +21,19 @@ public class SeguimientoReporteController : ControllerBase
     }
 
     [HttpGet]
-    // [Authorize(Roles = "Administrador, Moderador")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<SeguimientoReporteDto>>>> GetAll()
+    //[Authorize]
+    public async Task<IActionResult> GetAll()
     {
-        var seguimientos = await _seguimientoService.GetAllAsync();
-        var seguimientosDto = seguimientos.Select(s => new SeguimientoReporteDto
+        var reports = await _seguimientoService.GetAllMappedAsync();
+
+        return Ok(new
         {
-            Id = s.Id,
-            EstadoAnterior = s.EstadoAnterior,
-            Estado = s.Estado,
-            Comentario = s.Comentario,
-            AccionRealizada = s.AccionRealizada,
-            Prioridad = s.Prioridad,
-            CreateAt = s.CreateAt,
-            UpdateAt = s.UpdateAt
+            message = "Reportes obtenidos correctamente.",
+            data = reports
         });
 
-        return Ok(new ApiResponse<IEnumerable<SeguimientoReporteDto>>
-        {
-            Success = true,
-            Message = "Seguimientos obtenidos exitosamente",
-            Data = seguimientosDto
-        });
     }
+
 
     [HttpGet("{id}")]
     // [Authorize(Roles = "Administrador, Moderador")]
