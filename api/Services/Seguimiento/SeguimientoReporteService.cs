@@ -178,16 +178,19 @@ public async Task CambiarEstadoAsync(long reporteId, AuditoriaEstadoDto dto, Gui
     if (reporte == null)
         throw new ArgumentException("Reporte no encontrado");
 
-    // Mapea estados si es necesario, asegurándote que coincidan con los CHECK constraints
-    string estadoAnteriorMapeado = MapEstadoSeguimiento(dto.EstadoAnterior);
-    string estadoMapeado = MapEstadoSeguimiento(dto.Estado);
+    // Mapea para seguimiento (debe respetar CHECK constraint)
+    string estadoAnteriorMapeado = MapEstadoParaSeguimiento(dto.EstadoAnterior);
+    string estadoSeguimientoMapeado = MapEstadoParaSeguimiento(dto.Estado);
+
+    // Mapea para tabla reports (valores internos)
+    string estadoParaReport = MapEstadoParaBD(dto.Estado);
 
     var seguimiento = new SeguimientoReporte
     {
         ReporteId = reporteId,
         UsuarioId = usuarioId,
         EstadoAnterior = estadoAnteriorMapeado,
-        Estado = estadoMapeado,
+        Estado = estadoSeguimientoMapeado,
         Comentario = dto.Comentario ?? string.Empty,
         CreateAt = DateTime.UtcNow,
         UpdateAt = DateTime.UtcNow,
@@ -198,31 +201,64 @@ public async Task CambiarEstadoAsync(long reporteId, AuditoriaEstadoDto dto, Gui
 
     await _seguimientoRepository.AddAsync(seguimiento);
 
-    // Actualizar estado del reporte
-    reporte.Estado = dto.Estado;
+    reporte.Estado = estadoParaReport;
     _reportRepository.Update(reporte);
 
     await _reportRepository.SaveChangesAsync();
     await _seguimientoRepository.SaveChangesAsync();
 }
 
-private string MapEstadoSeguimiento(string estado)
+
+
+
+// Mapear estado recibido del cliente (frontend) al valor válido en DB
+private string MapEstadoParaBD(string estadoCliente)
 {
-    // Mapear estados del dto a los permitidos en la tabla seguimiento_reportes
-    // Ejemplo:
-    return estado switch
+    return estadoCliente switch
     {
-        "Pendiente_Moderacion" => "Pendiente de Revision",
-        "Aprobado" => "Revisado",
-        "En_Seguimiento" => "En Progreso",
-        "En_Proceso" => "En Progreso",
-        "Rechazado" => "Cancelado",
+        "Pendiente de Revision" => "Pendiente_Moderacion",
+        "Aprobado" => "Aprobado",
+        "Denegado" => "Rechazado",
         "Resuelto" => "Resuelto",
-        _ => throw new ArgumentException($"Estado inválido: {estado}")
+        "En Progreso" => "En_Seguimiento",  // Si usas este en frontend
+        "En_Proceso" => "En_Proceso",       // Si es que usas este
+        _ => throw new ArgumentException($"Estado inválido para la BD: {estadoCliente}")
     };
 }
 
-
+    // Mapear estado desde DB para enviar al cliente (opcional)
+    private string MapEstadoParaCliente(string estadoBD)
+    {
+        return estadoBD switch
+        {
+            "Pendiente_Moderacion" => "Pendiente de Revision",
+            "Aprobado" => "Aprobado",
+            "Rechazado" => "Denegado",
+            "Resuelto" => "Resuelto",
+            "En_Seguimiento" => "En Progreso",
+            "En_Proceso" => "En_Proceso",
+            _ => estadoBD
+        };
+    }
+private string MapEstadoParaSeguimiento(string estado)
+{
+    return estado switch
+    {
+        // Valores que vienen desde frontend o DTO
+        "Pendiente de Revision" => "Pendiente de Revision",
+        "Pendiente_Moderacion" => "Pendiente de Revision", // si llega así
+        "Aprobado" => "Revisado",
+        "Rechazado" => "Cancelado",      // si llega valor interno "Rechazado"
+        "Denegado" => "Cancelado",       // si llega valor cliente "Denegado"
+        "Resuelto" => "Resuelto",
+        "En Progreso" => "En Progreso",
+        "En_Seguimiento" => "En Progreso",  // si llega valor interno "En_Seguimiento"
+        "En_Proceso" => "En Progreso",
+        "Revisado" => "Revisado",
+        "Cancelado" => "Cancelado",
+        _ => throw new ArgumentException($"Estado inválido para seguimiento: {estado}")
+    };
+}
 
 
 
